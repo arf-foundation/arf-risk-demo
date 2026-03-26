@@ -75,6 +75,11 @@
         .approve { background: #d4edda; color: #155724; }
         .escalate { background: #fff3cd; color: #856404; }
         .deny { background: #f8d7da; color: #721c24; }
+        .explanation {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
         footer {
             text-align: center;
             margin-top: 40px;
@@ -99,7 +104,10 @@
                 <div class="result">
                     <strong>Risk score:</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
-                    <strong>Policy decision:</strong> <span id="policyDecision">Approve</span>
+                    <strong>Policy decision:</strong> <span id="policyDecision" class="status escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
+                </div>
+                <div class="explanation">
+                    ⚙️ <strong>Policy thresholds:</strong> Approve if risk &lt; 0.2, Escalate if 0.2 ≤ risk ≤ 0.8, Deny if risk &gt; 0.8.
                 </div>
             </div>
             <div class="col">
@@ -155,22 +163,78 @@
     </footer>
 
     <script>
-        // ---------- Bayesian Risk Engine (Beta-Binomial) ----------
+        // ---------- Exact Beta quantile via binary search ----------
+        function logBeta(a, b) {
+            // Log of Beta function using Lanczos approximation (simplified)
+            // We'll use a simple iterative method for the PDF, but we need the CDF.
+            // Instead, we can use a numerical integration of the Beta PDF.
+            // For simplicity and accuracy, we'll use a binary search on the CDF approximated via Simpson's rule.
+            // This is a one-time per interval, so it's fine for interactive use.
+            function betaPDF(x, a, b) {
+                if (x <= 0) return 0;
+                if (x >= 1) return 0;
+                // Using natural logs to avoid overflow
+                const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBetaFunc(a, b);
+                return Math.exp(logPDF);
+            }
+            function logBetaFunc(a, b) {
+                // Lanczos approximation for log Beta (courtesy of Wikipedia)
+                const gamma = (z) => {
+                    const g = 7;
+                    const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                              771.32342877765313, -176.61502916214059, 12.507343278686905,
+                              -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                    if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+                    z -= 1;
+                    let x = p[0];
+                    for (let i = 1; i < g+2; i++) x += p[i] / (z + i);
+                    const t = z + g + 0.5;
+                    return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+                };
+                return Math.log(gamma(a)) + Math.log(gamma(b)) - Math.log(gamma(a + b));
+            }
+            return logBetaFunc(a, b);
+        }
+
+        function betaCDF(x, a, b) {
+            // Regularized incomplete beta function (using series expansion)
+            // We'll use a simple numerical integration via Simpson's rule for simplicity and accuracy.
+            if (x <= 0) return 0;
+            if (x >= 1) return 1;
+            const N = 200; // integration steps
+            const dx = x / N;
+            let sum = 0;
+            for (let i = 0; i <= N; i++) {
+                const t = i * dx;
+                const w = (i === 0 || i === N) ? 1 : (i % 2 === 0 ? 2 : 4);
+                const pdf = betaPDF(t, a, b);
+                sum += w * pdf;
+            }
+            return sum * dx / 3;
+        }
+
+        function betaQuantile(p, a, b, tol = 1e-6) {
+            // Binary search for x such that CDF(x) = p
+            let lo = 0, hi = 1;
+            while (hi - lo > tol) {
+                const mid = (lo + hi) / 2;
+                const cdf = betaCDF(mid, a, b);
+                if (cdf < p) lo = mid;
+                else hi = mid;
+            }
+            return (lo + hi) / 2;
+        }
+
         function computeRisk(failures, successes) {
             const alpha = 1 + failures;
-            const beta = 1 + successes;
-            const risk = alpha / (alpha + beta);
-            // approximate credible interval using normal approximation for speed (or use exact beta quantiles via js? We'll use approximation)
-            // Better: use exact beta quantiles? Plotly doesn't have beta, but we can approximate with normal for demo.
-            const varRisk = (alpha * beta) / (Math.pow(alpha + beta, 2) * (alpha + beta + 1));
-            const se = Math.sqrt(varRisk);
-            const z = 1.96;
-            let lo = Math.max(0, risk - z * se);
-            let hi = Math.min(1, risk + z * se);
-            // For exact, we could use jStat or compute manually, but this is fine for demo.
+            const betaParam = 1 + successes;
+            const risk = alpha / (alpha + betaParam);
+            const lo = betaQuantile(0.025, alpha, betaParam);
+            const hi = betaQuantile(0.975, alpha, betaParam);
             return { risk, lo, hi };
         }
 
+        // Update UI
         function updateRiskUI() {
             const failures = parseFloat(document.getElementById('failures').value) || 0;
             const successes = parseFloat(document.getElementById('successes').value) || 0;
@@ -214,7 +278,7 @@
             Plotly.newPlot('gaugeChart', gaugeData, { margin: { t: 50, b: 30, l: 50, r: 50 } });
         }
 
-        // Infrastructure evaluation (map fault to failures/successes)
+        // Infrastructure evaluation
         const faultMap = {
             none: [1, 99],
             switch_down: [20, 80],
@@ -257,7 +321,7 @@
             Plotly.newPlot('intentGauge', gaugeData, { margin: { t: 50, b: 30, l: 50, r: 50 } });
         }
 
-        // ---------- MCMC (Metropolis-Hastings) ----------
+        // ---------- MCMC (unchanged) ----------
         function runMCMC() {
             const nSamples = parseInt(document.getElementById('samples').value);
             const burnIn = parseInt(document.getElementById('warmup').value);
@@ -265,11 +329,7 @@
 
             // Data: 10 observations with mean 0.5, sd 0.2 (simulated)
             const data = [0.45, 0.62, 0.48, 0.51, 0.55, 0.49, 0.47, 0.53, 0.52, 0.50];
-            // Prior: N(0,1)
-            function logPrior(mu) {
-                return -0.5 * mu * mu;
-            }
-            // Likelihood: N(mu, 0.2^2)
+            function logPrior(mu) { return -0.5 * mu * mu; }
             function logLikelihood(mu) {
                 let ll = 0;
                 for (let i = 0; i < data.length; i++) {
@@ -278,11 +338,8 @@
                 }
                 return ll;
             }
-            function logPosterior(mu) {
-                return logPrior(mu) + logLikelihood(mu);
-            }
+            function logPosterior(mu) { return logPrior(mu) + logLikelihood(mu); }
 
-            // MCMC
             let current = 0.0;
             let currentLog = logPosterior(current);
             const samples = [];
@@ -303,7 +360,6 @@
             }
             const acceptanceRate = accepted / total;
 
-            // Compute summary
             const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
             samples.sort((a,b)=>a-b);
             const median = samples[Math.floor(samples.length/2)];
@@ -345,7 +401,7 @@
             });
         }
 
-        // Initialisation
+        // Event listeners
         document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
         document.getElementById('evaluateIntentBtn').addEventListener('click', evaluateIntent);
         document.getElementById('runMCMC').addEventListener('click', runMCMC);
