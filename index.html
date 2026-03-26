@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARF – Bayesian Risk Scoring Demo</title>
+    <title>ARF – Bayesian Risk Scoring Demo (Comprehensive)</title>
     <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: auto;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
             background: #f5f7fa;
             color: #1a2634;
@@ -28,6 +31,7 @@
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
+            margin-bottom: 20px;
         }
         .col {
             flex: 1;
@@ -71,6 +75,7 @@
             padding: 8px;
             border-radius: 6px;
             text-align: center;
+            margin: 10px 0;
         }
         .approve { background: #d4edda; color: #155724; }
         .escalate { background: #fff3cd; color: #856404; }
@@ -80,34 +85,57 @@
             color: #6c757d;
             margin-top: 5px;
         }
+        .inline-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .inline-group > * {
+            flex: 1;
+        }
         footer {
             text-align: center;
             margin-top: 40px;
             font-size: 0.8em;
             color: #6c757d;
         }
+        .badge {
+            font-size: 0.8em;
+            background: #e9ecef;
+            border-radius: 12px;
+            padding: 2px 8px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
-    <h1>🧠 ARF – Bayesian Risk Scoring Demo</h1>
+    <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge">v4 OSS</span></h1>
     <p><strong>Deterministic Probability Thresholding & Hybrid Bayesian Inference</strong> – fully client-side simulation.</p>
 
     <div class="card">
-        <h2>📊 Risk Scoring (Beta-Binomial Conjugate)</h2>
+        <h2>📊 Risk Scoring (Beta‑Binomial Conjugate)</h2>
         <div class="row">
             <div class="col">
+                <label>Category:</label>
+                <select id="category">
+                    <option value="default">Default (α=1.0, β=10.0)</option>
+                    <option value="database">Database (α=1.5, β=8.0)</option>
+                    <option value="network">Network (α=1.2, β=10.0)</option>
+                    <option value="compute">Compute (α=1.0, β=12.0)</option>
+                    <option value="security">Security (α=2.0, β=10.0)</option>
+                </select>
                 <label>Failures (observations of failure):</label>
                 <input type="number" id="failures" value="20" min="0" step="1">
                 <label>Successes (observations of success):</label>
                 <input type="number" id="successes" value="80" min="0" step="1">
                 <button id="updateRiskBtn">Update Risk</button>
                 <div class="result">
-                    <strong>Risk score:</strong> <span id="riskScore">0.20</span><br>
+                    <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
                     <strong>Policy decision:</strong> <span id="policyDecision" class="status escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
                 </div>
                 <div class="explanation">
-                    ⚙️ <strong>Policy thresholds:</strong> Approve if risk &lt; 0.2, Escalate if 0.2 ≤ risk ≤ 0.8, Deny if risk &gt; 0.8.
+                    📌 <strong>Deterministic Probability Thresholding (DPT):</strong> Approve if risk &lt; 0.2, Escalate if 0.2 ≤ risk ≤ 0.8, Deny if risk &gt; 0.8.
                 </div>
             </div>
             <div class="col">
@@ -117,8 +145,56 @@
     </div>
 
     <div class="card">
+        <h2>🧩 Hybrid Risk Engine (Online + Offline)</h2>
+        <div class="row">
+            <div class="col">
+                <label>HMC prediction (offline, simulated):</label>
+                <input type="range" id="hmcPred" min="0" max="1" step="0.01" value="0.35">
+                <span id="hmcVal">0.35</span>
+                <label>Weight of HMC (0-1):</label>
+                <input type="range" id="hmcWeight" min="0" max="1" step="0.01" value="0.3">
+                <span id="weightVal">0.30</span>
+                <button id="updateHybrid">Update Hybrid Risk</button>
+                <div class="result">
+                    <strong>Online risk (conjugate):</strong> <span id="onlineRisk">-</span><br>
+                    <strong>Hybrid risk (weighted average):</strong> <span id="hybridRisk">-</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="explanation">
+                    🧠 ARF blends online Beta‑Binomial updates with offline HMC‑learned patterns. The weight adjusts based on available data (here simulated with a slider). In production, weights are data‑driven.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📚 Semantic Memory (Similar Past Incidents)</h2>
+        <div class="row">
+            <div class="col">
+                <label>Select a scenario:</label>
+                <select id="memoryScenario">
+                    <option value="highLatency">High latency (latency_p99=450ms)</option>
+                    <option value="highErrorRate">High error rate (5% errors)</option>
+                    <option value="cpuSpike">CPU spike (90% utilisation)</option>
+                    <option value="normal">Normal operation</option>
+                </select>
+                <button id="retrieveMemory">Retrieve Similar Incidents</button>
+                <div id="memoryResult" class="result">
+                    Click to see similar incidents.
+                </div>
+            </div>
+            <div class="col">
+                <div class="explanation">
+                    📖 Semantic memory stores past incidents as embeddings. When evaluating an intent, ARF retrieves the most similar historical cases and uses their outcomes to adjust the risk estimate. Here we simulate a small memory store.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
         <h2>🏗️ Infrastructure Intent Evaluation</h2>
-        <p>Simulate a fault type and see how the risk score changes.</p>
+        <p>Simulate a fault type and see the final risk, decision, and healing actions.</p>
         <div class="row">
             <div class="col">
                 <label>Fault type:</label>
@@ -141,7 +217,7 @@
 
     <div class="card">
         <h2>🔄 Markov Chain Monte Carlo (Metropolis-Hastings)</h2>
-        <p>Sample from the posterior of a normal mean using MCMC.</p>
+        <p>Sample from the posterior of a normal mean using MCMC (simulating HMC).</p>
         <div class="row">
             <div class="col">
                 <label>Number of samples:</label>
@@ -159,112 +235,106 @@
     </div>
 
     <footer>
-        <p>ARF v4 – Bayesian Risk Scoring Demo | <a href="https://github.com/arf-foundation/agentic_reliability_framework" target="_blank">GitHub Repository</a></p>
+        <p>ARF v4 – Bayesian Risk Scoring Demo | <a href="https://github.com/arf-foundation/agentic_reliability_framework" target="_blank">GitHub Repository</a> | <a href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4" target="_blank">Hugging Face Space</a></p>
     </footer>
 
     <script>
-        // ---------- Exact Beta quantile via binary search ----------
-        function logBeta(a, b) {
-            // Log of Beta function using Lanczos approximation (simplified)
-            // We'll use a simple iterative method for the PDF, but we need the CDF.
-            // Instead, we can use a numerical integration of the Beta PDF.
-            // For simplicity and accuracy, we'll use a binary search on the CDF approximated via Simpson's rule.
-            // This is a one-time per interval, so it's fine for interactive use.
-            function betaPDF(x, a, b) {
-                if (x <= 0) return 0;
-                if (x >= 1) return 0;
-                // Using natural logs to avoid overflow
-                const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBetaFunc(a, b);
-                return Math.exp(logPDF);
-            }
-            function logBetaFunc(a, b) {
-                // Lanczos approximation for log Beta (courtesy of Wikipedia)
-                const gamma = (z) => {
-                    const g = 7;
-                    const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-                              771.32342877765313, -176.61502916214059, 12.507343278686905,
-                              -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-                    if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
-                    z -= 1;
-                    let x = p[0];
-                    for (let i = 1; i < g+2; i++) x += p[i] / (z + i);
-                    const t = z + g + 0.5;
-                    return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
-                };
-                return Math.log(gamma(a)) + Math.log(gamma(b)) - Math.log(gamma(a + b));
-            }
-            return logBetaFunc(a, b);
+        // ---------- Helper: Beta quantile via binary search ----------
+        function betaPDF(x, a, b) {
+            if (x <= 0 || x >= 1) return 0;
+            const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
+            return Math.exp(logPDF);
         }
-
+        function logBeta(a, b) {
+            // Lanczos approximation for log Gamma
+            function logGamma(z) {
+                const g = 7;
+                const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                          771.32342877765313, -176.61502916214059, 12.507343278686905,
+                          -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                if (z < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+                z -= 1;
+                let x = p[0];
+                for (let i = 1; i < g+2; i++) x += p[i] / (z + i);
+                const t = z + g + 0.5;
+                return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+            }
+            return logGamma(a) + logGamma(b) - logGamma(a + b);
+        }
         function betaCDF(x, a, b) {
-            // Regularized incomplete beta function (using series expansion)
-            // We'll use a simple numerical integration via Simpson's rule for simplicity and accuracy.
+            // Simpson integration
             if (x <= 0) return 0;
             if (x >= 1) return 1;
-            const N = 200; // integration steps
-            const dx = x / N;
+            const n = 200;
+            const dx = x / n;
             let sum = 0;
-            for (let i = 0; i <= N; i++) {
+            for (let i = 0; i <= n; i++) {
                 const t = i * dx;
-                const w = (i === 0 || i === N) ? 1 : (i % 2 === 0 ? 2 : 4);
-                const pdf = betaPDF(t, a, b);
-                sum += w * pdf;
+                const w = (i === 0 || i === n) ? 1 : (i % 2 === 0 ? 2 : 4);
+                sum += w * betaPDF(t, a, b);
             }
             return sum * dx / 3;
         }
-
         function betaQuantile(p, a, b, tol = 1e-6) {
-            // Binary search for x such that CDF(x) = p
             let lo = 0, hi = 1;
             while (hi - lo > tol) {
                 const mid = (lo + hi) / 2;
-                const cdf = betaCDF(mid, a, b);
-                if (cdf < p) lo = mid;
+                if (betaCDF(mid, a, b) < p) lo = mid;
                 else hi = mid;
             }
             return (lo + hi) / 2;
         }
 
-        function computeRisk(failures, successes) {
-            const alpha = 1 + failures;
-            const betaParam = 1 + successes;
-            const risk = alpha / (alpha + betaParam);
-            const lo = betaQuantile(0.025, alpha, betaParam);
-            const hi = betaQuantile(0.975, alpha, betaParam);
-            return { risk, lo, hi };
+        // Category priors (alpha, beta)
+        const categoryMap = {
+            default: [1.0, 10.0],
+            database: [1.5, 8.0],
+            network: [1.2, 10.0],
+            compute: [1.0, 12.0],
+            security: [2.0, 10.0]
+        };
+
+        // Global variables
+        let currentPriorAlpha = 1.0, currentPriorBeta = 10.0;
+        let currentFailures = 20, currentSuccesses = 80;
+        let onlineRisk = 0.0;
+        let hybridRisk = 0.0;
+
+        // Update risk using current prior + observations
+        function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
+            const alpha = priorAlpha + failures;
+            const beta = priorBeta + successes;
+            const risk = alpha / (alpha + beta);
+            const lo = betaQuantile(0.025, alpha, beta);
+            const hi = betaQuantile(0.975, alpha, beta);
+            return { risk, lo, hi, alpha, beta };
         }
 
-        // Update UI
+        // Update UI for the risk scoring card
         function updateRiskUI() {
+            const category = document.getElementById('category').value;
+            [currentPriorAlpha, currentPriorBeta] = categoryMap[category];
             const failures = parseFloat(document.getElementById('failures').value) || 0;
             const successes = parseFloat(document.getElementById('successes').value) || 0;
-            const { risk, lo, hi } = computeRisk(failures, successes);
+            currentFailures = failures;
+            currentSuccesses = successes;
+            const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
+            onlineRisk = risk;
+
             document.getElementById('riskScore').innerText = risk.toFixed(4);
             document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
-
-            // Policy thresholds
-            let decision = '';
-            let statusClass = '';
-            if (risk < 0.2) {
-                decision = 'Approve (risk < 0.2)';
-                statusClass = 'approve';
-            } else if (risk > 0.8) {
-                decision = 'Deny (risk > 0.8)';
-                statusClass = 'deny';
-            } else {
-                decision = 'Escalate (0.2 ≤ risk ≤ 0.8)';
-                statusClass = 'escalate';
-            }
+            const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
+            const statusClass = risk < 0.2 ? 'approve' : (risk > 0.8 ? 'deny' : 'escalate');
             const decisionSpan = document.getElementById('policyDecision');
-            decisionSpan.innerText = decision;
+            decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
             decisionSpan.className = `status ${statusClass}`;
 
-            // Update gauge chart
+            // Update gauge
             const gaugeData = [{
                 type: "indicator",
                 mode: "gauge+number",
                 value: risk,
-                title: { text: "Current Risk" },
+                title: { text: "Risk Score" },
                 gauge: {
                     axis: { range: [0, 1] },
                     bar: { color: "darkblue" },
@@ -276,38 +346,86 @@
                 }
             }];
             Plotly.newPlot('gaugeChart', gaugeData, { margin: { t: 50, b: 30, l: 50, r: 50 } });
+
+            // Update hybrid panel
+            document.getElementById('onlineRisk').innerText = risk.toFixed(4);
+            updateHybridRisk();
         }
 
-        // Infrastructure evaluation
+        // Hybrid risk blending
+        function updateHybridRisk() {
+            const hmcVal = parseFloat(document.getElementById('hmcPred').value);
+            const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
+            document.getElementById('hmcVal').innerText = hmcVal.toFixed(3);
+            document.getElementById('weightVal').innerText = hmcWeight.toFixed(3);
+            const hybrid = onlineRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
+            hybridRisk = hybrid;
+            document.getElementById('hybridRisk').innerText = hybrid.toFixed(4);
+        }
+
+        // Memory simulation (predefined incidents)
+        const memoryStore = {
+            highLatency: [
+                { description: "Latency spike to 450ms → escalated, later resolved with restart.", outcome: "escalate", risk: 0.65 },
+                { description: "Similar latency spike → HMC detected pattern → approved with auto‑scaling.", outcome: "approve", risk: 0.28 }
+            ],
+            highErrorRate: [
+                { description: "Error rate 5% → caused by misconfigured endpoint → denied.", outcome: "deny", risk: 0.92 },
+                { description: "Transient error spike → approved after analysis → risk 0.31", outcome: "approve", risk: 0.31 }
+            ],
+            cpuSpike: [
+                { description: "CPU 90% for 5 min → escalated, later scaled up.", outcome: "escalate", risk: 0.72 },
+                { description: "CPU spike during batch job → approved with warning.", outcome: "approve", risk: 0.41 }
+            ],
+            normal: [
+                { description: "Normal operation → approved.", outcome: "approve", risk: 0.12 }
+            ]
+        };
+        function retrieveMemory() {
+            const scenario = document.getElementById('memoryScenario').value;
+            const incidents = memoryStore[scenario];
+            let html = '<strong>Similar past incidents:</strong><ul>';
+            incidents.forEach(inc => {
+                html += `<li>${inc.description} (outcome: ${inc.outcome}, risk: ${inc.risk.toFixed(2)})</li>`;
+            });
+            html += '</ul><div class="explanation">These incidents influence the risk estimate through semantic similarity. In production, embeddings and FAISS are used to retrieve the top-k closest cases.</div>';
+            document.getElementById('memoryResult').innerHTML = html;
+        }
+
+        // Infrastructure intent evaluation (uses hybrid risk)
         const faultMap = {
             none: [1, 99],
             switch_down: [20, 80],
             server_overload: [35, 65],
             cascade: [60, 40]
         };
-
         function evaluateIntent() {
             const fault = document.getElementById('faultType').value;
             const [failures, successes] = faultMap[fault];
-            const { risk, lo, hi } = computeRisk(failures, successes);
+            const { risk: baseRisk, lo, hi } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
+            // Hybrid with current HMC settings
+            const hmcVal = parseFloat(document.getElementById('hmcPred').value);
+            const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
+            const finalRisk = baseRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
             let decision = '';
-            if (risk < 0.2) decision = 'Approve';
-            else if (risk > 0.8) decision = 'Deny';
+            if (finalRisk < 0.2) decision = 'Approve';
+            else if (finalRisk > 0.8) decision = 'Deny';
             else decision = 'Escalate';
+            const healingActions = decision === 'Deny' ? ['restart', 'rollback'] : (decision === 'Escalate' ? ['notify_ops', 'investigate'] : ['monitor']);
 
             const resultText = `
-                <strong>Risk score:</strong> ${risk.toFixed(4)}<br>
-                <strong>95% credible interval:</strong> [${lo.toFixed(4)}, ${hi.toFixed(4)}]<br>
-                <strong>Decision:</strong> ${decision}
+                <strong>Online risk:</strong> ${baseRisk.toFixed(4)}<br>
+                <strong>Hybrid risk (w/ HMC):</strong> ${finalRisk.toFixed(4)}<br>
+                <strong>Decision:</strong> ${decision}<br>
+                <strong>Healing actions:</strong> ${healingActions.join(', ')}
             `;
             document.getElementById('intentResult').innerHTML = resultText;
 
-            // Update separate gauge
             const gaugeData = [{
                 type: "indicator",
                 mode: "gauge+number",
-                value: risk,
-                title: { text: "Infrastructure Risk" },
+                value: finalRisk,
+                title: { text: "Final Risk" },
                 gauge: {
                     axis: { range: [0, 1] },
                     bar: { color: "darkblue" },
@@ -321,13 +439,11 @@
             Plotly.newPlot('intentGauge', gaugeData, { margin: { t: 50, b: 30, l: 50, r: 50 } });
         }
 
-        // ---------- MCMC (unchanged) ----------
+        // MCMC (unchanged from previous)
         function runMCMC() {
             const nSamples = parseInt(document.getElementById('samples').value);
             const burnIn = parseInt(document.getElementById('warmup').value);
             const total = nSamples + burnIn;
-
-            // Data: 10 observations with mean 0.5, sd 0.2 (simulated)
             const data = [0.45, 0.62, 0.48, 0.51, 0.55, 0.49, 0.47, 0.53, 0.52, 0.50];
             function logPrior(mu) { return -0.5 * mu * mu; }
             function logLikelihood(mu) {
@@ -371,8 +487,6 @@
                 <strong>95% credible interval:</strong> [${lo.toFixed(4)}, ${hi.toFixed(4)}]<br>
                 <strong>Acceptance rate:</strong> ${(acceptanceRate*100).toFixed(1)}%
             `;
-
-            // Trace plot
             const traceTrace = {
                 x: Array.from({length: samples.length}, (_,i) => i+1),
                 y: samples,
@@ -385,8 +499,6 @@
                 xaxis: { title: 'Iteration' },
                 yaxis: { title: 'μ' }
             });
-
-            // Histogram
             const histData = [{
                 x: samples,
                 type: 'histogram',
@@ -403,11 +515,14 @@
 
         // Event listeners
         document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
+        document.getElementById('updateHybrid').addEventListener('click', updateHybridRisk);
+        document.getElementById('retrieveMemory').addEventListener('click', retrieveMemory);
         document.getElementById('evaluateIntentBtn').addEventListener('click', evaluateIntent);
         document.getElementById('runMCMC').addEventListener('click', runMCMC);
 
         // Initial load
         updateRiskUI();
+        retrieveMemory();
         evaluateIntent();
         runMCMC();
     </script>
