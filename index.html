@@ -213,6 +213,35 @@
             background: #0f2a44;
             transform: scale(1.02);
         }
+        .collapsible {
+            cursor: pointer;
+            background: #eef2f5;
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .collapsible:hover {
+            background: #e2e8f0;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        .social-proof {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: #2c3e50;
+            background: #eef2f5;
+            padding: 8px 12px;
+            border-radius: 30px;
+            display: inline-block;
+        }
         @media (max-width: 760px) {
             body { padding: 12px; }
             .card { padding: 16px; }
@@ -225,9 +254,13 @@
             cursor: help;
             margin-left: 6px;
         }
-        hr {
-            margin: 16px 0;
-            border-color: #e9ecef;
+        .impact-message {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px;
+            border-radius: 12px;
+            background: #e9f5e9;
         }
     </style>
 </head>
@@ -249,7 +282,7 @@
     <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge simulated-badge">Simulated</span></h1>
     <p style="margin-bottom: 20px;"><strong>Deterministic Probability Thresholding & Hybrid Bayesian Inference</strong> – fully client-side simulation. Illustrates core concepts only.</p>
 
-    <!-- Risk Scoring Card -->
+    <!-- Risk Scoring Card (always visible) -->
     <div class="card">
         <h2>📊 Risk Scoring <span class="tooltip-icon" title="Beta‑Binomial conjugate prior: posterior mean = (α+failures)/(α+β+total)">ⓘ</span></h2>
         <div class="row">
@@ -271,6 +304,7 @@
                     <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
                     <strong>Policy decision:</strong> <span id="policyDecision" class="status escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
+                    <div id="riskImpactMessage" class="impact-message"></div>
                 </div>
                 <div class="explanation">
                     📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
@@ -282,53 +316,79 @@
         </div>
     </div>
 
-    <!-- Hybrid Risk Engine -->
-    <div class="card">
-        <h2>🧩 Hybrid Risk Engine (Online + Offline)</h2>
-        <div class="row">
-            <div class="col">
-                <label>HMC prediction (offline, simulated):</label>
-                <input type="range" id="hmcPred" min="0" max="1" step="0.01" value="0.35">
-                <span id="hmcVal">0.35</span>
-                <label>Weight of HMC (0-1):</label>
-                <input type="range" id="hmcWeight" min="0" max="1" step="0.01" value="0.3">
-                <span id="weightVal">0.30</span>
-                <button id="updateHybrid">Update Hybrid Risk</button>
-                <div class="result">
-                    <strong>Online risk (conjugate):</strong> <span id="onlineRisk">-</span><br>
-                    <strong>Hybrid risk (weighted avg):</strong> <span id="hybridRisk">-</span>
+    <!-- Collapsible advanced section -->
+    <div class="collapsible" id="advancedToggle">
+        <span>🧠 Show advanced inference (Hybrid + MCMC)</span>
+        <span style="font-size:1.2rem;">▼</span>
+    </div>
+    <div id="advancedContent" class="collapsible-content">
+        <!-- Hybrid Risk Engine Card -->
+        <div class="card">
+            <h2>🧩 Hybrid Risk Engine (Online + Offline)</h2>
+            <div class="row">
+                <div class="col">
+                    <label>HMC prediction (offline, simulated):</label>
+                    <input type="range" id="hmcPred" min="0" max="1" step="0.01" value="0.35">
+                    <span id="hmcVal">0.35</span>
+                    <label>Weight of HMC (0-1):</label>
+                    <input type="range" id="hmcWeight" min="0" max="1" step="0.01" value="0.3">
+                    <span id="weightVal">0.30</span>
+                    <button id="updateHybrid">Update Hybrid Risk</button>
+                    <div class="result">
+                        <strong>Online risk (conjugate):</strong> <span id="onlineRisk">-</span><br>
+                        <strong>Hybrid risk (weighted avg):</strong> <span id="hybridRisk">-</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="explanation">
+                        🧠 Blends online Beta‑Binomial updates with offline HMC‑learned patterns (simulated slider). In production, weights are data‑driven.
+                    </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="explanation">
-                    🧠 Blends online Beta‑Binomial updates with offline HMC‑learned patterns (simulated slider). In production, weights are data‑driven.
+        </div>
+
+        <!-- Semantic Memory Card -->
+        <div class="card">
+            <h2>📚 Semantic Memory <span class="tooltip-icon" title="FAISS‑based retrieval of past incidents">ⓘ</span></h2>
+            <div class="row">
+                <div class="col">
+                    <label>Select a scenario:</label>
+                    <select id="memoryScenario">
+                        <option value="highLatency">High latency (p99=450ms)</option>
+                        <option value="highErrorRate">High error rate (5%)</option>
+                        <option value="cpuSpike">CPU spike (90%)</option>
+                        <option value="normal">Normal operation</option>
+                    </select>
+                    <button id="retrieveMemory">Retrieve Similar Incidents</button>
+                    <div id="memoryResult" class="result">Click to see similar incidents.</div>
+                </div>
+                <div class="col">
+                    <div class="explanation">📖 Retrieves top‑k similar past cases (embeddings + FAISS simulation). Outcomes adjust risk estimates.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCMC Card -->
+        <div class="card">
+            <h2>🔄 MCMC (Metropolis-Hastings) <span class="tooltip-icon" title="Simulating HMC offline inference">ⓘ</span></h2>
+            <div class="row">
+                <div class="col">
+                    <label>Samples:</label>
+                    <input type="number" id="samples" value="5000" step="500" min="500">
+                    <label>Burn‑in steps:</label>
+                    <input type="number" id="warmup" value="1000" step="100" min="0">
+                    <button id="runMCMC">Run MCMC</button>
+                    <div id="mcmcSummary" class="result"></div>
+                </div>
+                <div class="col">
+                    <div id="tracePlot"></div>
+                    <div id="histPlot" style="margin-top:16px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Semantic Memory -->
-    <div class="card">
-        <h2>📚 Semantic Memory <span class="tooltip-icon" title="FAISS‑based retrieval of past incidents">ⓘ</span></h2>
-        <div class="row">
-            <div class="col">
-                <label>Select a scenario:</label>
-                <select id="memoryScenario">
-                    <option value="highLatency">High latency (p99=450ms)</option>
-                    <option value="highErrorRate">High error rate (5%)</option>
-                    <option value="cpuSpike">CPU spike (90%)</option>
-                    <option value="normal">Normal operation</option>
-                </select>
-                <button id="retrieveMemory">Retrieve Similar Incidents</button>
-                <div id="memoryResult" class="result">Click to see similar incidents.</div>
-            </div>
-            <div class="col">
-                <div class="explanation">📖 Retrieves top‑k similar past cases (embeddings + FAISS simulation). Outcomes adjust risk estimates.</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Infrastructure Intent Evaluation -->
+    <!-- Infrastructure Intent Evaluation (always visible) -->
     <div class="card">
         <h2>🏗️ Infrastructure Intent Evaluation</h2>
         <p>Simulate a fault type → final risk, decision, healing actions.</p>
@@ -350,22 +410,11 @@
         </div>
     </div>
 
-    <!-- MCMC Metropolis-Hastings -->
-    <div class="card">
-        <h2>🔄 MCMC (Metropolis-Hastings) <span class="tooltip-icon" title="Simulating HMC offline inference">ⓘ</span></h2>
-        <div class="row">
-            <div class="col">
-                <label>Samples:</label>
-                <input type="number" id="samples" value="5000" step="500" min="500">
-                <label>Burn‑in steps:</label>
-                <input type="number" id="warmup" value="1000" step="100" min="0">
-                <button id="runMCMC">Run MCMC</button>
-                <div id="mcmcSummary" class="result"></div>
-            </div>
-            <div class="col">
-                <div id="tracePlot"></div>
-                <div id="histPlot" style="margin-top:16px;"></div>
-            </div>
+    <!-- Social proof + urgency (placed near footer) -->
+    <div style="text-align: center; margin-top: 20px;">
+        <div class="social-proof">
+            🔥 <span id="liveUsers">47</span> engineers exploring ARF right now &nbsp;|&nbsp;
+            ✈️ Only <span id="spotsLeft">23</span> pilot spots left this quarter
         </div>
     </div>
 
@@ -375,13 +424,13 @@
     </footer>
 </div>
 
-<!-- Floating pilot button (mobile friendly) -->
+<!-- Floating pilot button -->
 <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="floating-pilot" id="floatingPilotBtn">
     ✈️ Request Pilot Access
 </a>
 
 <script>
-    // ---------- Beta utilities (same as original) ----------
+    // ---------- Beta utilities (unchanged) ----------
     function betaPDF(x, a, b) {
         if (x <= 0 || x >= 1) return 0;
         const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -446,6 +495,17 @@
         return { risk, lo, hi, alpha, beta };
     }
 
+    // Helper to show loss-aversion message based on decision and risk
+    function getImpactMessage(risk, decision) {
+        if (decision === 'Approve') {
+            return '✅ Estimated saved: $2,400 / month (no unnecessary escalations)';
+        } else if (decision === 'Deny') {
+            return '⚠️ Potential loss avoided: $8,500 / month (prevented breach)';
+        } else {
+            return '🔄 Manual review cost: $1,200 / month (escalation overhead)';
+        }
+    }
+
     function updateRiskUI() {
         const category = document.getElementById('category').value;
         [currentPriorAlpha, currentPriorBeta] = categoryMap[category];
@@ -463,6 +523,10 @@
         const decisionSpan = document.getElementById('policyDecision');
         decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         decisionSpan.className = `status ${statusClass}`;
+
+        // Loss aversion message
+        const impactMsg = getImpactMessage(risk, decision);
+        document.getElementById('riskImpactMessage').innerHTML = impactMsg;
 
         Plotly.newPlot('gaugeChart', [{
             type: "indicator", mode: "gauge+number", value: risk,
@@ -520,7 +584,7 @@
         const btn = document.getElementById('runMCMC');
         btn.classList.add('loading-btn');
         btn.textContent = 'Running...';
-        await new Promise(r => setTimeout(r, 50)); // allow UI update
+        await new Promise(r => setTimeout(r, 50));
         const nSamples = parseInt(document.getElementById('samples').value);
         const burnIn = parseInt(document.getElementById('warmup').value);
         const total = nSamples + burnIn;
@@ -553,6 +617,31 @@
         btn.classList.remove('loading-btn');
         btn.textContent = 'Run MCMC';
     }
+
+    // Collapsible advanced section
+    const toggleBtn = document.getElementById('advancedToggle');
+    const advancedContent = document.getElementById('advancedContent');
+    let isOpen = false;
+    toggleBtn.addEventListener('click', () => {
+        if (!isOpen) {
+            advancedContent.style.maxHeight = advancedContent.scrollHeight + 'px';
+            toggleBtn.querySelector('span:last-child').innerHTML = '▲';
+        } else {
+            advancedContent.style.maxHeight = null;
+            toggleBtn.querySelector('span:last-child').innerHTML = '▼';
+        }
+        isOpen = !isOpen;
+    });
+
+    // Social proof dynamic counters (simulated)
+    function updateSocialProof() {
+        const live = Math.floor(Math.random() * 30) + 30; // 30–60
+        const spots = Math.floor(Math.random() * 20) + 5; // 5–25
+        document.getElementById('liveUsers').innerText = live;
+        document.getElementById('spotsLeft').innerText = spots;
+    }
+    setInterval(updateSocialProof, 8000);
+    updateSocialProof();
 
     // Event listeners
     document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
