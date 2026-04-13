@@ -242,12 +242,67 @@
             border-radius: 30px;
             display: inline-block;
         }
+        /* ========== MOBILE RESPONSIVE ENHANCEMENTS ========== */
         @media (max-width: 760px) {
             body { padding: 12px; }
             .card { padding: 16px; }
             button, input, select { padding: 12px; font-size: 1rem; }
             .sticky-banner { flex-direction: column; text-align: center; }
             .floating-pilot { padding: 8px 16px; font-size: 0.8rem; }
+            /* Force columns to stack and take full width */
+            .row {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .col {
+                width: 100%;
+                min-width: auto;
+            }
+            /* Slightly reduce gauge height on mobile */
+            .risk-gauge, .intent-gauge {
+                height: 240px;
+            }
+            /* Adjust heading sizes */
+            h1 {
+                font-size: 1.5rem;
+            }
+            h2 {
+                font-size: 1.25rem;
+            }
+            .status {
+                font-size: 1rem;
+            }
+            .result {
+                font-size: 0.85rem;
+            }
+            .explanation {
+                font-size: 0.8rem;
+            }
+            .social-proof {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .warning-banner {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+            }
+        }
+        /* Extra small devices (below 480px) */
+        @media (max-width: 480px) {
+            .risk-gauge, .intent-gauge {
+                height: 200px;
+            }
+            .collapsible {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+            .banner-text {
+                font-size: 0.8rem;
+            }
+            .banner-link {
+                padding: 4px 10px;
+                font-size: 0.8rem;
+            }
         }
         .tooltip-icon {
             border-bottom: 1px dashed #6c757d;
