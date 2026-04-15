@@ -3,170 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ARF – Bayesian Risk Scoring Demo (Simulated)</title>
+    <title>ARF – Bayesian Risk Scoring Demo (Dark Mode + Mobile)</title>
     <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* ========== DARK MODE (prefers-color-scheme) ========== */
+        :root {
+            --bg-body: #f5f7fb;
+            --text-primary: #1a2a3a;
+            --card-bg: white;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --border-light: #cbd5e0;
+            --result-bg: #f1f5f9;
+            --expl-bg: #f8fafc;
+            --social-bg: #eef2f5;
+            --footer-color: #6c757d;
+            --banner-bg: #1e3a5f;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+            --button-bg: #2c3e50;
+            --button-hover: #1e2f3e;
+            --input-bg: white;
         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #121212;
+                --text-primary: #e2e8f0;
+                --card-bg: #1e293b;
+                --card-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                --border-light: #334155;
+                --result-bg: #0f172a;
+                --expl-bg: #0f172a;
+                --social-bg: #1e293b;
+                --footer-color: #94a3b8;
+                --banner-bg: #0f2a44;
+                --warning-bg: #332701;
+                --warning-text: #fcd34d;
+                --button-bg: #334155;
+                --button-hover: #475569;
+                --input-bg: #0f172a;
+            }
+            .status.approve { background: #14532d; color: #bbf7d0; }
+            .status.escalate { background: #78350f; color: #fde68a; }
+            .status.deny { background: #7f1d1d; color: #fecaca; }
+            .impact-message { background: #1e293b; }
+            .social-proof { background: #1e293b; color: #cbd5e1; }
+            .explanation { background: #0f172a; color: #94a3b8; }
+            .result { background: #0f172a; color: #cbd5e1; }
+            input, select { background: var(--input-bg); color: var(--text-primary); border-color: var(--border-light); }
+            .tooltip-icon { color: #94a3b8; }
+            a { color: #60a5fa; }
+        }
+        /* ========== MOBILE‑FIRST STYLES ========== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fb;
-            color: #1a2a3a;
+            background: var(--bg-body);
+            color: var(--text-primary);
             line-height: 1.5;
-            padding: 16px;
+            padding: 12px;
+            transition: background 0.2s, color 0.2s;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        /* Sticky pilot banner (dismissible) */
+        .container { max-width: 1400px; margin: 0 auto; }
         .sticky-banner {
             position: sticky;
             top: 0;
             z-index: 100;
-            background: #1e3a5f;
+            background: var(--banner-bg);
             color: white;
-            padding: 12px 16px;
+            padding: 12px;
             border-radius: 0 0 12px 12px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-align: center;
         }
-        .banner-text {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+        .banner-text { font-size: 0.85rem; font-weight: 500; }
         .banner-link {
             background: #ffc107;
             color: #1e3a5f;
-            padding: 6px 14px;
+            padding: 8px 14px;
             border-radius: 40px;
             text-decoration: none;
             font-weight: bold;
+            font-size: 0.85rem;
             transition: 0.2s;
+            display: inline-block;
+            align-self: center;
         }
-        .banner-link:hover {
-            background: #ffda6a;
-            transform: scale(1.02);
-        }
+        .banner-link:hover { background: #ffda6a; transform: scale(1.02); }
         .dismiss-banner {
             background: none;
             border: none;
             color: white;
             font-size: 1.2rem;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 8px;
+            align-self: flex-end;
             opacity: 0.7;
         }
         .warning-banner {
-            background: #fff3cd;
+            background: var(--warning-bg);
             border-left: 6px solid #f0ad4e;
-            padding: 14px 18px;
-            margin-bottom: 24px;
+            padding: 12px;
+            margin-bottom: 20px;
             border-radius: 12px;
-            font-weight: 500;
-            color: #856404;
+            font-size: 0.85rem;
+            color: var(--warning-text);
             display: flex;
-            gap: 12px;
             flex-wrap: wrap;
+            gap: 10px;
             align-items: center;
         }
-        h1 {
-            font-size: 1.8rem;
-            margin: 0 0 0.25rem 0;
-        }
+        h1 { font-size: 1.6rem; margin: 0 0 0.25rem 0; word-break: break-word; }
         .badge {
             background: #e2e6ea;
             border-radius: 40px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
+            padding: 4px 10px;
+            font-size: 0.7rem;
             font-weight: normal;
             margin-left: 8px;
+            white-space: nowrap;
         }
-        .simulated-badge {
-            background: #f8d7da;
-            color: #721c24;
-        }
+        .simulated-badge { background: #f8d7da; color: #721c24; }
+        @media (prefers-color-scheme: dark) { .simulated-badge { background: #7f1d1d; color: #fecaca; } }
         .card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 20px;
-            margin-bottom: 28px;
-            transition: box-shadow 0.2s;
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            margin-bottom: 20px;
         }
-        .card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-        .row {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-        .col {
-            flex: 1;
-            min-width: 240px;
-        }
-        label {
-            display: block;
-            margin-top: 12px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
+        .row { display: flex; flex-direction: column; gap: 16px; }
+        .col { width: 100%; }
+        label { display: block; margin-top: 12px; font-weight: 600; font-size: 0.85rem; }
         input, select, button {
             width: 100%;
-            padding: 12px 10px;
+            padding: 12px;
             margin-top: 6px;
             margin-bottom: 12px;
-            border: 1px solid #cbd5e0;
+            border: 1px solid var(--border-light);
             border-radius: 12px;
-            font-size: 0.95rem;
-            background: white;
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-primary);
             transition: 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2c3e50;
-            box-shadow: 0 0 0 3px rgba(44,62,80,0.1);
+            touch-action: manipulation;
         }
         button {
-            background: #2c3e50;
+            background: var(--button-bg);
             color: white;
             font-weight: 600;
             cursor: pointer;
             border: none;
+            min-height: 44px;
         }
-        button:hover {
-            background: #1e2f3e;
-            transform: translateY(-1px);
-        }
-        button:active {
-            transform: translateY(1px);
-        }
-        .loading-btn {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-        .risk-gauge, .intent-gauge {
-            height: 280px;
-            width: 100%;
-        }
+        button:hover { background: var(--button-hover); }
+        button:active { transform: translateY(1px); }
+        .loading-btn { opacity: 0.7; pointer-events: none; }
+        .risk-gauge, .intent-gauge { height: 240px; width: 100%; }
         .result {
-            background: #f1f5f9;
+            background: var(--result-bg);
             padding: 14px;
             border-radius: 16px;
             margin-top: 12px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            word-break: break-word;
         }
         .status {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             padding: 8px;
             border-radius: 40px;
@@ -177,9 +183,8 @@
         .escalate { background: #fff3cd; color: #856404; }
         .deny { background: #f8d7da; color: #721c24; }
         .explanation {
-            font-size: 0.85rem;
-            color: #4a627a;
-            background: #f8fafc;
+            font-size: 0.8rem;
+            background: var(--expl-bg);
             padding: 10px;
             border-radius: 12px;
             margin-top: 12px;
@@ -187,122 +192,49 @@
         footer {
             text-align: center;
             margin-top: 40px;
-            font-size: 0.75rem;
-            color: #6c757d;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 24px;
+            font-size: 0.7rem;
+            color: var(--footer-color);
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
         }
         .floating-pilot {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 99;
-            background: #1e3a5f;
+            background: var(--banner-bg);
             color: white;
             border-radius: 60px;
-            padding: 10px 20px;
+            padding: 10px 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             font-weight: bold;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 0.8rem;
             transition: 0.2s;
-        }
-        .floating-pilot:hover {
-            background: #0f2a44;
-            transform: scale(1.02);
         }
         .collapsible {
             cursor: pointer;
-            background: #eef2f5;
+            background: var(--social-bg);
             border-radius: 16px;
-            padding: 12px 18px;
+            padding: 12px;
             margin-bottom: 12px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background 0.2s;
         }
-        .collapsible:hover {
-            background: #e2e8f0;
-        }
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-        }
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
         .social-proof {
             margin-top: 12px;
-            font-size: 0.75rem;
-            color: #2c3e50;
-            background: #eef2f5;
-            padding: 8px 12px;
+            font-size: 0.7rem;
+            background: var(--social-bg);
+            padding: 6px 10px;
             border-radius: 30px;
             display: inline-block;
-        }
-        /* ========== MOBILE RESPONSIVE ENHANCEMENTS ========== */
-        @media (max-width: 760px) {
-            body { padding: 12px; }
-            .card { padding: 16px; }
-            button, input, select { padding: 12px; font-size: 1rem; }
-            .sticky-banner { flex-direction: column; text-align: center; }
-            .floating-pilot { padding: 8px 16px; font-size: 0.8rem; }
-            /* Force columns to stack and take full width */
-            .row {
-                flex-direction: column;
-                gap: 16px;
-            }
-            .col {
-                width: 100%;
-                min-width: auto;
-            }
-            /* Slightly reduce gauge height on mobile */
-            .risk-gauge, .intent-gauge {
-                height: 240px;
-            }
-            /* Adjust heading sizes */
-            h1 {
-                font-size: 1.5rem;
-            }
-            h2 {
-                font-size: 1.25rem;
-            }
-            .status {
-                font-size: 1rem;
-            }
-            .result {
-                font-size: 0.85rem;
-            }
-            .explanation {
-                font-size: 0.8rem;
-            }
-            .social-proof {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-            .warning-banner {
-                font-size: 0.85rem;
-                padding: 10px 12px;
-            }
-        }
-        /* Extra small devices (below 480px) */
-        @media (max-width: 480px) {
-            .risk-gauge, .intent-gauge {
-                height: 200px;
-            }
-            .collapsible {
-                padding: 10px 14px;
-                font-size: 0.9rem;
-            }
-            .banner-text {
-                font-size: 0.8rem;
-            }
-            .banner-link {
-                padding: 4px 10px;
-                font-size: 0.8rem;
-            }
+            text-align: center;
         }
         .tooltip-icon {
             border-bottom: 1px dashed #6c757d;
@@ -311,24 +243,59 @@
         }
         .impact-message {
             margin-top: 8px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             padding: 6px;
             border-radius: 12px;
             background: #e9f5e9;
         }
+        .copy-risk-btn, .export-btn {
+            background: #4a627a;
+            margin-top: 8px;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            margin-right: 8px;
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        @media (min-width: 641px) {
+            body { padding: 16px; }
+            .sticky-banner { flex-direction: row; justify-content: space-between; align-items: center; text-align: left; padding: 12px 20px; }
+            .dismiss-banner { align-self: center; }
+            .row { flex-direction: row; gap: 24px; }
+            .col { flex: 1; }
+            .risk-gauge, .intent-gauge { height: 280px; }
+            h1 { font-size: 1.8rem; }
+        }
+        @media (min-width: 1024px) { .card { padding: 24px; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Sticky pilot banner (dismissible) -->
     <div id="pilotBanner" class="sticky-banner">
         <span class="banner-text">🔐 The real ARF engine is access‑controlled and outcome‑based.</span>
         <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="banner-link">Request Pilot Access →</a>
         <button class="dismiss-banner" id="dismissBannerBtn" aria-label="Dismiss banner">✕</button>
     </div>
 
-    <!-- Warning banner -->
     <div class="warning-banner">
         <span>⚠️ <strong>Simulated client‑side demo</strong> – does NOT use the protected Bayesian engine. All data is mock.</span>
         <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" style="margin-left:auto; white-space:nowrap;">Learn about real engine →</a>
@@ -337,7 +304,7 @@
     <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge simulated-badge">Simulated</span></h1>
     <p style="margin-bottom: 20px;"><strong>Deterministic Probability Thresholding & Hybrid Bayesian Inference</strong> – fully client-side simulation. Illustrates core concepts only.</p>
 
-    <!-- Risk Scoring Card (always visible) -->
+    <!-- Risk Scoring Card -->
     <div class="card">
         <h2>📊 Risk Scoring <span class="tooltip-icon" title="Beta‑Binomial conjugate prior: posterior mean = (α+failures)/(α+β+total)">ⓘ</span></h2>
         <div class="row">
@@ -359,6 +326,10 @@
                     <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
                     <strong>Policy decision:</strong> <span id="policyDecision" class="status escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                        <button id="copyRiskBtn" class="copy-risk-btn">📋 Copy risk score</button>
+                        <button id="exportStateBtn" class="copy-risk-btn">💾 Export simulation state (JSON)</button>
+                    </div>
                     <div id="riskImpactMessage" class="impact-message"></div>
                 </div>
                 <div class="explanation">
@@ -443,7 +414,7 @@
         </div>
     </div>
 
-    <!-- Infrastructure Intent Evaluation (always visible) -->
+    <!-- Infrastructure Intent Evaluation -->
     <div class="card">
         <h2>🏗️ Infrastructure Intent Evaluation</h2>
         <p>Simulate a fault type → final risk, decision, healing actions.</p>
@@ -465,7 +436,7 @@
         </div>
     </div>
 
-    <!-- Social proof + urgency (placed near footer) -->
+    <!-- Social proof + urgency -->
     <div style="text-align: center; margin-top: 20px;">
         <div class="social-proof">
             🔥 <span id="liveUsers">47</span> engineers exploring ARF right now &nbsp;|&nbsp;
@@ -479,13 +450,12 @@
     </footer>
 </div>
 
-<!-- Floating pilot button -->
-<a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="floating-pilot" id="floatingPilotBtn">
-    ✈️ Request Pilot Access
-</a>
+<a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="floating-pilot">✈️ Request Pilot Access</a>
+<div id="toastMsg" class="toast-message">Copied to clipboard!</div>
+<div id="exportToast" class="toast-message" style="bottom: 140px;">State exported to console</div>
 
 <script>
-    // ---------- Beta utilities (unchanged) ----------
+    // ---------- Beta utilities ----------
     function betaPDF(x, a, b) {
         if (x <= 0 || x >= 1) return 0;
         const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -550,15 +520,10 @@
         return { risk, lo, hi, alpha, beta };
     }
 
-    // Helper to show loss-aversion message based on decision and risk
     function getImpactMessage(risk, decision) {
-        if (decision === 'Approve') {
-            return '✅ Estimated saved: $2,400 / month (no unnecessary escalations)';
-        } else if (decision === 'Deny') {
-            return '⚠️ Potential loss avoided: $8,500 / month (prevented breach)';
-        } else {
-            return '🔄 Manual review cost: $1,200 / month (escalation overhead)';
-        }
+        if (decision === 'Approve') return '✅ Estimated saved: $2,400 / month (no unnecessary escalations)';
+        if (decision === 'Deny') return '⚠️ Potential loss avoided: $8,500 / month (prevented breach)';
+        return '🔄 Manual review cost: $1,200 / month (escalation overhead)';
     }
 
     function updateRiskUI() {
@@ -579,9 +544,7 @@
         decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         decisionSpan.className = `status ${statusClass}`;
 
-        // Loss aversion message
-        const impactMsg = getImpactMessage(risk, decision);
-        document.getElementById('riskImpactMessage').innerHTML = impactMsg;
+        document.getElementById('riskImpactMessage').innerHTML = getImpactMessage(risk, decision);
 
         Plotly.newPlot('gaugeChart', [{
             type: "indicator", mode: "gauge+number", value: risk,
@@ -625,7 +588,7 @@
         const hmcVal = parseFloat(document.getElementById('hmcPred').value);
         const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
         const finalRisk = baseRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
-        let decision = finalRisk < 0.2 ? 'Approve' : (finalRisk > 0.8 ? 'Deny' : 'Escalate');
+        const decision = finalRisk < 0.2 ? 'Approve' : (finalRisk > 0.8 ? 'Deny' : 'Escalate');
         const healingActions = decision === 'Deny' ? ['restart', 'rollback'] : (decision === 'Escalate' ? ['notify_ops', 'investigate'] : ['monitor']);
         document.getElementById('intentResult').innerHTML = `<strong>Online risk:</strong> ${baseRisk.toFixed(4)}<br><strong>Hybrid risk:</strong> ${finalRisk.toFixed(4)}<br><strong>Decision:</strong> ${decision}<br><strong>Healing actions:</strong> ${healingActions.join(', ')}`;
         Plotly.newPlot('intentGauge', [{
@@ -688,15 +651,46 @@
         isOpen = !isOpen;
     });
 
-    // Social proof dynamic counters (simulated)
     function updateSocialProof() {
-        const live = Math.floor(Math.random() * 30) + 30; // 30–60
-        const spots = Math.floor(Math.random() * 20) + 5; // 5–25
-        document.getElementById('liveUsers').innerText = live;
-        document.getElementById('spotsLeft').innerText = spots;
+        document.getElementById('liveUsers').innerText = Math.floor(Math.random() * 30) + 30;
+        document.getElementById('spotsLeft').innerText = Math.floor(Math.random() * 20) + 5;
     }
     setInterval(updateSocialProof, 8000);
     updateSocialProof();
+
+    // UI improvements: copy risk and export state
+    const toast = document.getElementById('toastMsg');
+    function showToast() { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
+    document.getElementById('copyRiskBtn').addEventListener('click', () => {
+        const riskText = document.getElementById('riskScore').innerText;
+        const interval = document.getElementById('credibleInterval').innerText;
+        const decision = document.getElementById('policyDecision').innerText.split('(')[0].trim();
+        navigator.clipboard.writeText(`Risk score: ${riskText}\n95% CI: ${interval}\nDecision: ${decision}`).then(showToast);
+    });
+
+    // Additional improvement: Export current simulation state as JSON
+    const exportToast = document.getElementById('exportToast');
+    document.getElementById('exportStateBtn').addEventListener('click', () => {
+        const state = {
+            timestamp: new Date().toISOString(),
+            category: document.getElementById('category').value,
+            failures: document.getElementById('failures').value,
+            successes: document.getElementById('successes').value,
+            hmcPrediction: parseFloat(document.getElementById('hmcPred').value),
+            hmcWeight: parseFloat(document.getElementById('hmcWeight').value),
+            riskScore: parseFloat(document.getElementById('riskScore').innerText),
+            credibleInterval: document.getElementById('credibleInterval').innerText,
+            decision: document.getElementById('policyDecision').innerText.split('(')[0].trim(),
+            faultType: document.getElementById('faultType').value,
+            memoryScenario: document.getElementById('memoryScenario').value
+        };
+        console.log('ARF Demo State:', state);
+        const jsonStr = JSON.stringify(state, null, 2);
+        navigator.clipboard.writeText(jsonStr).then(() => {
+            exportToast.style.opacity = '1';
+            setTimeout(() => exportToast.style.opacity = '0', 2000);
+        }).catch(() => alert('State copied to console.'));
+    });
 
     // Event listeners
     document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
@@ -704,15 +698,9 @@
     document.getElementById('retrieveMemory').addEventListener('click', retrieveMemory);
     document.getElementById('evaluateIntentBtn').addEventListener('click', evaluateIntent);
     document.getElementById('runMCMC').addEventListener('click', runMCMC);
-
-    // Banner dismiss
     const banner = document.getElementById('pilotBanner');
-    const dismissBtn = document.getElementById('dismissBannerBtn');
-    if (dismissBtn) {
-        dismissBtn.addEventListener('click', () => { banner.style.display = 'none'; });
-    }
+    document.getElementById('dismissBannerBtn').addEventListener('click', () => banner.style.display = 'none');
 
-    // Initial load
     updateRiskUI();
     retrieveMemory();
     evaluateIntent();
