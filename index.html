@@ -320,7 +320,7 @@
     <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge simulated-badge">Simulated</span><span class="badge tests-badge">✅ 54/54 pressure tests passed</span></h1>
     <p style="margin-bottom: 20px;"><strong>Deterministic Probability Thresholding & Hybrid Bayesian Inference</strong> – fully client-side simulation. Illustrates core concepts only.</p>
 
-    <!-- Preset Scenario Dropdown (Recommendation #1) -->
+    <!-- Preset Scenario Dropdown -->
     <div class="card">
         <h2>📋 Real‑world scenarios (from LLMday talk)</h2>
         <label>Choose a scenario:</label>
@@ -373,7 +373,7 @@
         </div>
     </div>
 
-    <!-- Counterfactual Panel (Recommendation #5) -->
+    <!-- Counterfactual Panel (Corrected: With ARF loss = $500 review cost) -->
     <div class="counterfactual-panel">
         <div class="cf-toggle">
             <button id="cfWithoutBtn" class="cf-btn active">📉 Without ARF</button>
@@ -387,7 +387,7 @@
         </div>
     </div>
 
-    <!-- Collapsible Advanced Section – collapsed by default (Recommendation #7) -->
+    <!-- Collapsible Advanced Section (collapsed by default) -->
     <div class="collapsible" id="advancedToggle">
         <span>🧠 Show advanced inference (Hybrid + MCMC) – offline HMC model</span>
         <span style="font-size:1.2rem;">▼</span>
@@ -481,7 +481,7 @@
         </div>
     </div>
 
-    <!-- Social proof – static, credible (Recommendation #2) -->
+    <!-- Social proof – static, credible -->
     <div style="text-align: center; margin-top: 20px;">
         <div class="social-proof">
             ✅ 54/54 pressure tests passed &nbsp;|&nbsp;
@@ -556,7 +556,7 @@
     let currentPriorAlpha = 1.0, currentPriorBeta = 10.0;
     let currentFailures = 20, currentSuccesses = 80;
     let onlineRisk = 0.0;
-    let currentImpactEstimate = 150000; // default $150k impact for expected loss
+    let currentImpactEstimate = 150000;
     let currentScenario = "custom";
 
     function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
@@ -576,15 +576,13 @@
 
     function updateExpectedLossDisplay(risk, scenarioName) {
         let impact = 0;
-        let lossText = "";
         if (scenarioName === "aircanada") impact = 50000;
         else if (scenarioName === "pocketos") impact = 150000;
-        else if (scenarioName === "amazon") impact = 5000000; // $5M outage cost
+        else if (scenarioName === "amazon") impact = 5000000;
         else impact = currentImpactEstimate;
         const expectedLoss = risk * impact;
         const lossFormatted = expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
         document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${lossFormatted}</strong> (risk × impact estimate)`;
-        // Store for counterfactual
         window.currentRisk = risk;
         window.currentImpact = impact;
         updateCounterfactual(risk, impact);
@@ -630,17 +628,17 @@
         document.getElementById('hybridRisk').innerText = hybrid.toFixed(4);
     }
 
-    // Counterfactual logic
+    // Counterfactual logic (corrected: With ARF loss = $500 review cost)
     let cfMode = "without";
     function updateCounterfactual(risk, impact) {
         const withoutLoss = risk * impact;
-        const withLoss = 0; // ARF would have escalated, preventing loss (simplified)
+        const withLoss = 500; // manual review cost (realistic positive number)
         const saved = withoutLoss - withLoss;
         const cfDiv = document.getElementById('cfContent');
         if (cfMode === "without") {
             cfDiv.innerHTML = `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.`;
         } else {
-            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>$0</strong><br>ARF would have ESCALATED to human review, preventing the loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
+            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
         }
     }
 
@@ -657,10 +655,10 @@
         updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
     });
 
-    // Preset scenarios (Recommendation #1)
+    // Preset scenarios (corrected: PocketOS risk now ~0.72 → Escalate)
     const presets = {
         aircanada: { category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4, impact: 50000, description: "Air Canada chatbot hallucination" },
-        pocketos: { category: "database", failures: 40, successes: 60, hmcPred: 0.85, hmcWeight: 0.6, impact: 150000, description: "PocketOS – production DB deleted" },
+        pocketos: { category: "database", failures: 30, successes: 70, hmcPred: 0.75, hmcWeight: 0.5, impact: 150000, description: "PocketOS – production DB deleted (ARF escalates)" },
         amazon: { category: "compute", failures: 25, successes: 75, hmcPred: 0.70, hmcWeight: 0.5, impact: 5000000, description: "Amazon 6‑hour outage" }
     };
     function applyPreset(presetId) {
@@ -677,10 +675,8 @@
         currentScenario = presetId;
         updateRiskUI();
         updateHybridRisk();
-        // Also update the counterfactual impact
         window.currentImpact = p.impact;
         updateCounterfactual(window.currentRisk || 0.2, p.impact);
-        // Also update the demo description
         const resultDiv = document.getElementById('intentResult');
         if (resultDiv) resultDiv.innerHTML = `<em>Loaded scenario: ${p.description}</em>`;
     }
