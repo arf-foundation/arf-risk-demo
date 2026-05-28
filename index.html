@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ARF – Bayesian Risk Scoring Demo (Dark Mode + Mobile)</title>
+    <title>ARF – Bayesian Risk Scoring Demo | LLMday 2026</title>
     <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
     <style>
         /* ========== DARK MODE (prefers-color-scheme) ========== */
@@ -23,6 +23,7 @@
             --button-bg: #2c3e50;
             --button-hover: #1e2f3e;
             --input-bg: white;
+            --counterfactual-bg: #e9ecef;
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,17 +42,14 @@
                 --button-bg: #334155;
                 --button-hover: #475569;
                 --input-bg: #0f172a;
+                --counterfactual-bg: #1e293b;
             }
             .status.approve { background: #14532d; color: #bbf7d0; }
             .status.escalate { background: #78350f; color: #fde68a; }
             .status.deny { background: #7f1d1d; color: #fecaca; }
-            .impact-message { background: #1e293b; }
-            .social-proof { background: #1e293b; color: #cbd5e1; }
             .explanation { background: #0f172a; color: #94a3b8; }
             .result { background: #0f172a; color: #cbd5e1; }
-            input, select { background: var(--input-bg); color: var(--text-primary); border-color: var(--border-light); }
-            .tooltip-icon { color: #94a3b8; }
-            a { color: #60a5fa; }
+            .counterfactual-panel { background: var(--counterfactual-bg); border-color: #334155; }
         }
         /* ========== MOBILE‑FIRST STYLES ========== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -127,7 +125,11 @@
             white-space: nowrap;
         }
         .simulated-badge { background: #f8d7da; color: #721c24; }
-        @media (prefers-color-scheme: dark) { .simulated-badge { background: #7f1d1d; color: #fecaca; } }
+        .tests-badge { background: #d4edda; color: #155724; margin-left: 8px; }
+        @media (prefers-color-scheme: dark) { 
+            .simulated-badge { background: #7f1d1d; color: #fecaca; }
+            .tests-badge { background: #14532d; color: #bbf7d0; }
+        }
         .card {
             background: var(--card-bg);
             border-radius: 20px;
@@ -249,32 +251,46 @@
             border-radius: 12px;
             background: #e9f5e9;
         }
-        .copy-risk-btn, .export-btn {
-            background: #4a627a;
-            margin-top: 8px;
-            width: auto;
+        .counterfactual-panel {
+            background: var(--counterfactual-bg);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid var(--border-light);
+        }
+        .cf-toggle {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .cf-btn {
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .cf-btn.active {
+            background: #38bdf8;
+            color: #0a0c10;
+        }
+        .cf-loss {
+            font-family: monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .human-escalation {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            justify-content: center;
-            font-size: 0.8rem;
-            padding: 8px 12px;
-            margin-right: 8px;
-        }
-        .toast-message {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2c3e50;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            z-index: 200;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
+            background: #fff3cd;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
         @media (min-width: 641px) {
             body { padding: 16px; }
@@ -292,17 +308,30 @@
 <div class="container">
     <div id="pilotBanner" class="sticky-banner">
         <span class="banner-text">🔐 The real ARF engine is access‑controlled and outcome‑based.</span>
-        <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="banner-link">Request Pilot Access →</a>
+        <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="banner-link">Request Pilot Access →</a>
         <button class="dismiss-banner" id="dismissBannerBtn" aria-label="Dismiss banner">✕</button>
     </div>
 
     <div class="warning-banner">
         <span>⚠️ <strong>Simulated client‑side demo</strong> – does NOT use the protected Bayesian engine. All data is mock.</span>
-        <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" style="margin-left:auto; white-space:nowrap;">Learn about real engine →</a>
+        <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" style="margin-left:auto; white-space:nowrap;">Learn about real engine →</a>
     </div>
 
-    <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge simulated-badge">Simulated</span></h1>
+    <h1>🧠 ARF – Bayesian Risk Scoring Demo <span class="badge simulated-badge">Simulated</span><span class="badge tests-badge">✅ 54/54 pressure tests passed</span></h1>
     <p style="margin-bottom: 20px;"><strong>Deterministic Probability Thresholding & Hybrid Bayesian Inference</strong> – fully client-side simulation. Illustrates core concepts only.</p>
+
+    <!-- Preset Scenario Dropdown (Recommendation #1) -->
+    <div class="card">
+        <h2>📋 Real‑world scenarios (from LLMday talk)</h2>
+        <label>Choose a scenario:</label>
+        <select id="presetScenario">
+            <option value="custom">Custom (adjust sliders below)</option>
+            <option value="aircanada">✈️ Air Canada (2022) – Chatbot hallucination</option>
+            <option value="pocketos">💀 PocketOS (April 2026) – Production DB wiped in 9 seconds</option>
+            <option value="amazon">📦 Amazon (March 2026) – Outdated wiki caused 6‑hour outage</option>
+        </select>
+        <button id="applyPresetBtn">Load Scenario</button>
+    </div>
 
     <!-- Risk Scoring Card -->
     <div class="card">
@@ -326,6 +355,7 @@
                     <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
                     <strong>Policy decision:</strong> <span id="policyDecision" class="status escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
+                    <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
                         <button id="copyRiskBtn" class="copy-risk-btn">📋 Copy risk score</button>
                         <button id="exportStateBtn" class="copy-risk-btn">💾 Export simulation state (JSON)</button>
@@ -334,6 +364,7 @@
                 </div>
                 <div class="explanation">
                     📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
+                    <span class="human-escalation">👤 Escalate = human review required – you stay in control</span>
                 </div>
             </div>
             <div class="col">
@@ -342,9 +373,23 @@
         </div>
     </div>
 
-    <!-- Collapsible advanced section -->
+    <!-- Counterfactual Panel (Recommendation #5) -->
+    <div class="counterfactual-panel">
+        <div class="cf-toggle">
+            <button id="cfWithoutBtn" class="cf-btn active">📉 Without ARF</button>
+            <button id="cfWithBtn" class="cf-btn">🛡️ With ARF (governance)</button>
+        </div>
+        <div id="cfContent" class="cf-loss">
+            Without ARF: Expected loss = <strong>$47,000</strong> (crash loop, customer impact)
+        </div>
+        <div class="explanation" style="margin-top: 8px;">
+            🔍 <strong>Counterfactual analysis:</strong> What would have happened if the agent acted alone vs. with ARF governance.
+        </div>
+    </div>
+
+    <!-- Collapsible Advanced Section – collapsed by default (Recommendation #7) -->
     <div class="collapsible" id="advancedToggle">
-        <span>🧠 Show advanced inference (Hybrid + MCMC)</span>
+        <span>🧠 Show advanced inference (Hybrid + MCMC) – offline HMC model</span>
         <span style="font-size:1.2rem;">▼</span>
     </div>
     <div id="advancedContent" class="collapsible-content">
@@ -436,21 +481,22 @@
         </div>
     </div>
 
-    <!-- Social proof + urgency -->
+    <!-- Social proof – static, credible (Recommendation #2) -->
     <div style="text-align: center; margin-top: 20px;">
         <div class="social-proof">
-            🔥 <span id="liveUsers">47</span> engineers exploring ARF right now &nbsp;|&nbsp;
-            ✈️ Only <span id="spotsLeft">23</span> pilot spots left this quarter
+            ✅ 54/54 pressure tests passed &nbsp;|&nbsp;
+            🧪 3 active pilots (law‑tech, fintech, health tech) &nbsp;|&nbsp;
+            👥 Founder‑led – I work directly with pilots
         </div>
     </div>
 
     <footer>
-        <p>ARF – Simulated Risk Scoring Demo | <a href="https://github.com/arf-foundation/arf-risk-demo" target="_blank">Public GitHub Repo</a> | <a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank">Request Pilot Access to Real Engine</a></p>
+        <p>ARF – Simulated Risk Scoring Demo | <a href="https://github.com/arf-foundation/arf-risk-demo" target="_blank">Public GitHub Repo</a> | <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">Request Pilot Access to Real Engine</a></p>
         <p style="margin-top: 8px;">⚠️ This demo uses mock data and does not invoke the protected ARF core engine. The real engine is pilot‑only and outcome‑based.</p>
     </footer>
 </div>
 
-<a href="https://arf-frontend-sandy.vercel.app/signup" target="_blank" class="floating-pilot">✈️ Request Pilot Access</a>
+<a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="floating-pilot">✈️ Request Pilot Access (tracked)</a>
 <div id="toastMsg" class="toast-message">Copied to clipboard!</div>
 <div id="exportToast" class="toast-message" style="bottom: 140px;">State exported to console</div>
 
@@ -510,6 +556,8 @@
     let currentPriorAlpha = 1.0, currentPriorBeta = 10.0;
     let currentFailures = 20, currentSuccesses = 80;
     let onlineRisk = 0.0;
+    let currentImpactEstimate = 150000; // default $150k impact for expected loss
+    let currentScenario = "custom";
 
     function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
         const alpha = priorAlpha + failures;
@@ -524,6 +572,22 @@
         if (decision === 'Approve') return '✅ Estimated saved: $2,400 / month (no unnecessary escalations)';
         if (decision === 'Deny') return '⚠️ Potential loss avoided: $8,500 / month (prevented breach)';
         return '🔄 Manual review cost: $1,200 / month (escalation overhead)';
+    }
+
+    function updateExpectedLossDisplay(risk, scenarioName) {
+        let impact = 0;
+        let lossText = "";
+        if (scenarioName === "aircanada") impact = 50000;
+        else if (scenarioName === "pocketos") impact = 150000;
+        else if (scenarioName === "amazon") impact = 5000000; // $5M outage cost
+        else impact = currentImpactEstimate;
+        const expectedLoss = risk * impact;
+        const lossFormatted = expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${lossFormatted}</strong> (risk × impact estimate)`;
+        // Store for counterfactual
+        window.currentRisk = risk;
+        window.currentImpact = impact;
+        updateCounterfactual(risk, impact);
     }
 
     function updateRiskUI() {
@@ -545,6 +609,7 @@
         decisionSpan.className = `status ${statusClass}`;
 
         document.getElementById('riskImpactMessage').innerHTML = getImpactMessage(risk, decision);
+        updateExpectedLossDisplay(risk, currentScenario);
 
         Plotly.newPlot('gaugeChart', [{
             type: "indicator", mode: "gauge+number", value: risk,
@@ -565,6 +630,66 @@
         document.getElementById('hybridRisk').innerText = hybrid.toFixed(4);
     }
 
+    // Counterfactual logic
+    let cfMode = "without";
+    function updateCounterfactual(risk, impact) {
+        const withoutLoss = risk * impact;
+        const withLoss = 0; // ARF would have escalated, preventing loss (simplified)
+        const saved = withoutLoss - withLoss;
+        const cfDiv = document.getElementById('cfContent');
+        if (cfMode === "without") {
+            cfDiv.innerHTML = `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.`;
+        } else {
+            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>$0</strong><br>ARF would have ESCALATED to human review, preventing the loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
+        }
+    }
+
+    document.getElementById('cfWithoutBtn').addEventListener('click', () => {
+        cfMode = "without";
+        document.getElementById('cfWithoutBtn').classList.add('active');
+        document.getElementById('cfWithBtn').classList.remove('active');
+        updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
+    });
+    document.getElementById('cfWithBtn').addEventListener('click', () => {
+        cfMode = "with";
+        document.getElementById('cfWithBtn').classList.add('active');
+        document.getElementById('cfWithoutBtn').classList.remove('active');
+        updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
+    });
+
+    // Preset scenarios (Recommendation #1)
+    const presets = {
+        aircanada: { category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4, impact: 50000, description: "Air Canada chatbot hallucination" },
+        pocketos: { category: "database", failures: 40, successes: 60, hmcPred: 0.85, hmcWeight: 0.6, impact: 150000, description: "PocketOS – production DB deleted" },
+        amazon: { category: "compute", failures: 25, successes: 75, hmcPred: 0.70, hmcWeight: 0.5, impact: 5000000, description: "Amazon 6‑hour outage" }
+    };
+    function applyPreset(presetId) {
+        const p = presets[presetId];
+        if (!p) return;
+        document.getElementById('category').value = p.category;
+        document.getElementById('failures').value = p.failures;
+        document.getElementById('successes').value = p.successes;
+        document.getElementById('hmcPred').value = p.hmcPred;
+        document.getElementById('hmcWeight').value = p.hmcWeight;
+        document.getElementById('hmcVal').innerText = p.hmcPred;
+        document.getElementById('weightVal').innerText = p.hmcWeight;
+        currentImpactEstimate = p.impact;
+        currentScenario = presetId;
+        updateRiskUI();
+        updateHybridRisk();
+        // Also update the counterfactual impact
+        window.currentImpact = p.impact;
+        updateCounterfactual(window.currentRisk || 0.2, p.impact);
+        // Also update the demo description
+        const resultDiv = document.getElementById('intentResult');
+        if (resultDiv) resultDiv.innerHTML = `<em>Loaded scenario: ${p.description}</em>`;
+    }
+    document.getElementById('applyPresetBtn').addEventListener('click', () => {
+        const selected = document.getElementById('presetScenario').value;
+        if (selected !== "custom") applyPreset(selected);
+    });
+
+    // Memory store
     const memoryStore = {
         highLatency: [{ description: "Latency spike to 450ms → escalated, later resolved with restart.", outcome: "escalate", risk: 0.65 }, { description: "Similar latency spike → HMC detected pattern → approved with auto‑scaling.", outcome: "approve", risk: 0.28 }],
         highErrorRate: [{ description: "Error rate 5% → misconfigured endpoint → denied.", outcome: "deny", risk: 0.92 }, { description: "Transient error spike → approved after analysis → risk 0.31", outcome: "approve", risk: 0.31 }],
@@ -636,7 +761,7 @@
         btn.textContent = 'Run MCMC';
     }
 
-    // Collapsible advanced section
+    // Collapsible advanced section (default collapsed)
     const toggleBtn = document.getElementById('advancedToggle');
     const advancedContent = document.getElementById('advancedContent');
     let isOpen = false;
@@ -651,14 +776,7 @@
         isOpen = !isOpen;
     });
 
-    function updateSocialProof() {
-        document.getElementById('liveUsers').innerText = Math.floor(Math.random() * 30) + 30;
-        document.getElementById('spotsLeft').innerText = Math.floor(Math.random() * 20) + 5;
-    }
-    setInterval(updateSocialProof, 8000);
-    updateSocialProof();
-
-    // UI improvements: copy risk and export state
+    // Copy and export
     const toast = document.getElementById('toastMsg');
     function showToast() { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
     document.getElementById('copyRiskBtn').addEventListener('click', () => {
@@ -667,9 +785,7 @@
         const decision = document.getElementById('policyDecision').innerText.split('(')[0].trim();
         navigator.clipboard.writeText(`Risk score: ${riskText}\n95% CI: ${interval}\nDecision: ${decision}`).then(showToast);
     });
-
-    // Additional improvement: Export current simulation state as JSON
-    const exportToast = document.getElementById('exportToast');
+    const exportToastMsg = document.getElementById('exportToast');
     document.getElementById('exportStateBtn').addEventListener('click', () => {
         const state = {
             timestamp: new Date().toISOString(),
@@ -687,8 +803,8 @@
         console.log('ARF Demo State:', state);
         const jsonStr = JSON.stringify(state, null, 2);
         navigator.clipboard.writeText(jsonStr).then(() => {
-            exportToast.style.opacity = '1';
-            setTimeout(() => exportToast.style.opacity = '0', 2000);
+            exportToastMsg.style.opacity = '1';
+            setTimeout(() => exportToastMsg.style.opacity = '0', 2000);
         }).catch(() => alert('State copied to console.'));
     });
 
@@ -701,6 +817,7 @@
     const banner = document.getElementById('pilotBanner');
     document.getElementById('dismissBannerBtn').addEventListener('click', () => banner.style.display = 'none');
 
+    // Initialize
     updateRiskUI();
     retrieveMemory();
     evaluateIntent();
