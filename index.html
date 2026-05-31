@@ -361,9 +361,6 @@
         .action-approve { background: #14532d; color: #bbf7d0; }
         .action-escalate { background: #78350f; color: #fde68a; }
         .action-deny { background: #7f1d1d; color: #fecaca; }
-
-        /* Hide advanced section completely */
-        .advanced-section { display: none; }
     </style>
 </head>
 <body>
@@ -514,7 +511,7 @@
     };
 
     const impactMessages = {
-        aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). High reputational exposure – ARF could escalate customer‑facing claims to human review.",
+        aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). ARF would have escalated this customer‑facing claim to prevent reputational damage.",
         pocketos: "⚠️ 3 months of customer data lost; cloud provider restored but recovery took days. Estimated business impact: $150,000.",
         amazon: "⚠️ 6‑hour retail outage blocked checkout for millions. Estimated revenue loss: $5–10M. ARF would mandate senior‑engineer review for AI‑assisted changes."
     };
@@ -579,7 +576,7 @@
 
     const presets = {
         aircanada: {
-            category: "default", failures: 5, successes: 95,
+            category: "default", failures: 22, successes: 78,   // risk ~20.7% → ESCALATE
             impact: 812,
             description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)."
         },
@@ -610,7 +607,7 @@
         applyPreset(document.getElementById('presetScenario').value);
     });
 
-    // Fill incident table once
+    // Fill incident table
     const incidents = [
         { time: '2026-05-14 10:23:45', service: 'payment-api', metric: 'latency', value: '450ms', risk: 0.82, action: 'ESCALATE' },
         { time: '2026-05-14 09:15:22', service: 'auth-service', metric: 'error_rate', value: '12%', risk: 0.45, action: 'APPROVE' },
@@ -625,7 +622,7 @@
             <td><span class="action-pill ${i.action === 'APPROVE' ? 'action-approve' : i.action === 'ESCALATE' ? 'action-escalate' : 'action-deny'}">${i.action}</span></td>
         </tr>`).join('');
 
-    // Load first scenario by default
+    // Load Air Canada first (now shows ESCALATE)
     applyPreset('aircanada');
 </script>
 </body>
