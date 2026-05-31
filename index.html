@@ -789,7 +789,7 @@
                 <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}"
                     stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
                     transform="rotate(-90 ${size/2} ${size/2})" class="gauge-circle" />
-                <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="white" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
+                <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="${textColor}" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
             </svg>`;
         const status = risk < 0.2 ? 'SAFE' : (risk > 0.8 ? 'CRITICAL' : 'WARNING');
         const badgeColor = risk < 0.2 ? '#16a34a' : (risk > 0.8 ? '#dc2626' : '#ca8a04');
