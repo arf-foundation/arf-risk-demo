@@ -260,7 +260,7 @@
         }
         .trust-badge {
             background: #1e293b;
-            color: white;               /* <-- FIX: ensures readability in light mode */
+            color: white;               /* FIX: ensures readability in light mode */
             padding: 0.5rem 1rem;
             border-radius: 2rem;
             font-size: 0.8rem;
@@ -776,13 +776,15 @@
         updateCounterfactual(risk, impact);
     }
 
-    // ---------- Custom SVG Gauge (aligned with decision thresholds) ----------
+    // ---------- Custom SVG Gauge (text colour adapts to light/dark mode) ----------
     function drawCustomGauge(risk) {
         const container = document.getElementById('customGauge');
         const size = 180, radius = 70, stroke = 12;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - risk);
         const color = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
+        // Read the current text colour from the CSS variable (dark in light mode, light in dark mode)
+        const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary').trim() || '#e2e8f0';
         container.innerHTML = `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
                 <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="#374151" stroke-width="${stroke}" />
