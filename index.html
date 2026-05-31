@@ -401,6 +401,7 @@
                 <label>Successes (observed):</label>
                 <input type="number" id="successes" value="80" min="0" step="1">
                 <button id="updateRiskBtn">Update Risk</button>
+                <button id="resetRiskBtn" class="copy-risk-btn" style="margin-top:6px;">↺ Reset sliders</button>
                 <div class="result">
                     <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
                     <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
@@ -463,6 +464,9 @@
                 <div class="col">
                     <div class="explanation">
                         🧠 Blends online Beta‑Binomial updates with offline HMC‑learned patterns (simulated slider). In production, weights are data‑driven.
+                        <p style="font-size:0.8rem; color:var(--footer-color); margin-top:8px;">
+                        ⚠️ <strong>Demo limitations:</strong> This simulation uses a simplified conjugate Beta‑Binomial model and a minimal Metropolis‑Hastings sampler. It does not connect to the live ARF governance engine, and the prior/hyperprior blending is illustrative. For full mathematical details, see the ARF technical report.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -847,6 +851,18 @@
             exportToastMsg.style.opacity = '1';
             setTimeout(() => exportToastMsg.style.opacity = '0', 2000);
         }).catch(() => alert('State copied to console.'));
+    });
+
+    document.getElementById('resetRiskBtn').addEventListener('click', () => {
+        document.getElementById('category').value = 'default';
+        document.getElementById('failures').value = 20;
+        document.getElementById('successes').value = 80;
+        document.getElementById('hmcPred').value = 0.35;
+        document.getElementById('hmcWeight').value = 0.3;
+        document.getElementById('hmcVal').innerText = '0.35';
+        document.getElementById('weightVal').innerText = '0.30';
+        updateRiskUI();
+        updateHybridRisk();
     });
 
     document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
