@@ -162,6 +162,12 @@
         }
         button:hover { background: var(--button-hover); }
         button:active { transform: translateY(1px); }
+        .button-secondary {
+            background: transparent;
+            border: 1px solid var(--button-bg);
+            color: var(--button-bg);
+        }
+        .button-secondary:hover { background: var(--button-hover); color: white; }
 
         .result {
             background: var(--result-bg);
@@ -170,11 +176,18 @@
             margin-top: 12px;
             font-size: 0.85rem;
             word-break: break-word;
-            line-height: 1.8;                /* increase line spacing */
+            line-height: 1.8;
         }
         .result strong {
             display: block;
             margin-bottom: 2px;
+        }
+        .prevented-message {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 12px 0;
+            color: #fde68a;
         }
 
         .status {
@@ -278,6 +291,18 @@
             font-size: 1rem;
             text-align: center;
         }
+        .cf-saved {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #22c55e;
+            display: block;
+            margin: 8px 0;
+        }
+        .cf-tagline {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
         .human-escalation {
             display: inline-flex;
             align-items: center;
@@ -289,6 +314,22 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
+        .pilot-cta {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .pilot-cta a {
+            background: #38bdf8;
+            color: #0a0c10;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 2rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .pilot-cta a:hover { background: #7dd3fc; }
+
         @media (min-width: 641px) {
             body { padding: 16px; }
             .sticky-banner { flex-direction: row; justify-content: space-between; align-items: center; text-align: left; padding: 12px 20px; }
@@ -393,18 +434,22 @@
             <option value="pocketos">💀 PocketOS (Apr 2026) – Production DB wiped in 9 seconds</option>
             <option value="amazon">📦 Amazon (Mar 2026) – Outdated wiki caused 6‑hour outage</option>
         </select>
-        <button id="applyPresetBtn">Load Scenario & Evaluate Risk</button>
+        <div style="display: flex; gap: 8px;">
+            <button id="applyPresetBtn" style="flex:1;">Load Scenario & Evaluate Risk</button>
+            <button id="reevalBtn" class="button-secondary" style="flex:0 0 auto; min-width: 120px;">↻ Re‑evaluate</button>
+        </div>
     </div>
 
     <!-- Risk Scoring Result Card -->
     <div class="card" id="riskCard" style="display: none;">
         <h2>📊 Risk Scoring Result</h2>
         <div class="result">
-            <strong>Risk score (posterior mean):</strong> <span id="riskScore"></span><br>
+            <strong>Risk score (posterior mean) <span class="tooltip-icon" title="Risk = (α + failures) / (α + β + total observations) — simple Beta‑Binomial conjugate update.">ⓘ</span>:</strong> <span id="riskScore"></span><br>
             <strong>95% credible interval <span class="tooltip-icon" title="The range where the true failure probability lies with 95% confidence.">ⓘ</span>:</strong> <span id="credibleInterval"></span><br>
             <strong>Prior mean:</strong> <span id="priorMean"></span><br>
-            <strong>Policy decision:</strong> <span id="policyDecision" class="status"></span>
+            <strong>Policy decision <span class="tooltip-icon" id="decisionTooltip" title="Customer‑facing claims always escalate to protect reputation.">ⓘ</span>:</strong> <span id="policyDecision" class="status"></span>
             <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
+            <div id="preventedMessage" class="prevented-message">ARF would have ESCALATED to a human. The incident never happens.</div>
             <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
             <div id="riskImpactMessage" class="impact-message"></div>
         </div>
@@ -431,6 +476,9 @@
         <div class="explanation" style="margin-top: 8px;">
             🔍 <strong>Counterfactual analysis:</strong> What would have happened if the agent acted alone vs. with ARF governance.
         </div>
+        <div class="pilot-cta">
+            <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">Prevent incidents like these for your own agents. Request pilot access →</a>
+        </div>
     </div>
 
     <!-- Recent Incidents Table -->
@@ -449,7 +497,7 @@
         <p style="font-size:0.7rem; color:#94a3b8; margin-top:1rem; text-align:center;">Data shown is simulated for demonstration purposes only.</p>
     </div>
 
-    <!-- Social proof – white text added for desktop readability -->
+    <!-- Social proof -->
     <div style="text-align: center; margin-top: 20px;">
         <div style="background:#1e293b; padding:6px 10px; border-radius:30px; display:inline-block; font-size:0.7rem; color: white;">
             ✅ 54/54 pressure tests passed &nbsp;|&nbsp;
@@ -462,8 +510,6 @@
         <p>ARF – Simulated Risk Scoring Demo | <a href="https://github.com/arf-foundation/arf-risk-demo" target="_blank">Public Repo</a> | <a href="https://www.arf-ai.com/signup" target="_blank">Request Pilot Access</a></p>
     </footer>
 </div>
-
-<a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="floating-pilot" style="position:fixed; bottom:20px; right:20px; z-index:99; background:var(--banner-bg); color:white; border-radius:60px; padding:10px 16px; text-decoration:none; font-weight:bold;">✈️ Pilot Access</a>
 
 <script>
     // ---------- Beta utilities ----------
@@ -544,9 +590,19 @@
         decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         decisionSpan.className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
 
+        // Show decision tooltip for Air Canada (reputation policy)
+        const tooltipIcon = document.getElementById('decisionTooltip');
+        tooltipIcon.style.display = currentScenario === 'aircanada' ? 'inline' : 'none';
+
         const explanationDiv = document.getElementById('decisionExplanation');
         const thresholdText = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
         explanationDiv.innerHTML = `Because the risk (${(risk*100).toFixed(1)}%) is ${thresholdText}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
+
+        // Prevented incident message (refined improvement 1)
+        const preventedDiv = document.getElementById('preventedMessage');
+        preventedDiv.innerHTML = decision === 'Approve' ? 'ARF would have APPROVED. Incident avoided through confidence.' :
+                                 (decision === 'Deny' ? 'ARF would have DENIED. Catastrophic loss prevented.' :
+                                  'ARF would have ESCALATED to a human. The incident never happens.');
 
         const expectedLoss = risk * impact;
         document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (risk × impact estimate)`;
@@ -563,9 +619,14 @@
         const withoutLoss = risk * impact;
         const withLoss = 500;
         const saved = withoutLoss - withLoss;
-        document.getElementById('cfContent').innerHTML = cfMode === "without" ?
-            `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.` :
-            `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
+        const cfDiv = document.getElementById('cfContent');
+        if (cfMode === "without") {
+            cfDiv.innerHTML = `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.`;
+        } else {
+            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>
+                <span class="cf-saved">💰 You saved ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</span>
+                <span class="cf-tagline">That’s the cost of governance vs. the cost of chaos.</span>`;
+        }
     }
     document.getElementById('cfWithoutBtn').addEventListener('click', () => {
         cfMode = "without";
@@ -582,7 +643,7 @@
 
     const presets = {
         aircanada: {
-            category: "default", failures: 22, successes: 78,   // risk ~20.7% → ESCALATE
+            category: "default", failures: 22, successes: 78,
             impact: 812,
             description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)."
         },
@@ -610,6 +671,9 @@
     }
 
     document.getElementById('applyPresetBtn').addEventListener('click', () => {
+        applyPreset(document.getElementById('presetScenario').value);
+    });
+    document.getElementById('reevalBtn').addEventListener('click', () => {
         applyPreset(document.getElementById('presetScenario').value);
     });
 
