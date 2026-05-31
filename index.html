@@ -170,7 +170,13 @@
             margin-top: 12px;
             font-size: 0.85rem;
             word-break: break-word;
+            line-height: 1.8;                /* increase line spacing */
         }
+        .result strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
         .status {
             font-size: 1rem;
             font-weight: bold;
@@ -443,9 +449,9 @@
         <p style="font-size:0.7rem; color:#94a3b8; margin-top:1rem; text-align:center;">Data shown is simulated for demonstration purposes only.</p>
     </div>
 
-    <!-- Social proof -->
+    <!-- Social proof – white text added for desktop readability -->
     <div style="text-align: center; margin-top: 20px;">
-        <div class="social-proof" style="background:#1e293b; padding:6px 10px; border-radius:30px; display:inline-block; font-size:0.7rem;">
+        <div style="background:#1e293b; padding:6px 10px; border-radius:30px; display:inline-block; font-size:0.7rem; color: white;">
             ✅ 54/54 pressure tests passed &nbsp;|&nbsp;
             🧪 3 active pilots &nbsp;|&nbsp;
             👥 Founder‑led
