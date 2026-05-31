@@ -171,6 +171,7 @@
             justify-content: center;
             align-items: center;
             margin: 1rem 0;
+            color: var(--text-primary); /* <-- sets currentColor for SVG text */
         }
         .gauge-circle {
             transition: stroke-dashoffset 0.5s ease;
@@ -776,22 +777,21 @@
         updateCounterfactual(risk, impact);
     }
 
-    // ---------- Custom SVG Gauge (text colour adapts to light/dark mode) ----------
+    // ---------- Custom SVG Gauge (now uses currentColor for text) ----------
     function drawCustomGauge(risk) {
         const container = document.getElementById('customGauge');
         const size = 180, radius = 70, stroke = 12;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - risk);
         const color = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
-        // Read the current text colour from the CSS variable (dark in light mode, light in dark mode)
-        const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary').trim() || '#e2e8f0';
+        // The text colour inherits from the .svg-gauge container's `color: var(--text-primary)`
         container.innerHTML = `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
                 <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="#374151" stroke-width="${stroke}" />
                 <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}"
                     stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
                     transform="rotate(-90 ${size/2} ${size/2})" class="gauge-circle" />
-                <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="${textColor}" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
+                <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="currentColor" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
             </svg>`;
         const status = risk < 0.2 ? 'SAFE' : (risk > 0.8 ? 'CRITICAL' : 'WARNING');
         const badgeColor = risk < 0.2 ? '#16a34a' : (risk > 0.8 ? '#dc2626' : '#ca8a04');
