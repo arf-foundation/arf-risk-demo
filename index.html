@@ -446,8 +446,8 @@
         <select id="presetScenario">
             <option value="custom">Custom (adjust sliders below)</option>
             <option value="aircanada">✈️ Air Canada (2022) – Chatbot hallucination</option>
-            <option value="pocketos">💀 PocketOS (April 2026) – Production DB wiped in 9 seconds</option>
-            <option value="amazon">📦 Amazon (March 2026) – Outdated wiki caused 6‑hour outage</option>
+            <option value="pocketos">💀 PocketOS (Apr 2026) – Production DB wiped in 9 seconds</option>
+            <option value="amazon">📦 Amazon (Mar 2026) – Outdated wiki caused 6‑hour outage</option>
         </select>
         <button id="applyPresetBtn">Load Scenario</button>
     </div>
@@ -736,10 +736,11 @@
     let currentImpactEstimate = 150000;
     let currentScenario = "custom";
 
+    // Updated impact messages with accurate figures from real incidents
     const impactMessages = {
-        aircanada: "⚠️ Low financial risk (expected loss ~$2,700), but high reputational exposure. ARF could escalate for customer‑facing claims.",
-        pocketos: "⚠️ Loss avoided: $150,000 (data recovery + customer trust)",
-        amazon: "⚠️ Loss avoided: $5,000,000 (revenue loss + engineering hours)",
+        aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). High reputational exposure – ARF could escalate customer‑facing claims to human review.",
+        pocketos: "⚠️ 3 months of customer data lost; cloud provider restored but recovery took days. Estimated business impact: $150,000.",
+        amazon: "⚠️ 6‑hour retail outage blocked checkout for millions. Estimated revenue loss: $5–10M. ARF would mandate senior‑engineer review for AI‑assisted changes.",
         custom: {
             approve: '✅ Estimated saved: $2,400 / month (no unnecessary escalations)',
             deny: '⚠️ Potential loss avoided: $8,500 / month (prevented breach)',
@@ -767,10 +768,11 @@
     }
 
     function updateExpectedLossDisplay(risk, scenarioName) {
+        // Impact estimates based on actual incident data where possible
         let impact = 0;
-        if (scenarioName === "aircanada") impact = 50000;
-        else if (scenarioName === "pocketos") impact = 150000;
-        else if (scenarioName === "amazon") impact = 5000000;
+        if (scenarioName === "aircanada") impact = 812;        // actual damages from BBC article
+        else if (scenarioName === "pocketos") impact = 150000;  // estimated
+        else if (scenarioName === "amazon") impact = 5000000;   // estimated (placeholder)
         else impact = currentImpactEstimate;
         const expectedLoss = risk * impact;
         const lossFormatted = expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -780,13 +782,12 @@
         updateCounterfactual(risk, impact);
     }
 
-    // ---------- Custom SVG Gauge ----------
+    // ---------- Custom SVG Gauge (aligned with decision thresholds) ----------
     function drawCustomGauge(risk) {
         const container = document.getElementById('customGauge');
         const size = 180, radius = 70, stroke = 12;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - risk);
-        // Color aligned with decision thresholds
         const color = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
         container.innerHTML = `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
@@ -796,7 +797,6 @@
                     transform="rotate(-90 ${size/2} ${size/2})" class="gauge-circle" />
                 <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="white" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
             </svg>`;
-        // Status badge aligned with decision thresholds
         const status = risk < 0.2 ? 'SAFE' : (risk > 0.8 ? 'CRITICAL' : 'WARNING');
         const badgeColor = risk < 0.2 ? '#16a34a' : (risk > 0.8 ? '#dc2626' : '#ca8a04');
         document.getElementById('statusBadge').innerHTML = `<span style="display:inline-block;padding:0.3rem 1rem;border-radius:2rem;font-weight:bold;background:${badgeColor};color:white;">${status}</span>`;
@@ -804,7 +804,7 @@
 
     // ---------- Risk Factor Breakdown ----------
     function drawRiskFactors(risk) {
-        const conjWeight = 0.49, hmcWeight = 0.24, hyperWeight = 0.27; // static for demo
+        const conjWeight = 0.49, hmcWeight = 0.24, hyperWeight = 0.27;
         const container = document.getElementById('riskFactors');
         container.innerHTML = `
             <div style="border-top:1px solid #334155; padding-top:0.8rem; font-size:0.85rem; color:#94a3b8;">Risk Factor Breakdown <span style="font-size:0.7rem;">(* simulated weights for demo)</span></div>
@@ -825,7 +825,6 @@
         const { risk, lo, hi } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
         onlineRisk = risk;
 
-        // Update prior mean
         const priorMean = currentPriorAlpha / (currentPriorAlpha + currentPriorBeta);
         document.getElementById('priorMean').innerText = priorMean.toFixed(4);
         document.getElementById('riskScore').innerText = risk.toFixed(4);
@@ -906,10 +905,23 @@
         updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
     });
 
+    // Presets with corrected descriptions and impact
     const presets = {
-        aircanada: { category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4, impact: 50000, description: "Air Canada chatbot hallucination" },
-        pocketos: { category: "database", failures: 30, successes: 70, hmcPred: 0.75, hmcWeight: 0.5, impact: 150000, description: "PocketOS – production DB deleted (ARF escalates)" },
-        amazon: { category: "compute", failures: 25, successes: 75, hmcPred: 0.70, hmcWeight: 0.5, impact: 5000000, description: "Amazon 6‑hour outage" }
+        aircanada: {
+            category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4,
+            impact: 812,
+            description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)."
+        },
+        pocketos: {
+            category: "database", failures: 30, successes: 70, hmcPred: 0.75, hmcWeight: 0.5,
+            impact: 150000,
+            description: "Cursor AI agent deleted production DB in 9 seconds – no confirmation, no human in the loop."
+        },
+        amazon: {
+            category: "compute", failures: 25, successes: 75, hmcPred: 0.70, hmcWeight: 0.5,
+            impact: 5000000,
+            description: "Engineer relied on AI‑inferred advice from outdated wiki → 6‑hour retail outage."
+        }
     };
     function applyPreset(presetId) {
         const p = presets[presetId];
