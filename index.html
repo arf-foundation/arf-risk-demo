@@ -60,8 +60,9 @@
             line-height: 1.5;
             padding: 12px;
             transition: background 0.2s, color 0.2s;
+            position: relative;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
         .sticky-banner {
             position: sticky;
             top: 0;
@@ -136,6 +137,7 @@
             box-shadow: var(--card-shadow);
             padding: 16px;
             margin-bottom: 20px;
+            border: 1px solid var(--border-light);
         }
         .row { display: flex; flex-direction: column; gap: 16px; }
         .col { width: 100%; }
@@ -302,6 +304,54 @@
             h1 { font-size: 1.8rem; }
         }
         @media (min-width: 1024px) { .card { padding: 24px; } }
+
+        /* ============================================
+           UNIFIED ANIMATED TECH GRID (from pitch deck)
+           ============================================ */
+        :root {
+            --grid-color: rgba(56, 189, 248, 0.12);
+            --glow-color-start: rgba(56, 189, 248, 0.08);
+            --glow-color-end: transparent;
+            --grid-size: 40px;
+            --animation-speed-grid: 20s;
+            --animation-speed-glow: 6s;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            pointer-events: none;
+            z-index: 0;
+            animation: gridMove var(--animation-speed-grid) linear infinite;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: var(--grid-size) var(--grid-size); }
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, var(--glow-color-start), var(--glow-color-end) 80%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulseGlow var(--animation-speed-glow) ease infinite;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.4; }
+        }
     </style>
 </head>
 <body>
@@ -628,11 +678,10 @@
         document.getElementById('hybridRisk').innerText = hybrid.toFixed(4);
     }
 
-    // Counterfactual logic (corrected: With ARF loss = $500 review cost)
     let cfMode = "without";
     function updateCounterfactual(risk, impact) {
         const withoutLoss = risk * impact;
-        const withLoss = 500; // manual review cost (realistic positive number)
+        const withLoss = 500;
         const saved = withoutLoss - withLoss;
         const cfDiv = document.getElementById('cfContent');
         if (cfMode === "without") {
@@ -655,7 +704,6 @@
         updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
     });
 
-    // Preset scenarios (corrected: PocketOS risk now ~0.72 → Escalate)
     const presets = {
         aircanada: { category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4, impact: 50000, description: "Air Canada chatbot hallucination" },
         pocketos: { category: "database", failures: 30, successes: 70, hmcPred: 0.75, hmcWeight: 0.5, impact: 150000, description: "PocketOS – production DB deleted (ARF escalates)" },
@@ -685,7 +733,6 @@
         if (selected !== "custom") applyPreset(selected);
     });
 
-    // Memory store
     const memoryStore = {
         highLatency: [{ description: "Latency spike to 450ms → escalated, later resolved with restart.", outcome: "escalate", risk: 0.65 }, { description: "Similar latency spike → HMC detected pattern → approved with auto‑scaling.", outcome: "approve", risk: 0.28 }],
         highErrorRate: [{ description: "Error rate 5% → misconfigured endpoint → denied.", outcome: "deny", risk: 0.92 }, { description: "Transient error spike → approved after analysis → risk 0.31", outcome: "approve", risk: 0.31 }],
@@ -757,7 +804,6 @@
         btn.textContent = 'Run MCMC';
     }
 
-    // Collapsible advanced section (default collapsed)
     const toggleBtn = document.getElementById('advancedToggle');
     const advancedContent = document.getElementById('advancedContent');
     let isOpen = false;
@@ -772,7 +818,6 @@
         isOpen = !isOpen;
     });
 
-    // Copy and export
     const toast = document.getElementById('toastMsg');
     function showToast() { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
     document.getElementById('copyRiskBtn').addEventListener('click', () => {
@@ -804,7 +849,6 @@
         }).catch(() => alert('State copied to console.'));
     });
 
-    // Event listeners
     document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
     document.getElementById('updateHybrid').addEventListener('click', updateHybridRisk);
     document.getElementById('retrieveMemory').addEventListener('click', retrieveMemory);
@@ -813,7 +857,6 @@
     const banner = document.getElementById('pilotBanner');
     document.getElementById('dismissBannerBtn').addEventListener('click', () => banner.style.display = 'none');
 
-    // Initialize
     updateRiskUI();
     retrieveMemory();
     evaluateIntent();
