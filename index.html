@@ -473,8 +473,10 @@
                 <button id="resetRiskBtn" class="copy-risk-btn" style="margin-top:6px;">↺ Reset sliders</button>
                 <div class="result">
                     <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
-                    <strong>95% credible interval:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
+                    <strong>95% credible interval <span class="tooltip-icon" title="The range where the true failure probability lies with 95% confidence.">ⓘ</span>:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
+                    <strong>Prior mean:</strong> <span id="priorMean">0.0909</span><br>
                     <strong>Policy decision:</strong> <span id="policyDecision" class="status status-escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
+                    <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
                     <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
                         <button id="copyRiskBtn" class="copy-risk-btn">📋 Copy risk score</button>
@@ -538,7 +540,7 @@
 
     <!-- Collapsible Advanced Section -->
     <div class="collapsible" id="advancedToggle">
-        <span>🧠 Show advanced inference (Hybrid + MCMC) – offline HMC model</span>
+        <span>🧠 Dive deeper: Hybrid risk & MCMC (click to expand)</span>
         <span style="font-size:1.2rem;">▼</span>
     </div>
     <div id="advancedContent" class="collapsible-content">
@@ -734,6 +736,28 @@
     let currentImpactEstimate = 150000;
     let currentScenario = "custom";
 
+    // Scenario-specific impact messages (enhancement 3)
+    const impactMessages = {
+        aircanada: "✅ No loss – routine operation (but reputational risk highlighted in ARF escalation policy)",
+        pocketos: "⚠️ Loss avoided: $150,000 (data recovery + customer trust)",
+        amazon: "⚠️ Loss avoided: $5,000,000 (revenue loss + engineering hours)",
+        custom: {
+            approve: '✅ Estimated saved: $2,400 / month (no unnecessary escalations)',
+            deny: '⚠️ Potential loss avoided: $8,500 / month (prevented breach)',
+            escalate: '🔄 Manual review cost: $1,200 / month (escalation overhead)'
+        }
+    };
+
+    function getImpactMessage(risk, decision) {
+        if (currentScenario !== 'custom' && impactMessages[currentScenario]) {
+            return impactMessages[currentScenario];
+        }
+        const msgs = impactMessages.custom;
+        if (decision === 'Approve') return msgs.approve;
+        if (decision === 'Deny') return msgs.deny;
+        return msgs.escalate;
+    }
+
     function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
         const alpha = priorAlpha + failures;
         const beta = priorBeta + successes;
@@ -741,12 +765,6 @@
         const lo = betaQuantile(0.025, alpha, beta);
         const hi = betaQuantile(0.975, alpha, beta);
         return { risk, lo, hi, alpha, beta };
-    }
-
-    function getImpactMessage(risk, decision) {
-        if (decision === 'Approve') return '✅ Estimated saved: $2,400 / month (no unnecessary escalations)';
-        if (decision === 'Deny') return '⚠️ Potential loss avoided: $8,500 / month (prevented breach)';
-        return '🔄 Manual review cost: $1,200 / month (escalation overhead)';
     }
 
     function updateExpectedLossDisplay(risk, scenarioName) {
@@ -788,7 +806,7 @@
         const conjWeight = 0.49, hmcWeight = 0.24, hyperWeight = 0.27; // static for demo
         const container = document.getElementById('riskFactors');
         container.innerHTML = `
-            <div style="border-top:1px solid #334155; padding-top:0.8rem; font-size:0.85rem; color:#94a3b8;">Risk Factor Breakdown</div>
+            <div style="border-top:1px solid #334155; padding-top:0.8rem; font-size:0.85rem; color:#94a3b8;">Risk Factor Breakdown <span style="font-size:0.7rem;">(* simulated weights for demo)</span></div>
             <div style="display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Conjugate prior</span><span>${(conjWeight*risk*100).toFixed(1)}% (weight ${conjWeight.toFixed(2)})</span></div>
             <div style="width:100%; background:#374151; border-radius:4px; height:6px; margin:0.2rem 0;"><div style="width:${conjWeight*100}%; background:#3b82f6; height:6px; border-radius:4px;"></div></div>
             <div style="display:flex; justify-content:space-between; margin-top:0.5rem;"><span>HMC prediction</span><span>${(hmcWeight*risk*100).toFixed(1)}% (weight ${hmcWeight.toFixed(2)})</span></div>
@@ -806,6 +824,9 @@
         const { risk, lo, hi } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
         onlineRisk = risk;
 
+        // Update prior mean
+        const priorMean = currentPriorAlpha / (currentPriorAlpha + currentPriorBeta);
+        document.getElementById('priorMean').innerText = priorMean.toFixed(4);
         document.getElementById('riskScore').innerText = risk.toFixed(4);
         document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
         const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
@@ -813,6 +834,13 @@
         const decisionSpan = document.getElementById('policyDecision');
         decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         decisionSpan.className = `status ${decisionClass}`;
+
+        // Dynamic decision explanation (enhancement 1)
+        const explanationDiv = document.getElementById('decisionExplanation');
+        if (explanationDiv) {
+            const thresholdText = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
+            explanationDiv.innerHTML = `Because the risk (${(risk*100).toFixed(1)}%) is ${thresholdText}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
+        }
 
         drawCustomGauge(risk);
         drawRiskFactors(risk);
@@ -906,13 +934,76 @@
         if (selected !== "custom") applyPreset(selected);
     });
 
-    const memoryStore = { /* unchanged */ };
-    function retrieveMemory() { /* unchanged */ }
+    const memoryStore = {
+        highLatency: [{ description: "Latency spike to 450ms → escalated, later resolved with restart.", outcome: "escalate", risk: 0.65 }, { description: "Similar latency spike → HMC detected pattern → approved with auto‑scaling.", outcome: "approve", risk: 0.28 }],
+        highErrorRate: [{ description: "Error rate 5% → misconfigured endpoint → denied.", outcome: "deny", risk: 0.92 }, { description: "Transient error spike → approved after analysis → risk 0.31", outcome: "approve", risk: 0.31 }],
+        cpuSpike: [{ description: "CPU 90% for 5 min → escalated, later scaled up.", outcome: "escalate", risk: 0.72 }, { description: "CPU spike during batch job → approved with warning.", outcome: "approve", risk: 0.41 }],
+        normal: [{ description: "Normal operation → approved.", outcome: "approve", risk: 0.12 }]
+    };
+    function retrieveMemory() {
+        const scenario = document.getElementById('memoryScenario').value;
+        const incidents = memoryStore[scenario];
+        let html = '<strong>Similar past incidents:</strong><ul>';
+        incidents.forEach(inc => { html += `<li>${inc.description} (outcome: ${inc.outcome}, risk: ${inc.risk.toFixed(2)})</li>`; });
+        html += '</ul><div class="explanation">Semantic similarity (FAISS) would weight these to adjust risk.</div>';
+        document.getElementById('memoryResult').innerHTML = html;
+    }
 
     const faultMap = { none: [1,99], switch_down: [20,80], server_overload: [35,65], cascade: [60,40] };
-    function evaluateIntent() { /* unchanged */ }
+    function evaluateIntent() {
+        const fault = document.getElementById('faultType').value;
+        const [failures, successes] = faultMap[fault];
+        const { risk: baseRisk } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
+        const hmcVal = parseFloat(document.getElementById('hmcPred').value);
+        const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
+        const finalRisk = baseRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
+        const decision = finalRisk < 0.2 ? 'Approve' : (finalRisk > 0.8 ? 'Deny' : 'Escalate');
+        const healingActions = decision === 'Deny' ? ['restart', 'rollback'] : (decision === 'Escalate' ? ['notify_ops', 'investigate'] : ['monitor']);
+        document.getElementById('intentResult').innerHTML = `<strong>Online risk:</strong> ${baseRisk.toFixed(4)}<br><strong>Hybrid risk:</strong> ${finalRisk.toFixed(4)}<br><strong>Decision:</strong> ${decision}<br><strong>Healing actions:</strong> ${healingActions.join(', ')}`;
+        Plotly.newPlot('intentGauge', [{
+            type: "indicator", mode: "gauge+number", value: finalRisk,
+            title: { text: "Final Risk" }, gauge: { axis: { range: [0,1] }, bar: { color: "#2c3e50" },
+                     steps: [{ range: [0,0.2], color: "#d4edda" }, { range: [0.2,0.8], color: "#fff3cd" }, { range: [0.8,1], color: "#f8d7da" }] }
+        }], { margin: { t: 40, b: 30, l: 40, r: 40 }, responsive: true });
+    }
 
-    async function runMCMC() { /* unchanged */ }
+    async function runMCMC() {
+        const btn = document.getElementById('runMCMC');
+        btn.classList.add('loading-btn');
+        btn.textContent = 'Running...';
+        await new Promise(r => setTimeout(r, 50));
+        const nSamples = parseInt(document.getElementById('samples').value);
+        const burnIn = parseInt(document.getElementById('warmup').value);
+        const total = nSamples + burnIn;
+        const data = [0.45,0.62,0.48,0.51,0.55,0.49,0.47,0.53,0.52,0.50];
+        const logPrior = mu => -0.5 * mu * mu;
+        const logLikelihood = mu => data.reduce((acc,d) => acc - 0.5 * ((d - mu)**2) / (0.2**2), 0);
+        const logPosterior = mu => logPrior(mu) + logLikelihood(mu);
+        let current = 0.0, currentLog = logPosterior(current);
+        const samples = [];
+        let accepted = 0;
+        const proposalSD = 0.05;
+        for (let i = 0; i < total; i++) {
+            const proposal = current + (Math.random() - 0.5) * 2 * proposalSD;
+            const proposalLog = logPosterior(proposal);
+            if (Math.random() < Math.min(1, Math.exp(proposalLog - currentLog))) {
+                current = proposal;
+                currentLog = proposalLog;
+                accepted++;
+            }
+            if (i >= burnIn) samples.push(current);
+        }
+        const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+        samples.sort((a,b)=>a-b);
+        const median = samples[Math.floor(samples.length/2)];
+        const lo = samples[Math.floor(samples.length*0.025)];
+        const hi = samples[Math.floor(samples.length*0.975)];
+        document.getElementById('mcmcSummary').innerHTML = `<strong>Mean μ:</strong> ${mean.toFixed(4)}<br><strong>Median μ:</strong> ${median.toFixed(4)}<br><strong>95% CI:</strong> [${lo.toFixed(4)}, ${hi.toFixed(4)}]<br><strong>Acceptance:</strong> ${((accepted/total)*100).toFixed(1)}%`;
+        Plotly.newPlot('tracePlot', [{ x: Array.from({length: samples.length}, (_,i)=>i+1), y: samples, mode: 'lines', line: { width: 1 }, name: 'μ' }], { title: 'Trace of μ', xaxis: { title: 'Iteration' }, yaxis: { title: 'μ' }, responsive: true });
+        Plotly.newPlot('histPlot', [{ x: samples, type: 'histogram', nbinsx: 50, name: 'Posterior' }], { title: 'Posterior Distribution', xaxis: { title: 'μ' }, bargap: 0.05, responsive: true });
+        btn.classList.remove('loading-btn');
+        btn.textContent = 'Run MCMC';
+    }
 
     const toggleBtn = document.getElementById('advancedToggle');
     const advancedContent = document.getElementById('advancedContent');
@@ -967,6 +1058,7 @@
         document.getElementById('hmcWeight').value = 0.3;
         document.getElementById('hmcVal').innerText = '0.35';
         document.getElementById('weightVal').innerText = '0.30';
+        currentScenario = 'custom';
         updateRiskUI();
         updateHybridRisk();
     });
