@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ARF – Bayesian Risk Scoring Demo | LLMday 2026</title>
+    <title>ARF – Risk Demo | LLMday 2026</title>
     <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
     <style>
         /* ========== DARK MODE (prefers-color-scheme) ========== */
@@ -29,7 +29,7 @@
             :root {
                 --bg-body: #121212;
                 --text-primary: #e2e8f0;
-                --card-bg: #0f172a;               /* solid, no transparency */
+                --card-bg: #0f172a;
                 --card-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 --border-light: #334155;
                 --result-bg: #0f172a;
@@ -62,7 +62,7 @@
             transition: background 0.2s, color 0.2s;
             position: relative;
         }
-        .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+        .container { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
         .sticky-banner {
             position: sticky;
             top: 0;
@@ -139,7 +139,7 @@
         .row { display: flex; flex-direction: column; gap: 16px; }
         .col { width: 100%; }
         label { display: block; margin-top: 12px; font-weight: 600; font-size: 0.85rem; }
-        input, select, button {
+        select, button {
             width: 100%;
             padding: 12px;
             margin-top: 6px;
@@ -162,20 +162,6 @@
         }
         button:hover { background: var(--button-hover); }
         button:active { transform: translateY(1px); }
-        .loading-btn { opacity: 0.7; pointer-events: none; }
-        .risk-gauge, .intent-gauge { height: 240px; width: 100%; }
-
-        /* ----- Custom SVG Gauge ----- */
-        .svg-gauge {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 1rem 0;
-            color: var(--text-primary); /* <-- sets currentColor for SVG text */
-        }
-        .gauge-circle {
-            transition: stroke-dashoffset 0.5s ease;
-        }
 
         .result {
             background: var(--result-bg);
@@ -211,47 +197,6 @@
             border-top: 1px solid var(--border-light);
             padding-top: 20px;
         }
-        .floating-pilot {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 99;
-            background: var(--banner-bg);
-            color: white;
-            border-radius: 60px;
-            padding: 10px 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .collapsible {
-            cursor: pointer;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 12px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #334155;
-        }
-        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
-        .social-proof {
-            margin-top: 12px;
-            font-size: 0.7rem;
-            background: var(--social-bg);
-            padding: 6px 10px;
-            border-radius: 30px;
-            display: inline-block;
-            text-align: center;
-        }
-        /* Trust badges – now forced to white text regardless of mode */
         .trust-badges {
             display: flex;
             flex-wrap: wrap;
@@ -261,7 +206,7 @@
         }
         .trust-badge {
             background: #1e293b;
-            color: white;               /* FIX: ensures readability in light mode */
+            color: white;
             padding: 0.5rem 1rem;
             border-radius: 2rem;
             font-size: 0.8rem;
@@ -344,13 +289,12 @@
             .dismiss-banner { align-self: center; }
             .row { flex-direction: row; gap: 24px; }
             .col { flex: 1; }
-            .risk-gauge, .intent-gauge { height: 280px; }
             h1 { font-size: 1.8rem; }
         }
         @media (min-width: 1024px) { .card { padding: 24px; } }
 
         /* ============================================
-           VERY SOFT ANIMATED TECH GRID (almost invisible)
+           VERY SOFT ANIMATED TECH GRID
            ============================================ */
         :root {
             --grid-color: rgba(56, 189, 248, 0.03);
@@ -396,7 +340,6 @@
             100% { opacity: 0.2; }
         }
 
-        /* Incident table styling */
         .incident-table th {
             text-align: left;
             padding: 0.5rem 0.5rem;
@@ -418,6 +361,9 @@
         .action-approve { background: #14532d; color: #bbf7d0; }
         .action-escalate { background: #78350f; color: #fde68a; }
         .action-deny { background: #7f1d1d; color: #fecaca; }
+
+        /* Hide advanced section completely */
+        .advanced-section { display: none; }
     </style>
 </head>
 <body>
@@ -434,66 +380,34 @@
     </div>
 
     <h1>🛡️ ARF – Prevent the Next AI Incident <span class="badge simulated-badge">Simulated</span><span class="badge tests-badge">✅ 54/54 tests passed</span></h1>
-    <p style="margin-bottom: 20px;"><strong>See how ARF would have scored risk for real‑world AI failures – live Bayesian simulation.</strong></p>
+    <p style="margin-bottom: 20px;"><strong>See how ARF would have scored risk for three real‑world AI failures.</strong></p>
 
-    <!-- Preset Scenario Dropdown -->
+    <!-- Scenario Selector -->
     <div class="card">
-        <h2>📋 Real‑world scenarios (from LLMday talk)</h2>
-        <label>Choose a scenario:</label>
+        <h2>📋 Choose a real‑world scenario</h2>
         <select id="presetScenario">
-            <option value="custom">Custom (adjust sliders below)</option>
-            <option value="aircanada">✈️ Air Canada (2022) – Chatbot hallucination</option>
+            <option value="aircanada">✈️ Air Canada (2022) – Chatbot promised fake discount</option>
             <option value="pocketos">💀 PocketOS (Apr 2026) – Production DB wiped in 9 seconds</option>
             <option value="amazon">📦 Amazon (Mar 2026) – Outdated wiki caused 6‑hour outage</option>
         </select>
-        <button id="applyPresetBtn">Load Scenario</button>
+        <button id="applyPresetBtn">Load Scenario & Evaluate Risk</button>
     </div>
 
-    <!-- Risk Scoring Card with custom SVG gauge, risk breakdown, status badge -->
-    <div class="card">
-        <h2>📊 Risk Scoring <span class="tooltip-icon" title="Beta‑Binomial conjugate prior: posterior mean = (α+failures)/(α+β+total)">ⓘ</span></h2>
-        <div class="row">
-            <div class="col">
-                <label>Category (prior):</label>
-                <select id="category">
-                    <option value="default">Default (α=1.0, β=10.0)</option>
-                    <option value="database">Database (α=1.5, β=8.0)</option>
-                    <option value="network">Network (α=1.2, β=10.0)</option>
-                    <option value="compute">Compute (α=1.0, β=12.0)</option>
-                    <option value="security">Security (α=2.0, β=10.0)</option>
-                </select>
-                <label>Failures (observed):</label>
-                <input type="number" id="failures" value="20" min="0" step="1">
-                <label>Successes (observed):</label>
-                <input type="number" id="successes" value="80" min="0" step="1">
-                <button id="updateRiskBtn">Update Risk</button>
-                <button id="resetRiskBtn" class="copy-risk-btn" style="margin-top:6px;">↺ Reset sliders</button>
-                <div class="result">
-                    <strong>Risk score (posterior mean):</strong> <span id="riskScore">0.20</span><br>
-                    <strong>95% credible interval <span class="tooltip-icon" title="The range where the true failure probability lies with 95% confidence.">ⓘ</span>:</strong> <span id="credibleInterval">[0.13, 0.28]</span><br>
-                    <strong>Prior mean:</strong> <span id="priorMean">0.0909</span><br>
-                    <strong>Policy decision:</strong> <span id="policyDecision" class="status status-escalate">Escalate (0.2 ≤ risk ≤ 0.8)</span>
-                    <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
-                    <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-                        <button id="copyRiskBtn" class="copy-risk-btn">📋 Copy risk score</button>
-                        <button id="exportStateBtn" class="copy-risk-btn">💾 Export simulation state (JSON)</button>
-                    </div>
-                    <div id="riskImpactMessage" class="impact-message"></div>
-                </div>
-                <div class="explanation">
-                    📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
-                    <span class="human-escalation">👤 Escalate = human review required – you stay in control</span>
-                </div>
-            </div>
-            <div class="col" style="display: flex; flex-direction: column; align-items: center;">
-                <!-- Custom SVG gauge -->
-                <div class="svg-gauge" id="customGauge"></div>
-                <!-- Status badge -->
-                <div id="statusBadge" style="margin: 0.5rem 0;"></div>
-                <!-- Risk factor breakdown (filled by JS) -->
-                <div id="riskFactors" style="width:100%; margin-top: 1rem;"></div>
-            </div>
+    <!-- Risk Scoring Result Card -->
+    <div class="card" id="riskCard" style="display: none;">
+        <h2>📊 Risk Scoring Result</h2>
+        <div class="result">
+            <strong>Risk score (posterior mean):</strong> <span id="riskScore"></span><br>
+            <strong>95% credible interval <span class="tooltip-icon" title="The range where the true failure probability lies with 95% confidence.">ⓘ</span>:</strong> <span id="credibleInterval"></span><br>
+            <strong>Prior mean:</strong> <span id="priorMean"></span><br>
+            <strong>Policy decision:</strong> <span id="policyDecision" class="status"></span>
+            <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
+            <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
+            <div id="riskImpactMessage" class="impact-message"></div>
+        </div>
+        <div class="explanation">
+            📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
+            <span class="human-escalation">👤 Escalate = human review required – you stay in control</span>
         </div>
     </div>
 
@@ -504,131 +418,15 @@
         <div class="trust-badge">📜 GDPR Ready</div>
     </div>
 
-    <!-- Simulated Quota Bar -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin:0; font-size:1rem;">Your Plan (Demo) <span style="background:#7c3aed; padding:0.2rem 0.6rem; border-radius:1rem; font-size:0.7rem; margin-left:0.5rem;">PRO</span></h3>
-        </div>
-        <div style="margin-top: 0.5rem;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                <span>Remaining evaluations this month</span>
-                <span id="quotaRemaining" style="font-weight: bold;">279</span>
-            </div>
-            <div class="quota-bar">
-                <div class="quota-fill" id="quotaFill" style="width: 28%;"></div>
-            </div>
-            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.3rem;">Limit: 1,000 evaluations/month (simulated)</div>
-        </div>
-    </div>
-
     <!-- Counterfactual Panel -->
-    <div class="counterfactual-panel">
+    <div class="counterfactual-panel" id="cfPanel" style="display: none;">
         <div class="cf-toggle">
             <button id="cfWithoutBtn" class="cf-btn active">📉 Without ARF</button>
             <button id="cfWithBtn" class="cf-btn">🛡️ With ARF (governance)</button>
         </div>
-        <div id="cfContent" class="cf-loss">
-            Without ARF: Expected loss = <strong>$47,000</strong> (crash loop, customer impact)
-        </div>
+        <div id="cfContent" class="cf-loss"></div>
         <div class="explanation" style="margin-top: 8px;">
             🔍 <strong>Counterfactual analysis:</strong> What would have happened if the agent acted alone vs. with ARF governance.
-        </div>
-    </div>
-
-    <!-- Collapsible Advanced Section -->
-    <div class="collapsible" id="advancedToggle">
-        <span>🧠 Dive deeper: Hybrid risk & MCMC (click to expand)</span>
-        <span style="font-size:1.2rem;">▼</span>
-    </div>
-    <div id="advancedContent" class="collapsible-content">
-        <!-- Hybrid Risk Engine Card -->
-        <div class="card">
-            <h2>🧩 Hybrid Risk Engine (Online + Offline)</h2>
-            <div class="row">
-                <div class="col">
-                    <label>HMC prediction (offline, simulated):</label>
-                    <input type="range" id="hmcPred" min="0" max="1" step="0.01" value="0.35">
-                    <span id="hmcVal">0.35</span>
-                    <label>Weight of HMC (0-1):</label>
-                    <input type="range" id="hmcWeight" min="0" max="1" step="0.01" value="0.3">
-                    <span id="weightVal">0.30</span>
-                    <button id="updateHybrid">Update Hybrid Risk</button>
-                    <div class="result">
-                        <strong>Online risk (conjugate):</strong> <span id="onlineRisk">-</span><br>
-                        <strong>Hybrid risk (weighted avg):</strong> <span id="hybridRisk">-</span>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="explanation">
-                        🧠 Blends online Beta‑Binomial updates with offline HMC‑learned patterns (simulated slider). In production, weights are data‑driven.
-                        <p style="font-size:0.8rem; color:var(--footer-color); margin-top:8px;">
-                        ⚠️ <strong>Demo limitations:</strong> This simulation uses a simplified conjugate Beta‑Binomial model and a minimal Metropolis‑Hastings sampler. It does not connect to the live ARF governance engine, and the prior/hyperprior blending is illustrative. For full mathematical details, see the ARF technical report.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Semantic Memory Card -->
-        <div class="card">
-            <h2>📚 Semantic Memory <span class="tooltip-icon" title="FAISS‑based retrieval of past incidents">ⓘ</span></h2>
-            <div class="row">
-                <div class="col">
-                    <label>Select a scenario:</label>
-                    <select id="memoryScenario">
-                        <option value="highLatency">High latency (p99=450ms)</option>
-                        <option value="highErrorRate">High error rate (5%)</option>
-                        <option value="cpuSpike">CPU spike (90%)</option>
-                        <option value="normal">Normal operation</option>
-                    </select>
-                    <button id="retrieveMemory">Retrieve Similar Incidents</button>
-                    <div id="memoryResult" class="result">Click to see similar incidents.</div>
-                </div>
-                <div class="col">
-                    <div class="explanation">📖 Retrieves top‑k similar past cases (embeddings + FAISS simulation). Outcomes adjust risk estimates.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MCMC Card -->
-        <div class="card">
-            <h2>🔄 MCMC (Metropolis-Hastings) <span class="tooltip-icon" title="Simulating HMC offline inference">ⓘ</span></h2>
-            <div class="row">
-                <div class="col">
-                    <label>Samples:</label>
-                    <input type="number" id="samples" value="5000" step="500" min="500">
-                    <label>Burn‑in steps:</label>
-                    <input type="number" id="warmup" value="1000" step="100" min="0">
-                    <button id="runMCMC">Run MCMC</button>
-                    <div id="mcmcSummary" class="result"></div>
-                </div>
-                <div class="col">
-                    <div id="tracePlot"></div>
-                    <div id="histPlot" style="margin-top:16px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Infrastructure Intent Evaluation -->
-    <div class="card">
-        <h2>🏗️ Infrastructure Intent Evaluation</h2>
-        <p>Simulate a fault type → final risk, decision, healing actions.</p>
-        <div class="row">
-            <div class="col">
-                <label>Fault type:</label>
-                <select id="faultType">
-                    <option value="none">None</option>
-                    <option value="switch_down">Switch down</option>
-                    <option value="server_overload">Server overload</option>
-                    <option value="cascade">Cascade failure</option>
-                </select>
-                <button id="evaluateIntentBtn">Evaluate Intent</button>
-                <div id="intentResult" class="result">Click to see analysis.</div>
-            </div>
-            <div class="col">
-                <div id="intentGauge" class="intent-gauge"></div>
-            </div>
         </div>
     </div>
 
@@ -639,17 +437,10 @@
             <table class="incident-table" style="width:100%;">
                 <thead>
                     <tr>
-                        <th>Time</th>
-                        <th>Service</th>
-                        <th>Metric</th>
-                        <th>Value</th>
-                        <th>Risk</th>
-                        <th>Action</th>
+                        <th>Time</th><th>Service</th><th>Metric</th><th>Value</th><th>Risk</th><th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="incidentTableBody">
-                    <!-- filled by JS -->
-                </tbody>
+                <tbody id="incidentTableBody"></tbody>
             </table>
         </div>
         <p style="font-size:0.7rem; color:#94a3b8; margin-top:1rem; text-align:center;">Data shown is simulated for demonstration purposes only.</p>
@@ -657,25 +448,22 @@
 
     <!-- Social proof -->
     <div style="text-align: center; margin-top: 20px;">
-        <div class="social-proof">
+        <div class="social-proof" style="background:#1e293b; padding:6px 10px; border-radius:30px; display:inline-block; font-size:0.7rem;">
             ✅ 54/54 pressure tests passed &nbsp;|&nbsp;
-            🧪 3 active pilots (law‑tech, fintech, health tech) &nbsp;|&nbsp;
-            👥 Founder‑led – I work directly with pilots
+            🧪 3 active pilots &nbsp;|&nbsp;
+            👥 Founder‑led
         </div>
     </div>
 
     <footer>
-        <p>ARF – Simulated Risk Scoring Demo | <a href="https://github.com/arf-foundation/arf-risk-demo" target="_blank">Public GitHub Repo</a> | <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">Request Pilot Access to Real Engine</a></p>
-        <p style="margin-top: 8px;">⚠️ This demo uses mock data and does not invoke the protected ARF core engine. The real engine is pilot‑only and outcome‑based.</p>
+        <p>ARF – Simulated Risk Scoring Demo | <a href="https://github.com/arf-foundation/arf-risk-demo" target="_blank">Public Repo</a> | <a href="https://www.arf-ai.com/signup" target="_blank">Request Pilot Access</a></p>
     </footer>
 </div>
 
-<a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="floating-pilot">✈️ Request Pilot Access (tracked)</a>
-<div id="toastMsg" class="toast-message">Copied to clipboard!</div>
-<div id="exportToast" class="toast-message" style="bottom: 140px;">State exported to console</div>
+<a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="floating-pilot" style="position:fixed; bottom:20px; right:20px; z-index:99; background:var(--banner-bg); color:white; border-radius:60px; padding:10px 16px; text-decoration:none; font-weight:bold;">✈️ Pilot Access</a>
 
 <script>
-    // ---------- Beta utilities (unchanged) ----------
+    // ---------- Beta utilities ----------
     function betaPDF(x, a, b) {
         if (x <= 0 || x >= 1) return 0;
         const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -722,37 +510,14 @@
     const categoryMap = {
         default: [1.0, 10.0],
         database: [1.5, 8.0],
-        network: [1.2, 10.0],
-        compute: [1.0, 12.0],
-        security: [2.0, 10.0]
+        compute: [1.0, 12.0]
     };
-
-    let currentPriorAlpha = 1.0, currentPriorBeta = 10.0;
-    let currentFailures = 20, currentSuccesses = 80;
-    let onlineRisk = 0.0;
-    let currentImpactEstimate = 150000;
-    let currentScenario = "custom";
 
     const impactMessages = {
         aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). High reputational exposure – ARF could escalate customer‑facing claims to human review.",
         pocketos: "⚠️ 3 months of customer data lost; cloud provider restored but recovery took days. Estimated business impact: $150,000.",
-        amazon: "⚠️ 6‑hour retail outage blocked checkout for millions. Estimated revenue loss: $5–10M. ARF would mandate senior‑engineer review for AI‑assisted changes.",
-        custom: {
-            approve: '✅ Estimated saved: $2,400 / month (no unnecessary escalations)',
-            deny: '⚠️ Potential loss avoided: $8,500 / month (prevented breach)',
-            escalate: '🔄 Manual review cost: $1,200 / month (escalation overhead)'
-        }
+        amazon: "⚠️ 6‑hour retail outage blocked checkout for millions. Estimated revenue loss: $5–10M. ARF would mandate senior‑engineer review for AI‑assisted changes."
     };
-
-    function getImpactMessage(risk, decision) {
-        if (currentScenario !== 'custom' && impactMessages[currentScenario]) {
-            return impactMessages[currentScenario];
-        }
-        const msgs = impactMessages.custom;
-        if (decision === 'Approve') return msgs.approve;
-        if (decision === 'Deny') return msgs.deny;
-        return msgs.escalate;
-    }
 
     function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
         const alpha = priorAlpha + failures;
@@ -763,113 +528,31 @@
         return { risk, lo, hi, alpha, beta };
     }
 
-    function updateExpectedLossDisplay(risk, scenarioName) {
-        let impact = 0;
-        if (scenarioName === "aircanada") impact = 812;
-        else if (scenarioName === "pocketos") impact = 150000;
-        else if (scenarioName === "amazon") impact = 5000000;
-        else impact = currentImpactEstimate;
-        const expectedLoss = risk * impact;
-        const lossFormatted = expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
-        document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${lossFormatted}</strong> (risk × impact estimate)`;
-        window.currentRisk = risk;
-        window.currentImpact = impact;
-        updateCounterfactual(risk, impact);
-    }
+    let currentRisk = 0, currentImpact = 0, currentScenario = "";
 
-    // ---------- Custom SVG Gauge (now uses currentColor for text) ----------
-    function drawCustomGauge(risk) {
-        const container = document.getElementById('customGauge');
-        const size = 180, radius = 70, stroke = 12;
-        const circumference = 2 * Math.PI * radius;
-        const offset = circumference * (1 - risk);
-        const color = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
-        // The text colour inherits from the .svg-gauge container's `color: var(--text-primary)`
-        container.innerHTML = `
-            <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="#374151" stroke-width="${stroke}" />
-                <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}"
-                    stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
-                    transform="rotate(-90 ${size/2} ${size/2})" class="gauge-circle" />
-                <text x="${size/2}" y="${size/2+8}" text-anchor="middle" fill="currentColor" font-size="24" font-weight="bold">${(risk*100).toFixed(0)}%</text>
-            </svg>`;
-        const status = risk < 0.2 ? 'SAFE' : (risk > 0.8 ? 'CRITICAL' : 'WARNING');
-        const badgeColor = risk < 0.2 ? '#16a34a' : (risk > 0.8 ? '#dc2626' : '#ca8a04');
-        document.getElementById('statusBadge').innerHTML = `<span style="display:inline-block;padding:0.3rem 1rem;border-radius:2rem;font-weight:bold;background:${badgeColor};color:white;">${status}</span>`;
-    }
+    function showResults(risk, lo, hi, priorMean, decision, impact) {
+        document.getElementById('riskCard').style.display = 'block';
+        document.getElementById('cfPanel').style.display = 'block';
 
-    // ---------- Risk Factor Breakdown ----------
-    function drawRiskFactors(risk) {
-        const conjWeight = 0.49, hmcWeight = 0.24, hyperWeight = 0.27;
-        const container = document.getElementById('riskFactors');
-        container.innerHTML = `
-            <div style="border-top:1px solid #334155; padding-top:0.8rem; font-size:0.85rem; color:#94a3b8;">Risk Factor Breakdown <span style="font-size:0.7rem;">(* simulated weights for demo)</span></div>
-            <div style="display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Conjugate prior</span><span>${(conjWeight*risk*100).toFixed(1)}% (weight ${conjWeight.toFixed(2)})</span></div>
-            <div style="width:100%; background:#374151; border-radius:4px; height:6px; margin:0.2rem 0;"><div style="width:${conjWeight*100}%; background:#3b82f6; height:6px; border-radius:4px;"></div></div>
-            <div style="display:flex; justify-content:space-between; margin-top:0.5rem;"><span>HMC prediction</span><span>${(hmcWeight*risk*100).toFixed(1)}% (weight ${hmcWeight.toFixed(2)})</span></div>
-            <div style="width:100%; background:#374151; border-radius:4px; height:6px; margin:0.2rem 0;"><div style="width:${hmcWeight*100}%; background:#8b5cf6; height:6px; border-radius:4px;"></div></div>
-            <div style="display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Hyperprior shrinkage</span><span>${(hyperWeight*risk*100).toFixed(1)}% (weight ${hyperWeight.toFixed(2)})</span></div>
-            <div style="width:100%; background:#374151; border-radius:4px; height:6px; margin:0.2rem 0;"><div style="width:${hyperWeight*100}%; background:#22c55e; height:6px; border-radius:4px;"></div></div>
-        `;
-    }
-
-    function updateRiskUI() {
-        const category = document.getElementById('category').value;
-        [currentPriorAlpha, currentPriorBeta] = categoryMap[category];
-        const failures = parseFloat(document.getElementById('failures').value) || 0;
-        const successes = parseFloat(document.getElementById('successes').value) || 0;
-        const { risk, lo, hi } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
-        onlineRisk = risk;
-
-        const priorMean = currentPriorAlpha / (currentPriorAlpha + currentPriorBeta);
-        document.getElementById('priorMean').innerText = priorMean.toFixed(4);
         document.getElementById('riskScore').innerText = risk.toFixed(4);
         document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
-        const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
-        const decisionClass = risk < 0.2 ? 'status-approve' : (risk > 0.8 ? 'status-deny' : 'status-escalate');
+        document.getElementById('priorMean').innerText = priorMean.toFixed(4);
         const decisionSpan = document.getElementById('policyDecision');
         decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
-        decisionSpan.className = `status ${decisionClass}`;
+        decisionSpan.className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
 
         const explanationDiv = document.getElementById('decisionExplanation');
-        if (explanationDiv) {
-            const thresholdText = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
-            explanationDiv.innerHTML = `Because the risk (${(risk*100).toFixed(1)}%) is ${thresholdText}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
-        }
+        const thresholdText = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
+        explanationDiv.innerHTML = `Because the risk (${(risk*100).toFixed(1)}%) is ${thresholdText}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
 
-        drawCustomGauge(risk);
-        drawRiskFactors(risk);
-        updateExpectedLossDisplay(risk, currentScenario);
-        document.getElementById('onlineRisk').innerText = risk.toFixed(4);
-        updateHybridRisk();
+        const expectedLoss = risk * impact;
+        document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (risk × impact estimate)`;
 
-        const remaining = Math.floor(Math.random() * 300 + 100);
-        document.getElementById('quotaRemaining').innerText = remaining;
-        document.getElementById('quotaFill').style.width = (remaining / 1000 * 100) + '%';
+        document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
 
-        const incidents = [
-            { time: '2026-05-14 10:23:45', service: 'payment-api', metric: 'latency', value: '450ms', risk: 0.82, action: 'ESCALATE' },
-            { time: '2026-05-14 09:15:22', service: 'auth-service', metric: 'error_rate', value: '12%', risk: 0.45, action: 'APPROVE' },
-            { time: '2026-05-13 22:10:05', service: 'database', metric: 'cpu_usage', value: '92%', risk: 0.71, action: 'ESCALATE' },
-            { time: '2026-05-13 18:30:19', service: 'cache', metric: 'hit_rate', value: '34%', risk: 0.38, action: 'APPROVE' },
-            { time: '2026-05-13 14:45:03', service: 'message-queue', metric: 'backlog', value: '1250', risk: 0.63, action: 'DENY' },
-        ];
-        const tbody = document.getElementById('incidentTableBody');
-        tbody.innerHTML = incidents.map(i => `
-            <tr>
-                <td>${i.time}</td><td>${i.service}</td><td>${i.metric}</td><td>${i.value}</td>
-                <td style="font-weight:bold;color:#eab308;">${i.risk.toFixed(2)}</td>
-                <td><span class="action-pill ${i.action === 'APPROVE' ? 'action-approve' : (i.action === 'ESCALATE' ? 'action-escalate' : 'action-deny')}">${i.action}</span></td>
-            </tr>`).join('');
-    }
-
-    function updateHybridRisk() {
-        const hmcVal = parseFloat(document.getElementById('hmcPred').value);
-        const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
-        document.getElementById('hmcVal').innerText = hmcVal.toFixed(3);
-        document.getElementById('weightVal').innerText = hmcWeight.toFixed(3);
-        const hybrid = onlineRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
-        document.getElementById('hybridRisk').innerText = hybrid.toFixed(4);
+        currentRisk = risk;
+        currentImpact = impact;
+        updateCounterfactual(risk, impact);
     }
 
     let cfMode = "without";
@@ -877,209 +560,73 @@
         const withoutLoss = risk * impact;
         const withLoss = 500;
         const saved = withoutLoss - withLoss;
-        const cfDiv = document.getElementById('cfContent');
-        if (cfMode === "without") {
-            cfDiv.innerHTML = `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.`;
-        } else {
-            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
-        }
+        document.getElementById('cfContent').innerHTML = cfMode === "without" ?
+            `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.` :
+            `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>💰 <strong>Loss avoided: ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong>`;
     }
-
     document.getElementById('cfWithoutBtn').addEventListener('click', () => {
         cfMode = "without";
         document.getElementById('cfWithoutBtn').classList.add('active');
         document.getElementById('cfWithBtn').classList.remove('active');
-        updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
+        updateCounterfactual(currentRisk, currentImpact);
     });
     document.getElementById('cfWithBtn').addEventListener('click', () => {
         cfMode = "with";
         document.getElementById('cfWithBtn').classList.add('active');
         document.getElementById('cfWithoutBtn').classList.remove('active');
-        updateCounterfactual(window.currentRisk || 0.2, window.currentImpact || 150000);
+        updateCounterfactual(currentRisk, currentImpact);
     });
 
     const presets = {
         aircanada: {
-            category: "default", failures: 5, successes: 95, hmcPred: 0.65, hmcWeight: 0.4,
+            category: "default", failures: 5, successes: 95,
             impact: 812,
             description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)."
         },
         pocketos: {
-            category: "database", failures: 30, successes: 70, hmcPred: 0.75, hmcWeight: 0.5,
+            category: "database", failures: 30, successes: 70,
             impact: 150000,
             description: "Cursor AI agent deleted production DB in 9 seconds – no confirmation, no human in the loop."
         },
         amazon: {
-            category: "compute", failures: 25, successes: 75, hmcPred: 0.70, hmcWeight: 0.5,
+            category: "compute", failures: 25, successes: 75,
             impact: 5000000,
             description: "Engineer relied on AI‑inferred advice from outdated wiki → 6‑hour retail outage."
         }
     };
+
     function applyPreset(presetId) {
         const p = presets[presetId];
         if (!p) return;
-        document.getElementById('category').value = p.category;
-        document.getElementById('failures').value = p.failures;
-        document.getElementById('successes').value = p.successes;
-        document.getElementById('hmcPred').value = p.hmcPred;
-        document.getElementById('hmcWeight').value = p.hmcWeight;
-        document.getElementById('hmcVal').innerText = p.hmcPred;
-        document.getElementById('weightVal').innerText = p.hmcWeight;
-        currentImpactEstimate = p.impact;
         currentScenario = presetId;
-        updateRiskUI();
-        updateHybridRisk();
-        window.currentImpact = p.impact;
-        updateCounterfactual(window.currentRisk || 0.2, p.impact);
-        const resultDiv = document.getElementById('intentResult');
-        if (resultDiv) resultDiv.innerHTML = `<em>Loaded scenario: ${p.description}</em>`;
+        const [priorAlpha, priorBeta] = categoryMap[p.category];
+        const { risk, lo, hi } = computeRiskFromPrior(p.failures, p.successes, priorAlpha, priorBeta);
+        const priorMean = priorAlpha / (priorAlpha + priorBeta);
+        const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
+        showResults(risk, lo, hi, priorMean, decision, p.impact);
     }
+
     document.getElementById('applyPresetBtn').addEventListener('click', () => {
-        const selected = document.getElementById('presetScenario').value;
-        if (selected !== "custom") applyPreset(selected);
+        applyPreset(document.getElementById('presetScenario').value);
     });
 
-    const memoryStore = {
-        highLatency: [{ description: "Latency spike to 450ms → escalated, later resolved with restart.", outcome: "escalate", risk: 0.65 }, { description: "Similar latency spike → HMC detected pattern → approved with auto‑scaling.", outcome: "approve", risk: 0.28 }],
-        highErrorRate: [{ description: "Error rate 5% → misconfigured endpoint → denied.", outcome: "deny", risk: 0.92 }, { description: "Transient error spike → approved after analysis → risk 0.31", outcome: "approve", risk: 0.31 }],
-        cpuSpike: [{ description: "CPU 90% for 5 min → escalated, later scaled up.", outcome: "escalate", risk: 0.72 }, { description: "CPU spike during batch job → approved with warning.", outcome: "approve", risk: 0.41 }],
-        normal: [{ description: "Normal operation → approved.", outcome: "approve", risk: 0.12 }]
-    };
-    function retrieveMemory() {
-        const scenario = document.getElementById('memoryScenario').value;
-        const incidents = memoryStore[scenario];
-        let html = '<strong>Similar past incidents:</strong><ul>';
-        incidents.forEach(inc => { html += `<li>${inc.description} (outcome: ${inc.outcome}, risk: ${inc.risk.toFixed(2)})</li>`; });
-        html += '</ul><div class="explanation">Semantic similarity (FAISS) would weight these to adjust risk.</div>';
-        document.getElementById('memoryResult').innerHTML = html;
-    }
+    // Fill incident table once
+    const incidents = [
+        { time: '2026-05-14 10:23:45', service: 'payment-api', metric: 'latency', value: '450ms', risk: 0.82, action: 'ESCALATE' },
+        { time: '2026-05-14 09:15:22', service: 'auth-service', metric: 'error_rate', value: '12%', risk: 0.45, action: 'APPROVE' },
+        { time: '2026-05-13 22:10:05', service: 'database', metric: 'cpu_usage', value: '92%', risk: 0.71, action: 'ESCALATE' },
+        { time: '2026-05-13 18:30:19', service: 'cache', metric: 'hit_rate', value: '34%', risk: 0.38, action: 'APPROVE' },
+        { time: '2026-05-13 14:45:03', service: 'message-queue', metric: 'backlog', value: '1250', risk: 0.63, action: 'DENY' }
+    ];
+    document.getElementById('incidentTableBody').innerHTML = incidents.map(i => `
+        <tr>
+            <td>${i.time}</td><td>${i.service}</td><td>${i.metric}</td><td>${i.value}</td>
+            <td style="font-weight:bold;color:#eab308;">${i.risk.toFixed(2)}</td>
+            <td><span class="action-pill ${i.action === 'APPROVE' ? 'action-approve' : i.action === 'ESCALATE' ? 'action-escalate' : 'action-deny'}">${i.action}</span></td>
+        </tr>`).join('');
 
-    const faultMap = { none: [1,99], switch_down: [20,80], server_overload: [35,65], cascade: [60,40] };
-    function evaluateIntent() {
-        const fault = document.getElementById('faultType').value;
-        const [failures, successes] = faultMap[fault];
-        const { risk: baseRisk } = computeRiskFromPrior(failures, successes, currentPriorAlpha, currentPriorBeta);
-        const hmcVal = parseFloat(document.getElementById('hmcPred').value);
-        const hmcWeight = parseFloat(document.getElementById('hmcWeight').value);
-        const finalRisk = baseRisk * (1 - hmcWeight) + hmcVal * hmcWeight;
-        const decision = finalRisk < 0.2 ? 'Approve' : (finalRisk > 0.8 ? 'Deny' : 'Escalate');
-        const healingActions = decision === 'Deny' ? ['restart', 'rollback'] : (decision === 'Escalate' ? ['notify_ops', 'investigate'] : ['monitor']);
-        document.getElementById('intentResult').innerHTML = `<strong>Online risk:</strong> ${baseRisk.toFixed(4)}<br><strong>Hybrid risk:</strong> ${finalRisk.toFixed(4)}<br><strong>Decision:</strong> ${decision}<br><strong>Healing actions:</strong> ${healingActions.join(', ')}`;
-        Plotly.newPlot('intentGauge', [{
-            type: "indicator", mode: "gauge+number", value: finalRisk,
-            title: { text: "Final Risk" }, gauge: { axis: { range: [0,1] }, bar: { color: "#2c3e50" },
-                     steps: [{ range: [0,0.2], color: "#d4edda" }, { range: [0.2,0.8], color: "#fff3cd" }, { range: [0.8,1], color: "#f8d7da" }] }
-        }], { margin: { t: 40, b: 30, l: 40, r: 40 }, responsive: true });
-    }
-
-    async function runMCMC() {
-        const btn = document.getElementById('runMCMC');
-        btn.classList.add('loading-btn');
-        btn.textContent = 'Running...';
-        await new Promise(r => setTimeout(r, 50));
-        const nSamples = parseInt(document.getElementById('samples').value);
-        const burnIn = parseInt(document.getElementById('warmup').value);
-        const total = nSamples + burnIn;
-        const data = [0.45,0.62,0.48,0.51,0.55,0.49,0.47,0.53,0.52,0.50];
-        const logPrior = mu => -0.5 * mu * mu;
-        const logLikelihood = mu => data.reduce((acc,d) => acc - 0.5 * ((d - mu)**2) / (0.2**2), 0);
-        const logPosterior = mu => logPrior(mu) + logLikelihood(mu);
-        let current = 0.0, currentLog = logPosterior(current);
-        const samples = [];
-        let accepted = 0;
-        const proposalSD = 0.05;
-        for (let i = 0; i < total; i++) {
-            const proposal = current + (Math.random() - 0.5) * 2 * proposalSD;
-            const proposalLog = logPosterior(proposal);
-            if (Math.random() < Math.min(1, Math.exp(proposalLog - currentLog))) {
-                current = proposal;
-                currentLog = proposalLog;
-                accepted++;
-            }
-            if (i >= burnIn) samples.push(current);
-        }
-        const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
-        samples.sort((a,b)=>a-b);
-        const median = samples[Math.floor(samples.length/2)];
-        const lo = samples[Math.floor(samples.length*0.025)];
-        const hi = samples[Math.floor(samples.length*0.975)];
-        document.getElementById('mcmcSummary').innerHTML = `<strong>Mean μ:</strong> ${mean.toFixed(4)}<br><strong>Median μ:</strong> ${median.toFixed(4)}<br><strong>95% CI:</strong> [${lo.toFixed(4)}, ${hi.toFixed(4)}]<br><strong>Acceptance:</strong> ${((accepted/total)*100).toFixed(1)}%`;
-        Plotly.newPlot('tracePlot', [{ x: Array.from({length: samples.length}, (_,i)=>i+1), y: samples, mode: 'lines', line: { width: 1 }, name: 'μ' }], { title: 'Trace of μ', xaxis: { title: 'Iteration' }, yaxis: { title: 'μ' }, responsive: true });
-        Plotly.newPlot('histPlot', [{ x: samples, type: 'histogram', nbinsx: 50, name: 'Posterior' }], { title: 'Posterior Distribution', xaxis: { title: 'μ' }, bargap: 0.05, responsive: true });
-        btn.classList.remove('loading-btn');
-        btn.textContent = 'Run MCMC';
-    }
-
-    const toggleBtn = document.getElementById('advancedToggle');
-    const advancedContent = document.getElementById('advancedContent');
-    let isOpen = false;
-    toggleBtn.addEventListener('click', () => {
-        if (!isOpen) {
-            advancedContent.style.maxHeight = advancedContent.scrollHeight + 'px';
-            toggleBtn.querySelector('span:last-child').innerHTML = '▲';
-        } else {
-            advancedContent.style.maxHeight = null;
-            toggleBtn.querySelector('span:last-child').innerHTML = '▼';
-        }
-        isOpen = !isOpen;
-    });
-
-    const toast = document.getElementById('toastMsg');
-    function showToast() { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
-    document.getElementById('copyRiskBtn').addEventListener('click', () => {
-        const riskText = document.getElementById('riskScore').innerText;
-        const interval = document.getElementById('credibleInterval').innerText;
-        const decision = document.getElementById('policyDecision').innerText.split('(')[0].trim();
-        navigator.clipboard.writeText(`Risk score: ${riskText}\n95% CI: ${interval}\nDecision: ${decision}`).then(showToast);
-    });
-    const exportToastMsg = document.getElementById('exportToast');
-    document.getElementById('exportStateBtn').addEventListener('click', () => {
-        const state = {
-            timestamp: new Date().toISOString(),
-            category: document.getElementById('category').value,
-            failures: document.getElementById('failures').value,
-            successes: document.getElementById('successes').value,
-            hmcPrediction: parseFloat(document.getElementById('hmcPred').value),
-            hmcWeight: parseFloat(document.getElementById('hmcWeight').value),
-            riskScore: parseFloat(document.getElementById('riskScore').innerText),
-            credibleInterval: document.getElementById('credibleInterval').innerText,
-            decision: document.getElementById('policyDecision').innerText.split('(')[0].trim(),
-            faultType: document.getElementById('faultType').value,
-            memoryScenario: document.getElementById('memoryScenario').value
-        };
-        console.log('ARF Demo State:', state);
-        const jsonStr = JSON.stringify(state, null, 2);
-        navigator.clipboard.writeText(jsonStr).then(() => {
-            exportToastMsg.style.opacity = '1';
-            setTimeout(() => exportToastMsg.style.opacity = '0', 2000);
-        }).catch(() => alert('State copied to console.'));
-    });
-
-    document.getElementById('resetRiskBtn').addEventListener('click', () => {
-        document.getElementById('category').value = 'default';
-        document.getElementById('failures').value = 20;
-        document.getElementById('successes').value = 80;
-        document.getElementById('hmcPred').value = 0.35;
-        document.getElementById('hmcWeight').value = 0.3;
-        document.getElementById('hmcVal').innerText = '0.35';
-        document.getElementById('weightVal').innerText = '0.30';
-        currentScenario = 'custom';
-        updateRiskUI();
-        updateHybridRisk();
-    });
-
-    document.getElementById('updateRiskBtn').addEventListener('click', updateRiskUI);
-    document.getElementById('updateHybrid').addEventListener('click', updateHybridRisk);
-    document.getElementById('retrieveMemory').addEventListener('click', retrieveMemory);
-    document.getElementById('evaluateIntentBtn').addEventListener('click', evaluateIntent);
-    document.getElementById('runMCMC').addEventListener('click', runMCMC);
-    const banner = document.getElementById('pilotBanner');
-    document.getElementById('dismissBannerBtn').addEventListener('click', () => banner.style.display = 'none');
-
-    updateRiskUI();
-    retrieveMemory();
-    evaluateIntent();
-    runMCMC();
+    // Load first scenario by default
+    applyPreset('aircanada');
 </script>
 </body>
 </html>
