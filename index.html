@@ -17,7 +17,6 @@
             --expl-bg: #f8fafc;
             --social-bg: #eef2f5;
             --footer-color: #6c757d;
-            --banner-bg: #1e3a5f;
             --warning-bg: #fff3cd;
             --warning-text: #856404;
             --button-bg: #2c3e50;
@@ -36,7 +35,6 @@
                 --expl-bg: #0f172a;
                 --social-bg: #1e293b;
                 --footer-color: #94a3b8;
-                --banner-bg: #0f2a44;
                 --warning-bg: #332701;
                 --warning-text: #fcd34d;
                 --button-bg: #334155;
@@ -63,45 +61,8 @@
             position: relative;
         }
         .container { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
-        .sticky-banner {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--banner-bg);
-            color: white;
-            padding: 12px;
-            border-radius: 0 0 12px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .banner-text { font-size: 0.85rem; font-weight: 500; }
-        .banner-link {
-            background: #ffc107;
-            color: #1e3a5f;
-            padding: 8px 14px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.85rem;
-            transition: 0.2s;
-            display: inline-block;
-            align-self: center;
-        }
-        .banner-link:hover { background: #ffda6a; transform: scale(1.02); }
-        .dismiss-banner {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            align-self: flex-end;
-            opacity: 0.7;
-        }
+        .back-link { text-align: center; margin-bottom: 10px; }
+        .back-link a { color: #38bdf8; text-decoration: underline; font-size: 0.9rem; }
         .warning-banner {
             background: var(--warning-bg);
             border-left: 6px solid #f0ad4e;
@@ -341,21 +302,19 @@
         }
         .button-row .re-eval-btn {
             flex: 0 0 auto;
-            min-width: 100px;          /* slightly smaller, better fit */
+            min-width: 100px;
         }
         @media (max-width: 400px) {
             .button-row {
                 flex-direction: column;
             }
             .button-row .re-eval-btn {
-                min-width: 0;          /* allow to shrink */
+                min-width: 0;
             }
         }
 
         @media (min-width: 641px) {
             body { padding: 16px; }
-            .sticky-banner { flex-direction: row; justify-content: space-between; align-items: center; text-align: left; padding: 12px 20px; }
-            .dismiss-banner { align-self: center; }
             .row { flex-direction: row; gap: 24px; }
             .col { flex: 1; }
             h1 { font-size: 1.8rem; }
@@ -434,10 +393,8 @@
 </head>
 <body>
 <div class="container">
-    <div id="pilotBanner" class="sticky-banner">
-        <span class="banner-text">🔐 The real ARF engine is access‑controlled and outcome‑based.</span>
-        <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" class="banner-link">Request Pilot Access →</a>
-        <button class="dismiss-banner" id="dismissBannerBtn" aria-label="Dismiss banner">✕</button>
+    <div class="back-link">
+        <a href="https://arf-foundation.github.io/pitch-deck/">← Back to presentation</a>
     </div>
 
     <div class="warning-banner">
@@ -454,7 +411,7 @@
         <select id="presetScenario">
             <option value="aircanada">✈️ Air Canada (2022) – Chatbot promised fake discount</option>
             <option value="pocketos">💀 PocketOS (Apr 2026) – Production DB wiped in 9 seconds</option>
-            <option value="amazon">📦 Amazon (Mar 2026) – Outdated wiki caused 6‑hour outage</option>
+            <option value="cruise">🚗 Cruise Robotaxi (2023) – Pedestrian dragged, license revoked</option>
         </select>
         <div class="button-row">
             <button id="applyPresetBtn" class="load-btn">Load Scenario & Evaluate Risk</button>
@@ -479,6 +436,8 @@
             📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
             <span class="human-escalation">👤 Escalate = human review required – you stay in control</span>
         </div>
+        <!-- Detailed counterfactual reasoning -->
+        <div id="counterfactualReasoning" class="explanation" style="margin-top: 12px;"></div>
     </div>
 
     <!-- Trust badges -->
@@ -587,7 +546,14 @@
     const impactMessages = {
         aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). ARF would have escalated this customer‑facing claim to prevent reputational damage.",
         pocketos: "⚠️ 3 months of customer data lost; cloud provider restored but recovery took days. Estimated business impact: $150,000.",
-        amazon: "⚠️ 6‑hour retail outage blocked checkout for millions. Estimated revenue loss: $5–10M. ARF would mandate senior‑engineer review for AI‑assisted changes."
+        cruise: "⚠️ License revoked, 950 cars recalled, operations suspended. Estimated loss: $1.5B+. ARF would have escalated any high‑variance autonomous decisions for human review."
+    };
+
+    // Scenario‑specific counterfactual reasoning
+    const counterfactualReasoning = {
+        aircanada: `ARF escalated because the risk (20.7%) falls within the 0.2–0.8 “escalate” band. Customer‑facing claims automatically receive extra scrutiny to protect brand reputation. <strong>What if ARF had approved?</strong> The chatbot’s error would have gone unchecked, exposing the airline to further liability and PR damage. <strong>What if ARF had denied?</strong> Overly cautious blocking of routine customer interactions would frustrate users and slow down service. Escalation to a human reviewer strikes the right balance.`,
+        pocketos: `ARF escalated because the risk (28.8%) is in the escalation zone and the potential loss ($150k) is significant. <strong>What if ARF had approved?</strong> The agent would have executed the destructive API call, wiping the production database and causing days of outage. <strong>What if ARF had denied?</strong> Routine tasks would be blocked unnecessarily, slowing development. Escalation ensures a human validates the action before it’s too late.`,
+        cruise: `ARF escalated because the risk (31.9%) exceeds the 20% threshold and the potential impact is catastrophic ($1.5B). <strong>What if ARF had approved?</strong> The autonomous system would have continued operating without human oversight, risking further safety incidents and regulatory action. <strong>What if ARF had denied?</strong> Halting all autonomous operations would cripple the business and delay critical updates. Escalation allows a safety engineer to review the situation and apply the right intervention.`
     };
 
     function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
@@ -628,6 +594,9 @@
         document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (risk × impact estimate)`;
 
         document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
+
+        // Set the detailed counterfactual reasoning
+        document.getElementById('counterfactualReasoning').innerHTML = counterfactualReasoning[currentScenario] || '';
 
         currentRisk = risk;
         currentImpact = impact;
@@ -672,10 +641,10 @@
             impact: 150000,
             description: "Cursor AI agent deleted production DB in 9 seconds – no confirmation, no human in the loop."
         },
-        amazon: {
-            category: "compute", failures: 25, successes: 75,
-            impact: 5000000,
-            description: "Engineer relied on AI‑inferred advice from outdated wiki → 6‑hour retail outage."
+        cruise: {
+            category: "compute", failures: 35, successes: 65,
+            impact: 1500000000,
+            description: "Autonomous vehicle dragged a pedestrian; license revoked, 950 cars recalled, $1.5B+ losses."
         }
     };
 
@@ -712,7 +681,7 @@
             <td><span class="action-pill ${i.action === 'APPROVE' ? 'action-approve' : i.action === 'ESCALATE' ? 'action-escalate' : 'action-deny'}">${i.action}</span></td>
         </tr>`).join('');
 
-    // Load Air Canada first (now shows ESCALATE)
+    // Load Air Canada first
     applyPreset('aircanada');
 </script>
 </body>
