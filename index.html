@@ -96,7 +96,7 @@
         .decision-hero:focus { outline: 2px solid #38bdf8; }
         .decision-hero .icon { font-size: 2rem; }
         .approve-hero { color: #22c55e; }
-        .escalate-hero { color: #fbbf24; }   /* brighter yellow for contrast */
+        .escalate-hero { color: #fbbf24; }
         .deny-hero { color: #f87171; }
 
         .status { font-size: 1rem; font-weight: bold; padding: 8px; border-radius: 40px; text-align: center; margin: 12px 0; }
@@ -174,6 +174,16 @@
             margin-left: 8px; transition: 0.2s;
         }
         .share-btn:hover { background: #334155; color: white; }
+
+        .bottom-line {
+            background: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid #38bdf8;
+            padding: 8px 12px;
+            margin: 12px 0 0;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #bae6fd;
+        }
     </style>
 </head>
 <body>
@@ -204,6 +214,18 @@
         </div>
     </div>
 
+    <!-- Understanding your results guide -->
+    <details id="guideDetails" class="card" style="margin-bottom: 20px;">
+        <summary style="font-size: 1rem; color: #38bdf8; cursor: pointer;">📘 Understanding your results (click to expand)</summary>
+        <div class="explanation" style="margin-top: 10px; font-size: 0.8rem;">
+            <p><strong>Risk score (posterior mean)</strong> – the probability that a similar action would fail, based on past observations and a weak prior. Higher = more dangerous.</p>
+            <p><strong>95% credible interval</strong> – the range where the true failure probability likely lies, given the data. Narrower = more certainty.</p>
+            <p><strong>Prior mean</strong> – what the model believed before seeing any data for this category. It shifts as outcomes are recorded.</p>
+            <p><strong>Policy decision</strong> – ARF’s recommendation: <strong>Approve</strong> (&lt;20% risk), <strong>Escalate</strong> (20–80% risk), <strong>Deny</strong> (&gt;80% risk). Escalation means a human must review before execution.</p>
+            <p><strong>Expected loss</strong> – risk × financial impact of the incident. This is what ARF minimises when choosing an action.</p>
+        </div>
+    </details>
+
     <!-- Risk Scoring Result Card -->
     <div class="card" id="riskCard" style="display: none;">
         <h2>📊 Risk Scoring Result</h2>
@@ -216,6 +238,7 @@
             <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
             <div id="expectedLossDisplay" style="margin-top: 8px; font-weight: 500;"></div>
             <div id="riskImpactMessage" class="impact-message"></div>
+            <button id="copyReportBtn" style="margin-top:12px; width:auto; padding:8px 16px; font-size:0.8rem; background: #334155; border: 1px solid #475569; border-radius: 8px;">📋 Copy full report</button>
         </div>
         <div class="explanation">
             📌 <strong>Deterministic Probability Thresholding:</strong> Approve if risk &lt; 0.2, Escalate if 0.2–0.8, Deny if &gt; 0.8.
@@ -293,28 +316,161 @@
     function betaQuantile(p, a, b, tol = 1e-6) { let lo = 0, hi = 1; while (hi - lo > tol) { const mid = (lo + hi) / 2; if (betaCDF(mid, a, b) < p) lo = mid; else hi = mid; } return (lo + hi) / 2; }
 
     const categoryMap = { default: [1.0, 10.0], database: [1.5, 8.0], compute: [1.0, 12.0] };
-    const impactMessages = { aircanada: "...", pocketos: "...", cruise: "..." };  // keep same as before
-    const counterfactualReasoning = { ... }; // keep same
 
-    function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) { ... }
+    const impactMessages = {
+        aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). ARF would have escalated this customer‑facing claim to prevent reputational damage.",
+        pocketos: "⚠️ 3 months of customer data lost; cloud provider restored but recovery took days. Estimated business impact: $150,000.",
+        cruise: "⚠️ License revoked, 950 cars recalled, operations suspended. Estimated loss: $1.5B+. ARF would have escalated any high‑variance autonomous decisions for human review."
+    };
+
+    const counterfactualReasoning = {
+        aircanada: `<div class="bottom-line">💰 Bottom line: Escalating this $812 claim avoids a reputational firestorm – the cost of a manual review is trivial compared to losing public trust.</div>ARF escalated because the risk (20.7%) falls within the 0.2–0.8 “escalate” band. Customer‑facing claims automatically receive extra scrutiny to protect brand reputation. <strong>What if ARF had approved?</strong> The chatbot’s error would have gone unchecked, exposing the airline to further liability and PR damage. <strong>What if ARF had denied?</strong> Overly cautious blocking of routine customer interactions would frustrate users and slow down service. Escalation to a human reviewer strikes the right balance.`,
+        pocketos: `<div class="bottom-line">💰 Bottom line: A $500 manual review prevents a $43,150 outage – a 98% reduction in expected loss.</div>ARF escalated because the risk (28.8%) is in the escalation zone and the potential loss ($150k) is significant. <strong>What if ARF had approved?</strong> The agent would have executed the destructive API call, wiping the production database and causing days of outage. <strong>What if ARF had denied?</strong> Routine tasks would be blocked unnecessarily, slowing development. Escalation ensures a human validates the action before it’s too late.`,
+        cruise: `<div class="bottom-line">💰 Bottom line: Escalating this $1.5B risk to a safety engineer costs $500 – governance is 3 million times cheaper than the disaster it prevents.</div>ARF escalated because the risk (31.9%) exceeds the 20% threshold and the potential impact is catastrophic ($1.5B). <strong>What if ARF had approved?</strong> The autonomous system would have continued operating without human oversight, risking further safety incidents and regulatory action. <strong>What if ARF had denied?</strong> Halting all autonomous operations would cripple the business and delay critical updates. Escalation allows a safety engineer to review the situation and apply the right intervention.`
+    };
+
+    function computeRiskFromPrior(failures, successes, priorAlpha, priorBeta) {
+        const alpha = priorAlpha + failures;
+        const beta = priorBeta + successes;
+        const risk = alpha / (alpha + beta);
+        const lo = betaQuantile(0.025, alpha, beta);
+        const hi = betaQuantile(0.975, alpha, beta);
+        return { risk, lo, hi, alpha, beta };
+    }
+
     let currentRisk = 0, currentImpact = 0, currentScenario = "";
+    let currentDecision = ""; // store decision for report
     let firstLoad = true;
 
-    function showResults(risk, lo, hi, priorMean, decision, impact) { ... } // unchanged
+    function showResults(risk, lo, hi, priorMean, decision, impact) {
+        const riskCard = document.getElementById('riskCard');
+        riskCard.style.display = 'block';
+        riskCard.classList.remove('fade-in');
+        void riskCard.offsetWidth;
+        riskCard.classList.add('fade-in');
+
+        const cfPanel = document.getElementById('cfPanel');
+        cfPanel.style.display = 'block';
+        cfPanel.classList.remove('fade-in');
+        void cfPanel.offsetWidth;
+        cfPanel.classList.add('fade-in');
+
+        const heroDiv = document.getElementById('decisionHero');
+        const icon = decision === 'Approve' ? '✅' : (decision === 'Deny' ? '🛑' : '⚠️');
+        const heroClass = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
+        heroDiv.innerHTML = `<span class="icon">${icon}</span> ARF would have <span class="${heroClass}">${decision.toUpperCase()}</span> this action.`;
+        heroDiv.className = 'decision-hero ' + heroClass;
+        setTimeout(() => heroDiv.focus(), 100);
+
+        document.getElementById('riskScore').innerText = risk.toFixed(4);
+        document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
+        document.getElementById('priorMean').innerText = priorMean.toFixed(4);
+        const decisionSpan = document.getElementById('policyDecision');
+        decisionSpan.innerText = `${decision} (risk = ${risk.toFixed(4)})`;
+        decisionSpan.className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
+
+        const tooltipIcon = document.getElementById('decisionTooltip');
+        tooltipIcon.style.display = currentScenario === 'aircanada' ? 'inline' : 'none';
+
+        const explanationDiv = document.getElementById('decisionExplanation');
+        const thresholdText = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
+        explanationDiv.innerHTML = `Because the risk (${(risk*100).toFixed(1)}%) is ${thresholdText}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
+
+        const expectedLoss = risk * impact;
+        document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${expectedLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (risk × impact estimate)`;
+
+        document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
+        document.getElementById('counterfactualReasoning').innerHTML = counterfactualReasoning[currentScenario] || '';
+
+        currentRisk = risk;
+        currentImpact = impact;
+        currentDecision = decision;
+        updateCounterfactual(risk, impact);
+
+        if (firstLoad) {
+            firstLoad = false;
+            document.getElementById('counterfactualDetails').setAttribute('open', '');
+        }
+    }
+
     let cfMode = "without";
-    function updateCounterfactual(risk, impact) { ... } // unchanged
+    function updateCounterfactual(risk, impact) {
+        const withoutLoss = risk * impact;
+        const withLoss = 500;
+        const saved = withoutLoss - withLoss;
+        const cfDiv = document.getElementById('cfContent');
+        if (cfMode === "without") {
+            cfDiv.innerHTML = `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${withoutLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong><br>The agent would have executed the action, causing this loss.`;
+        } else {
+            cfDiv.innerHTML = `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${withLoss.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</strong> (manual review)<br>ARF would have ESCALATED to human review, preventing catastrophic loss.<br>
+                <span class="cf-saved">💰 You saved ${saved.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}</span>
+                <span class="cf-tagline">That’s the cost of governance vs. the cost of chaos.</span>`;
+        }
+    }
 
-    document.getElementById('cfWithoutBtn').addEventListener(...);
-    document.getElementById('cfWithBtn').addEventListener(...);
+    document.getElementById('cfWithoutBtn').addEventListener('click', () => {
+        cfMode = "without";
+        document.getElementById('cfWithoutBtn').classList.add('active');
+        document.getElementById('cfWithBtn').classList.remove('active');
+        updateCounterfactual(currentRisk, currentImpact);
+    });
+    document.getElementById('cfWithBtn').addEventListener('click', () => {
+        cfMode = "with";
+        document.getElementById('cfWithBtn').classList.add('active');
+        document.getElementById('cfWithoutBtn').classList.remove('active');
+        updateCounterfactual(currentRisk, currentImpact);
+    });
 
-    const presets = { ... }; // unchanged
+    const presets = {
+        aircanada: { category: "default", failures: 22, successes: 78, impact: 812, description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)." },
+        pocketos: { category: "database", failures: 30, successes: 70, impact: 150000, description: "Cursor AI agent deleted production DB in 9 seconds – no confirmation, no human in the loop." },
+        cruise: { category: "compute", failures: 35, successes: 65, impact: 1500000000, description: "Autonomous vehicle dragged a pedestrian; license revoked, 950 cars recalled, $1.5B+ losses." }
+    };
 
-    function applyPreset(presetId) { ... }
+    function applyPreset(presetId) {
+        const p = presets[presetId];
+        if (!p) return;
+        currentScenario = presetId;
+        const [priorAlpha, priorBeta] = categoryMap[p.category];
+        const { risk, lo, hi } = computeRiskFromPrior(p.failures, p.successes, priorAlpha, priorBeta);
+        const priorMean = priorAlpha / (priorAlpha + priorBeta);
+        const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
+        showResults(risk, lo, hi, priorMean, decision, p.impact);
+    }
 
     document.getElementById('applyPresetBtn').addEventListener('click', () => applyPreset(document.getElementById('presetScenario').value));
 
     // Share button
-    document.getElementById('shareBtn').addEventListener('click', () => { ... });
+    document.getElementById('shareBtn').addEventListener('click', () => {
+        const scenario = document.getElementById('presetScenario').value;
+        const url = new URL(window.location);
+        url.searchParams.set('scenario', scenario);
+        navigator.clipboard.writeText(url.toString()).then(() => {
+            alert('🔗 Link copied to clipboard!\nShare this exact scenario result.');
+        }).catch(() => {
+            prompt('Copy this link:', url.toString());
+        });
+    });
+
+    // Copy full report button
+    document.getElementById('copyReportBtn').addEventListener('click', () => {
+        const scenarioName = document.getElementById('presetScenario').options[document.getElementById('presetScenario').selectedIndex].text;
+        const riskScore = document.getElementById('riskScore').innerText;
+        const interval = document.getElementById('credibleInterval').innerText;
+        const prior = document.getElementById('priorMean').innerText;
+        const decision = currentDecision;
+        const impactMsg = impactMessages[currentScenario];
+        const expectedLoss = document.getElementById('expectedLossDisplay').innerText;
+        const withoutLoss = (currentRisk * currentImpact).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+        const withLoss = '$500';
+        const saved = ((currentRisk * currentImpact) - 500).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+        const report = `ARF Risk Demo Report\nScenario: ${scenarioName}\nRisk score: ${riskScore}\n95% CI: ${interval}\nPrior mean: ${prior}\nDecision: ARF would have ${decision.toUpperCase()} this action.\nExpected loss without ARF: ${withoutLoss}\nExpected loss with ARF: ${withLoss} (manual review)\nLoss avoided: ${saved}\nImpact: ${impactMsg}\n\n---\nThis is a simulated advisory response. The real ARF engine is access‑controlled. Request pilot access: https://www.arf-ai.com/signup`;
+        navigator.clipboard.writeText(report).then(() => {
+            alert('📋 Full report copied to clipboard!');
+        }).catch(() => {
+            prompt('Copy this report:', report);
+        });
+    });
 
     // URL param loading
     const urlParams = new URLSearchParams(window.location.search);
@@ -323,8 +479,18 @@
     else applyPreset('aircanada');
 
     // Fill incident table
-    const incidents = [ ... ];
-    document.getElementById('incidentTableBody').innerHTML = incidents.map(i => `...`).join('');
+    const incidents = [
+        { time: '2026-05-14 10:23:45', service: 'payment-api', metric: 'latency', value: '450ms', risk: 0.82, action: 'ESCALATE' },
+        { time: '2026-05-14 09:15:22', service: 'auth-service', metric: 'error_rate', value: '12%', risk: 0.45, action: 'APPROVE' },
+        { time: '2026-05-13 22:10:05', service: 'database', metric: 'cpu_usage', value: '92%', risk: 0.71, action: 'ESCALATE' },
+        { time: '2026-05-13 18:30:19', service: 'cache', metric: 'hit_rate', value: '34%', risk: 0.38, action: 'APPROVE' },
+        { time: '2026-05-13 14:45:03', service: 'message-queue', metric: 'backlog', value: '1250', risk: 0.63, action: 'DENY' }
+    ];
+    document.getElementById('incidentTableBody').innerHTML = incidents.map(i => `
+        <tr><td>${i.time}</td><td>${i.service}</td><td>${i.metric}</td><td>${i.value}</td>
+            <td style="font-weight:bold;color:#eab308;">${i.risk.toFixed(2)}</td>
+            <td><span class="action-pill ${i.action === 'APPROVE' ? 'action-approve' : i.action === 'ESCALATE' ? 'action-escalate' : 'action-deny'}">${i.action}</span></td>
+        </tr>`).join('');
 </script>
 </body>
 </html>
