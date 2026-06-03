@@ -149,10 +149,7 @@
             <option value="aircanada">✈️ Air Canada – Chatbot hallucination</option>
             <option value="pocketos">💀 PocketOS – Database wipe in 9 seconds</option>
         </select>
-        <div class="button-row">
-            <button id="applyPresetBtn" class="load-btn">Load Scenario & Evaluate Risk</button>
-            <button id="shareBtn" class="share-btn" aria-label="Copy shareable link">🔗 Copy link</button>
-        </div>
+        <button id="applyPresetBtn" class="load-btn">Load Scenario & Evaluate Risk</button>
     </div>
 
     <!-- Understanding your results guide -->
@@ -327,7 +324,6 @@
         pocketos: `<div class="bottom-line">💰 Bottom line: Denying this $150k destructive action prevents an outage that could cost days of recovery. A manual review would be required to override.</div>ARF denied because the risk (92.7%) far exceeds the 80% threshold. This category has a history of catastrophic outcomes. <strong>What if ARF had approved?</strong> The database would have been destroyed, causing massive business disruption. <strong>What if ARF had escalated?</strong> Escalation would still allow a human to approve the destructive action; denial adds an extra layer of protection by requiring explicit override.`
     };
 
-    // *** FIXED: now returns {risk, lo, hi, alpha, beta} instead of {r, lo, hi, alpha, beta} ***
     function computeRiskFromPrior(f, s, pa, pb) {
         const a = pa + f, b = pb + s;
         const risk = a / (a + b);
@@ -406,7 +402,6 @@
     const presets = {
         vmprovision: { category: "default", failures: 5, successes: 95, impact: 5000, description: "Routine VM provisioning in a well‑tested region – low historical failure rate." },
         aircanada: { category: "default", failures: 22, successes: 78, impact: 812, description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)." },
-        // *** FIXED: Changed to 100 failures / 0 successes to produce a DENY decision (>80%) ***
         pocketos: { category: "database", failures: 100, successes: 0, impact: 150000, description: "Cursor AI agent deleted production DB – catastrophic, repeated destructive actions in this category." }
     };
 
@@ -422,14 +417,6 @@
     }
 
     document.getElementById('applyPresetBtn').addEventListener('click', () => applyPreset(document.getElementById('presetScenario').value));
-
-    // Share button
-    document.getElementById('shareBtn').addEventListener('click', () => {
-        const s = document.getElementById('presetScenario').value;
-        const u = new URL(window.location);
-        u.searchParams.set('scenario', s);
-        navigator.clipboard.writeText(u.toString()).then(() => alert('🔗 Link copied!')).catch(() => prompt('Copy:', u.toString()));
-    });
 
     // Copy report
     document.getElementById('copyReportBtn').addEventListener('click', () => {
