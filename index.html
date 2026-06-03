@@ -324,7 +324,7 @@
     const counterfactualReasoning = {
         vmprovision: `<div class="bottom-line">💰 Bottom line: Approving this safe change avoids unnecessary human review, saving $2,400/month in escalation overhead.</div>ARF approved because the risk (5.4%) is well below the 20% threshold. This category has a history of reliable deployments. <strong>What if ARF had escalated?</strong> Routine operations would be delayed by manual reviews, slowing the team and frustrating engineers. <strong>What if ARF had denied?</strong> Safe changes would be blocked, creating bottlenecks and reducing deployment velocity. Approval with continuous monitoring is the optimal path.`,
         aircanada: `<div class="bottom-line">💰 Bottom line: Escalating this $812 claim avoids a reputational firestorm – the cost of a manual review is trivial compared to losing public trust.</div>ARF escalated because the risk (20.7%) falls within the 0.2–0.8 band. Customer‑facing claims automatically receive extra scrutiny. <strong>What if ARF had approved?</strong> The chatbot’s error would have gone unchecked, exposing the airline to further liability. <strong>What if ARF had denied?</strong> Routine customer interactions would be blocked, frustrating users. Escalation strikes the right balance.`,
-        pocketos: `<div class="bottom-line">💰 Bottom line: Denying this $150k destructive action prevents an outage that could cost days of recovery. A manual review would be required to override.</div>ARF denied because the risk (80.3%) exceeds the 80% threshold. This category has a history of catastrophic outcomes. <strong>What if ARF had approved?</strong> The database would have been destroyed, causing massive business disruption. <strong>What if ARF had escalated?</strong> Escalation would still allow a human to approve the destructive action; denial adds an extra layer of protection by requiring explicit override.`
+        pocketos: `<div class="bottom-line">💰 Bottom line: Denying this $150k destructive action prevents an outage that could cost days of recovery. A manual review would be required to override.</div>ARF denied because the risk (92.7%) far exceeds the 80% threshold. This category has a history of catastrophic outcomes. <strong>What if ARF had approved?</strong> The database would have been destroyed, causing massive business disruption. <strong>What if ARF had escalated?</strong> Escalation would still allow a human to approve the destructive action; denial adds an extra layer of protection by requiring explicit override.`
     };
 
     // *** FIXED: now returns {risk, lo, hi, alpha, beta} instead of {r, lo, hi, alpha, beta} ***
@@ -406,7 +406,8 @@
     const presets = {
         vmprovision: { category: "default", failures: 5, successes: 95, impact: 5000, description: "Routine VM provisioning in a well‑tested region – low historical failure rate." },
         aircanada: { category: "default", failures: 22, successes: 78, impact: 812, description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)." },
-        pocketos: { category: "database", failures: 80, successes: 20, impact: 150000, description: "Cursor AI agent deleted production DB – catastrophic, repeated destructive actions in this category." }
+        // *** FIXED: Changed to 100 failures / 0 successes to produce a DENY decision (>80%) ***
+        pocketos: { category: "database", failures: 100, successes: 0, impact: 150000, description: "Cursor AI agent deleted production DB – catastrophic, repeated destructive actions in this category." }
     };
 
     function applyPreset(id) {
