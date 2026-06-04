@@ -132,13 +132,13 @@
     <h1>🛡️ ARF – Prevent the Next AI Incident <span class="badge simulated-badge">Simulated</span><span class="badge tests-badge">✅ 54/54 tests passed</span></h1>
     <p style="margin-bottom:20px;color:#cbd5e1;"><strong>See all three ARF decisions: APPROVE, ESCALATE, and DENY.</strong></p>
 
-    <!-- Scenario Selector (updated with Cloudflare) -->
+    <!-- Scenario Selector – three real incidents from the pitch deck -->
     <div class="card">
         <h2>📋 Choose a real‑world scenario</h2>
         <select id="presetScenario" aria-label="Choose a real‑world scenario">
-            <option value="vmprovision">🖥️ Routine VM Provisioning – Low‑risk change</option>
             <option value="aircanada">✈️ Air Canada – Chatbot hallucination</option>
             <option value="cloudflare">🌩️ Cloudflare – Configuration cascade (Feb 2026)</option>
+            <option value="pocketos">💀 PocketOS – Autonomous coding agent deletes production DB</option>
         </select>
         <button id="applyPresetBtn" class="load-btn">Load Scenario & Evaluate Risk</button>
     </div>
@@ -292,15 +292,15 @@
     };
 
     const impactMessages = {
-        vmprovision: "✅ Routine provisioning with low historical failure rate. ARF would approve this action.",
         aircanada: "⚠️ Actual damages: $812 (plus tribunal fees). ARF would have escalated this customer‑facing claim to prevent reputational damage.",
-        cloudflare: "🌩️ A single configuration change cascaded into a multi‑hour global outage affecting 1,100+ customer prefixes. ARF would have escalated this change for human review, blocking the rollout until validated."
+        cloudflare: "🌩️ A single configuration change cascaded into a multi‑hour global outage affecting 1,100+ customer prefixes. ARF would have escalated this change for human review, blocking the rollout until validated.",
+        pocketos: "🚫 An autonomous coding agent with root API token deleted the production database and all backups in 9 seconds. ARF would have denied this destructive action outright."
     };
 
     const counterfactualReasoning = {
-        vmprovision: `<div class="bottom-line">💰 Bottom line: Approving this safe change avoids unnecessary human review, saving $2,400/month in escalation overhead.</div>ARF approved because the risk (5.4%) is well below the 20% threshold. This category has a history of reliable deployments. <strong>What if ARF had escalated?</strong> Routine operations would be delayed by manual reviews, slowing the team and frustrating engineers. <strong>What if ARF had denied?</strong> Safe changes would be blocked, creating bottlenecks and reducing deployment velocity. Approval with continuous monitoring is the optimal path.`,
         aircanada: `<div class="bottom-line">💰 Bottom line: Escalating this $812 claim avoids a reputational firestorm – the cost of a manual review is trivial compared to losing public trust.</div>ARF escalated because the risk (20.7%) falls within the 0.2–0.8 band. Customer‑facing claims automatically receive extra scrutiny. <strong>What if ARF had approved?</strong> The chatbot’s error would have gone unchecked, exposing the airline to further liability. <strong>What if ARF had denied?</strong> Routine customer interactions would be blocked, frustrating users. Escalation strikes the right balance.`,
-        cloudflare: `<div class="bottom-line">💰 Bottom line: Escalating this $10M+ configuration change could have prevented the entire outage – a 30‑minute manual review is negligible compared to millions in SLA credits and brand damage.</div>ARF escalated because the risk (67%) falls in the escalate zone. The system detected a high‑risk configuration change in the network category with a volatile history. <strong>What if ARF had approved?</strong> The change would have propagated automatically, causing a cascading failure exactly as seen in February 2026. <strong>What if ARF had denied?</strong> A complete block would force the operator to re‑evaluate and make a safer, incremental change – still an improvement over an unvetted rollout.`
+        cloudflare: `<div class="bottom-line">💰 Bottom line: Escalating this $10M+ configuration change could have prevented the entire outage – a 30‑minute manual review is negligible compared to millions in SLA credits and brand damage.</div>ARF escalated because the risk (67%) falls in the escalate zone. The system detected a high‑risk configuration change in the network category with a volatile history. <strong>What if ARF had approved?</strong> The change would have propagated automatically, causing a cascading failure exactly as seen in February 2026. <strong>What if ARF had denied?</strong> A complete block would force the operator to re‑evaluate and make a safer, incremental change – still an improvement over an unvetted rollout.`,
+        pocketos: `<div class="bottom-line">💰 Bottom line: Denying this $150k destructive action prevents an outage that could take days to recover. A manual override would be required to proceed – an extra safety check.</div>ARF denied because the risk (92.7%) far exceeds the 80% threshold. The database category has a history of catastrophic outcomes when agents are over‑privileged. <strong>What if ARF had approved?</strong> The database would have been wiped, causing massive business disruption. <strong>What if ARF had escalated?</strong> Escalation would still allow a human to approve the destructive action; denial adds an extra layer of protection by requiring explicit override.`
     };
 
     function computeRiskFromPrior(f, s, pa, pb) {
@@ -376,9 +376,9 @@
     document.getElementById('cfWithBtn').addEventListener('click', () => { cfMode = "with"; document.getElementById('cfWithBtn').classList.add('active'); document.getElementById('cfWithoutBtn').classList.remove('active'); updateCounterfactual(currentRisk, currentImpact); });
 
     const presets = {
-        vmprovision: { category: "default", failures: 5, successes: 95, impact: 5000, description: "Routine VM provisioning in a well‑tested region – low historical failure rate." },
         aircanada: { category: "default", failures: 22, successes: 78, impact: 812, description: "Air Canada chatbot promised non‑existent bereavement discount; airline held liable ($812 damages)." },
-        cloudflare: { category: "compute", failures: 60, successes: 40, impact: 12000000, description: "Cloudflare BYOIP configuration error (Feb 2026) – a single change withdrew 1,100 customer prefixes, causing a multi‑hour global outage. Estimated SLA credits & reputational damage >$10M." }
+        cloudflare: { category: "compute", failures: 60, successes: 40, impact: 12000000, description: "Cloudflare BYOIP configuration error (Feb 2026) – a single change withdrew 1,100 customer prefixes, causing a multi‑hour global outage. Estimated SLA credits & reputational damage >$10M." },
+        pocketos: { category: "database", failures: 100, successes: 0, impact: 150000, description: "PocketOS (April 2026): Autonomous coding agent with root API token deleted production DB and all backups in 9 seconds. 3 months of customer data lost." }
     };
 
     function applyPreset(id) {
@@ -412,11 +412,11 @@
             const dec = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
             const wl = (risk * p.impact).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
             const saved = ((risk * p.impact) - 500).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
-            let name = key === 'vmprovision' ? '🖥️ Routine VM Provisioning' : key === 'aircanada' ? '✈️ Air Canada' : '🌩️ Cloudflare Config Cascade';
+            let name = key === 'aircanada' ? '✈️ Air Canada' : key === 'cloudflare' ? '🌩️ Cloudflare Config Cascade' : '💀 PocketOS';
             return { name, risk, lo, hi, dec, wl, saved };
         });
         const tb = document.getElementById('comparisonTableBody');
-        tb.innerHTML = rows.map(r => `<tr><td>${r.name}</td><td style="font-weight:bold;color:${r.risk<0.2?'#22c55e':r.risk>0.8?'#ef4444':'#eab308'}">${(r.risk*100).toFixed(1)}%</td><td>[${r.lo.toFixed(2)}, ${r.hi.toFixed(2)}]</td><td><span class="action-pill ${r.dec==='Approve'?'action-approve':r.dec==='Deny'?'action-deny':'action-escalate'}">${r.dec.toUpperCase()}</span></td><td>${r.wl}</td><td style="color:#22c55e;">${r.saved}</td></tr>`).join('');
+        tb.innerHTML = rows.map(r => `<tr><td style="padding:0.5rem; font-size:0.8rem;">${r.name}</td><td style="font-weight:bold;color:${r.risk<0.2?'#22c55e':r.risk>0.8?'#ef4444':'#eab308'};">${(r.risk*100).toFixed(1)}%</td><td style="padding:0.5rem; font-size:0.8rem;">[${r.lo.toFixed(2)}, ${r.hi.toFixed(2)}]</td><td style="padding:0.5rem; font-size:0.8rem;"><span class="action-pill ${r.dec==='Approve'?'action-approve':r.dec==='Deny'?'action-deny':'action-escalate'}">${r.dec.toUpperCase()}</span></td><td style="padding:0.5rem; font-size:0.8rem;">${r.wl}</td><td style="color:#22c55e;">${r.saved}</td></tr>`).join('');
     }
     buildComparisonTable();
 
@@ -432,7 +432,7 @@
         { time: '2026-05-13 18:30:19', service: 'cache', metric: 'hit_rate', value: '34%', risk: 0.38, action: 'APPROVE' },
         { time: '2026-05-13 14:45:03', service: 'message-queue', metric: 'backlog', value: '1250', risk: 0.63, action: 'DENY' }
     ];
-    document.getElementById('incidentTableBody').innerHTML = incidents.map(i => `<tr><td>${i.time}</td><td>${i.service}</td><td>${i.metric}</td><td>${i.value}</td><td style="font-weight:bold;color:#eab308;">${i.risk.toFixed(2)}</td><td><span class="action-pill ${i.action==='APPROVE'?'action-approve':i.action==='ESCALATE'?'action-escalate':'action-deny'}">${i.action}</span></td></tr>`).join('');
+    document.getElementById('incidentTableBody').innerHTML = incidents.map(i => `<tr><td style="padding:0.5rem 0.5rem;">${i.time}</td><td style="padding:0.5rem 0.5rem;">${i.service}</td><td style="padding:0.5rem 0.5rem;">${i.metric}</td><td style="padding:0.5rem 0.5rem;">${i.value}</td><td style="font-weight:bold;color:#eab308;">${i.risk.toFixed(2)}</td><td style="padding:0.5rem 0.5rem;"><span class="action-pill ${i.action==='APPROVE'?'action-approve':i.action==='ESCALATE'?'action-escalate':'action-deny'}">${i.action}</span></td></tr>`).join('');
 </script>
 </body>
 </html>
