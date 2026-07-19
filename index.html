@@ -85,7 +85,11 @@
         .trust-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 1rem 0; }
         .trust-badge { background: #1e293b; color: white; padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
         .tooltip-icon { border-bottom: 1px dashed #6c757d; cursor: help; margin-left: 6px; }
-        .impact-message { margin-top: 8px; font-size: 0.8rem; font-weight: 500; padding: 6px; border-radius: 12px; background: #e9f5e9; color: #0f172a; }
+        .impact-message {
+            margin-top: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05);
+            font-size: 0.9rem; font-weight: 500; color: #f1f5f9; text-align: center;
+            border: 1px dashed #475569;
+        }
         .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 12px; margin: 16px 0; border: 1px solid #334155; position: relative; overflow: hidden; }
         .cf-toggle { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; }
         .cf-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
@@ -143,6 +147,16 @@
             transition: transform 0.2s;
         }
         #partyBtn:hover { transform: scale(1.05); }
+
+        /* Scenario cards (new style) */
+        .scenario-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .scenario-card {
+            flex: 1; min-width: 150px; padding: 12px; border: 2px solid #334155; border-radius: 16px;
+            cursor: pointer; text-align: center; background: #1e293b; transition: border-color 0.2s, transform 0.2s;
+        }
+        .scenario-card:hover { border-color: #38bdf8; transform: translateY(-2px); }
+        .scenario-card .event-year { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+        .scenario-card .event-desc { font-size: 0.85rem; margin-top: 8px; color: #cbd5e1; }
     </style>
 </head>
 <body>
@@ -157,21 +171,24 @@
     <h1>🛡️ ARF – Prevent the Next AI Incident <span class="badge simulated-badge">Simulated</span></h1>
     <p style="margin-bottom:20px;color:#cbd5e1;"><strong>See all three ARF decisions: APPROVE, ESCALATE, and DENY.</strong></p>
 
-    <!-- Scenario Cards (story selector) -->
-    <div class="card" id="scenarioCards" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-        <div class="scenario-card" data-scenario="aircanada" style="flex:1; min-width:150px; padding:12px; border:2px solid #334155; border-radius:16px; cursor:pointer; text-align:center; background:#1e293b;">
-            ✈️ <strong>Air Canada</strong><br><small>Chatbot hallucination</small>
+    <!-- Scenario Cards with year and description -->
+    <div class="scenario-cards" id="scenarioCards">
+        <div class="scenario-card" data-scenario="aircanada">
+            <strong>✈️ Air Canada (2023)</strong>
+            <div class="event-desc">Chatbot promised non‑existent bereavement discount; airline held liable for $812 damages.</div>
         </div>
-        <div class="scenario-card" data-scenario="cloudflare" style="flex:1; min-width:150px; padding:12px; border:2px solid #334155; border-radius:16px; cursor:pointer; text-align:center; background:#1e293b;">
-            🌩️ <strong>Cloudflare</strong><br><small>Config cascade (Feb 2026)</small>
+        <div class="scenario-card" data-scenario="cloudflare">
+            <strong>🌩️ Cloudflare (Feb 2026)</strong>
+            <div class="event-desc">A single BGP configuration error withdrew 1,100+ customer prefixes, causing a global outage.</div>
         </div>
-        <div class="scenario-card" data-scenario="pocketos" style="flex:1; min-width:150px; padding:12px; border:2px solid #334155; border-radius:16px; cursor:pointer; text-align:center; background:#1e293b;">
-            💀 <strong>PocketOS</strong><br><small>Agent deletes production DB</small>
+        <div class="scenario-card" data-scenario="pocketos">
+            <strong>💀 PocketOS (Apr 2026)</strong>
+            <div class="event-desc">Autonomous coding agent with root API token deleted production DB and all backups in 9 seconds.</div>
         </div>
     </div>
     <p style="text-align:center; margin-bottom:20px; color:#94a3b8;">👆 Click a scenario to load it</p>
 
-    <!-- Risk Scoring Result Card (now with collapsed technical details) -->
+    <!-- Risk Scoring Result Card (now with posterior chart & audit trail) -->
     <div class="card" id="riskCard" style="display:none;">
         <h2>📊 Governance Decision</h2>
         <div class="result">
@@ -180,13 +197,22 @@
             <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
             <div id="riskImpactMessage" class="impact-message"></div>
             <details id="technicalDetails" style="margin-top:12px;">
-                <summary>📈 Technical details (risk breakdown)</summary>
+                <summary>📈 Technical details (risk breakdown + audit)</summary>
                 <strong>Risk score:</strong> <span id="riskScore"></span><br>
                 <strong>95% credible interval:</strong> <span id="credibleInterval"></span><br>
                 <strong>Prior mean:</strong> <span id="priorMean"></span><br>
                 <strong>Policy decision:</strong> <span id="policyDecision" class="status"></span>
                 <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
                 <div id="expectedLossDisplay" style="margin-top:8px;font-weight:500;"></div>
+
+                <!-- Posterior distribution chart -->
+                <div id="posteriorChart" style="width:100%; height:220px; margin-top:12px;"></div>
+
+                <!-- Audit trail -->
+                <details style="margin-top:12px;">
+                    <summary>📜 Audit trail (simulated)</summary>
+                    <div id="auditTrailContent" style="font-family: monospace; font-size:0.8rem; background:#0f172a; padding:8px; border-radius:8px; max-height:200px; overflow-y:auto;"></div>
+                </details>
             </details>
         </div>
         <div class="explanation">
@@ -286,10 +312,25 @@
         pocketos: "🚫 An autonomous coding agent with root API token deleted the production database and all backups in 9 seconds. ARF would have denied this destructive action outright."
     };
 
-    const counterfactualReasoning = {
-        aircanada: `<div class="bottom-line">💰 Bottom line: Escalating this $812 claim avoids a reputational firestorm – the cost of a manual review is trivial compared to losing public trust.</div>ARF escalated because the risk (20.7%) falls within the 0.2–0.8 band. Customer‑facing claims automatically receive extra scrutiny.`,
-        cloudflare: `<div class="bottom-line">💰 Bottom line: Escalating this $10M+ configuration change could have prevented the entire outage – a 30‑minute manual review is negligible compared to millions in SLA credits and brand damage.</div>`,
-        pocketos: `<div class="bottom-line">💰 Bottom line: Denying this $150k destructive action prevents an outage that could take days to recover. A manual override would be required to proceed – an extra safety check.</div>`
+    const auditTrailData = {
+        aircanada: [
+            ["2023-11-12 14:23:01", "Intent received: customer‑facing chatbot claim (bereavement discount)", "Pending"],
+            ["2023-11-12 14:23:02", "Risk engine computed posterior risk = 0.207", "Risk evaluated"],
+            ["2023-11-12 14:23:02", "Policy engine: customer‑facing claims → escalate if risk >0.2", "Escalate triggered"],
+            ["2023-11-12 14:23:03", "HealingIntent generated: ESCALATE to human review", "Complete audit trail"]
+        ],
+        cloudflare: [
+            ["2026-02-12 09:15:44", "Intent received: BGP configuration change (BYOIP)", "Pending"],
+            ["2026-02-12 09:15:44", "Risk engine computed posterior risk = 0.67", "Risk evaluated"],
+            ["2026-02-12 09:15:45", "Policy engine: high‑risk network change → escalate for manual approval", "Escalate triggered"],
+            ["2026-02-12 09:15:45", "HealingIntent generated: ESCALATE to network team", "Complete audit trail"]
+        ],
+        pocketos: [
+            ["2026-04-02 18:33:00", "Intent received: agent requests database deletion (production)", "Pending"],
+            ["2026-04-02 18:33:00", "Risk engine computed posterior risk = 0.927", "Risk evaluated"],
+            ["2026-04-02 18:33:01", "Policy engine: destructive action on database → deny", "Deny triggered"],
+            ["2026-04-02 18:33:01", "HealingIntent generated: DENY – requires explicit override", "Complete audit trail"]
+        ]
     };
 
     function computeRiskFromPrior(f, s, pa, pb) {
@@ -302,19 +343,18 @@
     let currentRisk = 0, currentImpact = 0, currentScenario = "", currentDecision = "";
     let firstLoad = true;
 
-    function showResults(risk, lo, hi, priorMean, decision, impact) {
+    function showResults(risk, lo, hi, priorMean, decision, impact, alpha, beta) {
         document.getElementById('riskCard').style.display = 'block';
         document.getElementById('riskCard').classList.add('fade-in');
         document.getElementById('cfPanel').style.display = 'block';
         document.getElementById('cfPanel').classList.add('fade-in');
-        document.getElementById('partySection').hidden = false; // reveal the fun button
+        document.getElementById('partySection').hidden = false;
 
         const hero = document.getElementById('decisionHero');
         const icon = decision === 'Approve' ? '✅' : (decision === 'Deny' ? '🛑' : '⚠️');
         const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
         hero.innerHTML = `<span class="icon">${icon}</span> ARF would have <span class="${cls}">${decision.toUpperCase()}</span> this action.`;
         hero.className = 'decision-hero ' + cls;
-        setTimeout(() => hero.focus(), 100);
 
         const fill = document.getElementById('riskThermometerFill');
         fill.style.width = `${risk * 100}%`;
@@ -336,6 +376,35 @@
         document.getElementById('expectedLossDisplay').innerHTML = `💰 Expected loss: <strong>${el.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong> (risk × impact estimate)`;
         document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
 
+        // Posterior chart
+        const x = Array.from({length: 100}, (_, i) => i / 100);
+        const y = x.map(v => betaPDF(v, alpha, beta));
+        const trace = {
+            x: x,
+            y: y,
+            type: 'scatter',
+            fill: 'tozeroy',
+            mode: 'lines',
+            line: { color: '#38bdf8' },
+            name: 'Posterior'
+        };
+        const layout = {
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            font: { color: '#94a3b8', size: 10 },
+            margin: { l: 40, r: 10, t: 30, b: 30 },
+            xaxis: { title: 'θ (failure probability)' },
+            yaxis: { title: 'Density' },
+            title: `Beta(${alpha.toFixed(1)}, ${beta.toFixed(1)}) Posterior`
+        };
+        Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
+
+        // Audit trail
+        const trail = auditTrailData[currentScenario] || [];
+        document.getElementById('auditTrailContent').innerHTML = trail.map(entry =>
+            `<div style="margin:4px 0;">[${entry[0]}] ${entry[1]} → <strong>${entry[2]}</strong></div>`
+        ).join('');
+
         currentRisk = risk;
         currentImpact = impact;
         currentDecision = decision;
@@ -354,7 +423,6 @@
             `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${wl.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong><br>The agent would have executed the action, causing this loss.` :
             `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${wl2.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong> (manual review)<br>ARF would have ${currentDecision === 'Approve' ? 'APPROVED' : currentDecision === 'Deny' ? 'DENIED' : 'ESCALATED to human review'}, preventing catastrophic loss.<br><span class="cf-saved">💰 You saved ${saved.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</span><span class="cf-tagline">That’s the cost of governance vs. the cost of chaos.</span>`;
         document.getElementById('cfContent').innerHTML = content;
-        // Money rain when "With ARF" is active and saved > 0
         const rainDiv = document.getElementById('moneyRain');
         if (cfMode === "with" && saved > 0) {
             startMoneyRain(rainDiv);
@@ -363,7 +431,6 @@
         }
     }
 
-    // Simple money rain effect (CSS dollar bills)
     let rainInterval;
     function startMoneyRain(container) {
         if (rainInterval) return;
@@ -400,10 +467,10 @@
         if (!p) return;
         currentScenario = id;
         const [pa, pb] = categoryMap[p.category];
-        const { risk, lo, hi } = computeRiskFromPrior(p.failures, p.successes, pa, pb);
+        const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(p.failures, p.successes, pa, pb);
         const priorMean = pa / (pa + pb);
         const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
-        showResults(risk, lo, hi, priorMean, decision, p.impact);
+        showResults(risk, lo, hi, priorMean, decision, p.impact, alpha, beta);
         // Highlight active scenario card
         document.querySelectorAll('.scenario-card').forEach(c => c.style.borderColor = '#334155');
         const activeCard = document.querySelector(`.scenario-card[data-scenario="${id}"]`);
@@ -421,7 +488,6 @@
     // ---------- Balloon party (fun ending) ----------
     const partyBtn = document.getElementById('partyBtn');
     partyBtn.addEventListener('click', () => {
-        // Launch balloons
         const container = document.getElementById('balloonContainer');
         const balloonEmojis = ['🎈','🎈','🎈','✨','🎉','🎊'];
         for (let i=0; i<30; i++) {
@@ -433,20 +499,13 @@
             container.appendChild(balloon);
             setTimeout(() => balloon.remove(), 4000);
         }
-        // Show caption
         const caption = document.getElementById('finalCaption');
         caption.classList.add('show');
-        // Hide party button after click
         partyBtn.style.display = 'none';
-        // Show final CTA after a delay
         setTimeout(() => {
             document.getElementById('finalCTA').style.display = 'block';
         }, 1500);
     });
-
-    // Also keep the previous comparison table and incident table if needed, but let's keep them out of the way.
-    // We'll hide them for the demo walkthrough to reduce clutter.
-    document.getElementById('scenarioCards').insertAdjacentHTML('afterend', '<div id="comparisonContainer" style="display:none;"></div>');
 </script>
 </body>
 </html>
