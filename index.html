@@ -90,14 +90,44 @@
             font-size: 0.9rem; font-weight: 500; color: #f1f5f9; text-align: center;
             border: 1px dashed #475569;
         }
-        .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 12px; margin: 16px 0; border: 1px solid #334155; position: relative; overflow: hidden; }
+        .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 16px; margin: 16px 0; border: 1px solid #334155; position: relative; overflow: hidden; }
         .cf-toggle { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; }
-        .cf-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        .cf-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
         .cf-btn.active { background: #38bdf8; color: #0a0c10; }
-        .cf-loss { font-family: monospace; font-size: 1.2rem; text-align: center; }
-        .cf-saved { font-size: 2.5rem; font-weight: 800; color: #22c55e; display: block; margin: 8px 0; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-        .cf-tagline { font-size: 0.9rem; color: #94a3b8; margin-bottom: 12px; }
-        .human-escalation { display: inline-flex; align-items: center; gap: 6px; background: #78350f; color: #fde68a; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: bold; }
+        .cf-content {
+            text-align: center;
+            padding: 8px 0;
+        }
+        .cf-state {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+        .cf-loss-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 6px 0;
+        }
+        .cf-loss-number.without { color: #f87171; }
+        .cf-loss-number.with { color: #4ade80; }
+        .cf-saved-badge {
+            display: inline-block;
+            background: #14532d;
+            color: #bbf7d0;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 6px;
+            border: 1px solid #22c55e;
+        }
+        .cf-sub {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
         .pilot-cta { text-align: center; margin-top: 16px; }
         .pilot-cta a { background: #38bdf8; color: #0a0c10; font-weight: 700; padding: 10px 20px; border-radius: 2rem; text-decoration: none; display: inline-block; transition: background 0.2s; }
         .pilot-cta a:hover { background: #7dd3fc; }
@@ -121,7 +151,7 @@
         .comparison-table th, .comparison-table td { padding: 0.5rem; font-size: 0.8rem; text-align: left; border-bottom: 1px solid #334155; }
         .comparison-table th { color: #94a3b8; }
 
-        /* Balloon / celebration styles */
+        /* Balloon / celebration styles (unchanged) */
         .balloon-container {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 10; overflow: hidden;
@@ -148,7 +178,7 @@
         }
         #partyBtn:hover { transform: scale(1.05); }
 
-        /* Scenario cards (new style) */
+        /* Scenario cards */
         .scenario-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
         .scenario-card {
             flex: 1; min-width: 150px; padding: 12px; border: 2px solid #334155; border-radius: 16px;
@@ -171,7 +201,7 @@
     <h1>🛡️ ARF – Prevent the Next AI Incident <span class="badge simulated-badge">Simulated</span></h1>
     <p style="margin-bottom:20px;color:#cbd5e1;"><strong>See all three ARF decisions: APPROVE, ESCALATE, and DENY.</strong></p>
 
-    <!-- Scenario Cards with year and description -->
+    <!-- Scenario Cards -->
     <div class="scenario-cards" id="scenarioCards">
         <div class="scenario-card" data-scenario="aircanada">
             <strong>✈️ Air Canada (2023)</strong>
@@ -188,7 +218,7 @@
     </div>
     <p style="text-align:center; margin-bottom:20px; color:#94a3b8;">👆 Click a scenario to load it</p>
 
-    <!-- Risk Scoring Result Card (now with posterior chart & audit trail) -->
+    <!-- Risk Scoring Result Card -->
     <div class="card" id="riskCard" style="display:none;">
         <h2>📊 Governance Decision</h2>
         <div class="result">
@@ -205,7 +235,7 @@
                 <div id="decisionExplanation" class="explanation" style="margin-top:8px;"></div>
                 <div id="expectedLossDisplay" style="margin-top:8px;font-weight:500;"></div>
 
-                <!-- Posterior distribution chart -->
+                <!-- Posterior chart -->
                 <div id="posteriorChart" style="width:100%; height:220px; margin-top:12px;"></div>
 
                 <!-- Audit trail -->
@@ -221,15 +251,13 @@
         </div>
     </div>
 
-    <!-- Counterfactual Panel (always visible after result) -->
+    <!-- Counterfactual Panel (redesigned) -->
     <div class="counterfactual-panel" id="cfPanel" style="display:none;">
         <div class="cf-toggle">
             <button id="cfWithoutBtn" class="cf-btn active">📉 Without ARF</button>
             <button id="cfWithBtn" class="cf-btn">🛡️ With ARF (governance)</button>
         </div>
-        <div id="cfContent" class="cf-loss"></div>
-        <div id="moneyRain" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
-        <div class="explanation" style="margin-top:8px;">🔍 <strong>Counterfactual analysis:</strong> What would have happened if the agent acted alone vs. with ARF governance.</div>
+        <div id="cfContent" class="cf-content"></div>
         <div class="pilot-cta">
             <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">
                 Prevent incidents like these. Request pilot access →<br>
@@ -238,7 +266,7 @@
         </div>
     </div>
 
-    <!-- Final celebration button (hidden initially) -->
+    <!-- Final celebration button -->
     <div style="text-align:center;" id="partySection" hidden>
         <button id="partyBtn">🎈 What happens if you don’t govern?</button>
         <div class="final-caption" id="finalCaption">Your infrastructure pops. Literally.</div>
@@ -418,43 +446,40 @@
 
     let cfMode = "without";
     function updateCounterfactual(risk, impact) {
-        const wl = risk * impact, wl2 = 500, saved = wl - wl2;
-        const content = cfMode === "without" ?
-            `📉 <strong>Without ARF</strong><br>Expected loss = <strong>${wl.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong><br>The agent would have executed the action, causing this loss.` :
-            `🛡️ <strong>With ARF</strong><br>Expected loss = <strong>${wl2.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong> (manual review)<br>ARF would have ${currentDecision === 'Approve' ? 'APPROVED' : currentDecision === 'Deny' ? 'DENIED' : 'ESCALATED to human review'}, preventing catastrophic loss.<br><span class="cf-saved">💰 You saved ${saved.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</span><span class="cf-tagline">That’s the cost of governance vs. the cost of chaos.</span>`;
-        document.getElementById('cfContent').innerHTML = content;
-        const rainDiv = document.getElementById('moneyRain');
-        if (cfMode === "with" && saved > 0) {
-            startMoneyRain(rainDiv);
+        const wl = risk * impact;
+        const wl2 = 500; // fixed manual review cost
+        const saved = wl - wl2;
+        const content = document.getElementById('cfContent');
+
+        if (cfMode === "without") {
+            content.innerHTML = `
+                <div class="cf-state">📉 Without ARF</div>
+                <div class="cf-loss-number without">${wl.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</div>
+                <div class="cf-sub">Expected loss from the agent acting alone</div>
+            `;
         } else {
-            stopMoneyRain(rainDiv);
+            content.innerHTML = `
+                <div class="cf-state">🛡️ With ARF (governance)</div>
+                <div class="cf-loss-number with">${wl2.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</div>
+                <div class="cf-sub">ARF would have ${currentDecision === 'Approve' ? 'APPROVED' : currentDecision === 'Deny' ? 'DENIED' : 'ESCALATED to human review'}</div>
+                <div class="cf-saved-badge">💰 You saved ${saved.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</div>
+            `;
         }
     }
 
-    let rainInterval;
-    function startMoneyRain(container) {
-        if (rainInterval) return;
-        function createBill() {
-            const bill = document.createElement('span');
-            bill.textContent = '💵';
-            bill.style.position = 'absolute';
-            bill.style.left = Math.random() * 100 + '%';
-            bill.style.top = '-20px';
-            bill.style.fontSize = '1.5rem';
-            bill.style.animation = 'floatUp 2s linear forwards';
-            container.appendChild(bill);
-            setTimeout(() => bill.remove(), 2000);
-        }
-        rainInterval = setInterval(createBill, 200);
-    }
-    function stopMoneyRain(container) {
-        clearInterval(rainInterval);
-        rainInterval = null;
-        container.innerHTML = '';
-    }
-
-    document.getElementById('cfWithoutBtn').addEventListener('click', () => { cfMode = "without"; document.getElementById('cfWithoutBtn').classList.add('active'); document.getElementById('cfWithBtn').classList.remove('active'); updateCounterfactual(currentRisk, currentImpact); });
-    document.getElementById('cfWithBtn').addEventListener('click', () => { cfMode = "with"; document.getElementById('cfWithBtn').classList.add('active'); document.getElementById('cfWithoutBtn').classList.remove('active'); updateCounterfactual(currentRisk, currentImpact); });
+    // Event listeners for toggle buttons
+    document.getElementById('cfWithoutBtn').addEventListener('click', () => {
+        cfMode = "without";
+        document.getElementById('cfWithoutBtn').classList.add('active');
+        document.getElementById('cfWithBtn').classList.remove('active');
+        updateCounterfactual(currentRisk, currentImpact);
+    });
+    document.getElementById('cfWithBtn').addEventListener('click', () => {
+        cfMode = "with";
+        document.getElementById('cfWithBtn').classList.add('active');
+        document.getElementById('cfWithoutBtn').classList.remove('active');
+        updateCounterfactual(currentRisk, currentImpact);
+    });
 
     const presets = {
         aircanada: { category: "default", failures: 22, successes: 78, impact: 812 },
@@ -485,7 +510,7 @@
     // Load Cloudflare by default
     applyPreset('cloudflare');
 
-    // ---------- Balloon party (fun ending) ----------
+    // ---------- Balloon party (unchanged) ----------
     const partyBtn = document.getElementById('partyBtn');
     partyBtn.addEventListener('click', () => {
         const container = document.getElementById('balloonContainer');
