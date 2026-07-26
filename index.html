@@ -120,7 +120,7 @@
         }
         .agent-request .req-meta span strong { color: #cbd5e1; font-weight: 500; }
 
-        /* Decision Hero – now with Policy Engine badge */
+        /* Decision Hero */
         .decision-hero {
             text-align: center;
             padding: 8px 0 6px;
@@ -188,7 +188,7 @@
         .escalate-hero .decision-badge { color: var(--glow-yellow); }
         .deny-hero .decision-badge { color: var(--glow-red); }
 
-        /* Risk Assessment – separate from decision */
+        /* Risk Assessment */
         .risk-assessment {
             display: flex;
             justify-content: center;
@@ -459,7 +459,7 @@
     <!-- Governance Decision Card -->
     <div class="card" id="riskCard" style="display:none;">
         <div class="result">
-            <!-- Agent Request – formatted as real request -->
+            <!-- Agent Request -->
             <div class="agent-request">
                 <div class="req-label">Agent Request</div>
                 <div class="req-action" id="actionDescription">—</div>
@@ -469,7 +469,7 @@
                 </div>
             </div>
 
-            <!-- Decision Hero – with Policy Engine badge -->
+            <!-- Decision Hero -->
             <div class="decision-hero" id="decisionHero" role="alert" aria-live="polite" tabindex="-1">
                 <div class="engine-badge">⚙️ Policy Engine</div>
                 <div class="decision-label">Governance Decision</div>
@@ -479,7 +479,7 @@
                 <div class="stat-certainty" id="decisionConfidence">—</div>
             </div>
 
-            <!-- Risk Assessment – separate from decision -->
+            <!-- Risk Assessment -->
             <div class="risk-assessment">
                 <span class="ra-label">Risk Assessment</span>
                 <span class="ra-level" id="riskLevel">—</span>
@@ -487,7 +487,7 @@
                 <span style="font-size:0.7rem;color:#94a3b8;" id="riskPercent">—</span>
             </div>
 
-            <!-- Impact message – now uses "would have" -->
+            <!-- Impact message -->
             <div id="riskImpactMessage" class="impact-message"></div>
 
             <!-- Outcome Box -->
@@ -513,7 +513,7 @@
                 </div>
             </details>
 
-            <!-- Technical Analysis – regrouped -->
+            <!-- Technical Analysis -->
             <details id="technicalDetails" style="margin-top:10px;">
                 <summary>🔬 Technical Analysis</summary>
                 <div class="detail-content">
@@ -699,7 +699,7 @@
         reason.textContent = data.reason;
         trigger.textContent = data.policyTrigger;
 
-        // Statistical Certainty (not confidence)
+        // Statistical Certainty
         const intervalWidth = hi - lo;
         const certaintyPct = Math.round((1 - intervalWidth) * 100);
         const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
