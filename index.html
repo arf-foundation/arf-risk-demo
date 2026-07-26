@@ -37,7 +37,6 @@
         }
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* Header with website link */
         .site-header {
             display: flex;
             justify-content: space-between;
@@ -87,7 +86,6 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* Hero */
         .hero-section { margin-bottom: 24px; }
         .hero-problem {
             font-size: 2.2rem;
@@ -97,13 +95,7 @@
             line-height: 1.3;
         }
         .hero-problem .highlight { color: #38bdf8; }
-        .hero-answer {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #ef4444;
-            margin: 0 0 8px 0;
-            line-height: 1.2;
-        }
+        /* hero-answer removed entirely */
         .hero-flow {
             display: flex;
             align-items: center;
@@ -146,7 +138,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Agent Request */
         .agent-request {
             background: #1e293b;
             padding: 14px 20px;
@@ -178,7 +169,6 @@
         }
         .agent-request .req-meta span strong { color: #cbd5e1; font-weight: 500; }
 
-        /* Decision Hero */
         .decision-hero {
             text-align: center;
             padding: 12px 0 8px;
@@ -246,7 +236,6 @@
         .escalate-hero .decision-badge { color: var(--glow-yellow); }
         .deny-hero .decision-badge { color: var(--glow-red); }
 
-        /* Risk Assessment */
         .risk-assessment {
             display: flex;
             justify-content: center;
@@ -284,7 +273,6 @@
             border: 1px solid #2a3a4a;
         }
 
-        /* Outcome Box */
         .outcome-box {
             margin-top: 14px;
             padding: 14px 20px;
@@ -317,7 +305,6 @@
             .outcome-box { grid-template-columns: 1fr; }
         }
 
-        /* Counterfactual */
         .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 20px; margin: 20px 0; border: 1px solid #334155; }
         .cf-toggle { display: flex; gap: 20px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
         .cf-btn { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
@@ -338,7 +325,6 @@
         .cf-flow .flow-outcome.good { color: #4ade80; }
         .cf-flow .flow-outcome.bad { color: #f87171; }
 
-        /* CTA orange */
         .pilot-cta { text-align: center; margin-top: 18px; }
         .pilot-cta a {
             background: var(--cta-bg);
@@ -358,7 +344,6 @@
             box-shadow: 0 6px 30px rgba(249, 115, 22, 0.5);
         }
 
-        /* Footer – business friendly */
         footer {
             text-align: center;
             margin-top: 40px;
@@ -382,7 +367,6 @@
         details[open] summary { margin-bottom: 8px; }
         details .detail-content { padding: 8px 0; font-size: 0.92rem; line-height: 1.8; }
 
-        /* Scenario Cards */
         .scenario-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
         .scenario-card {
             flex: 1; min-width: 180px; padding: 14px 16px; border: 2px solid #334155; border-radius: 16px;
@@ -417,7 +401,6 @@
             color: #94a3b8;
         }
 
-        /* Timeline */
         .timeline { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
         .timeline-step {
             display: flex;
@@ -514,7 +497,6 @@
             .risk-assessment { flex-direction: column; align-items: stretch; }
             .agent-request .req-meta { flex-direction: column; gap: 4px; }
             .hero-problem { font-size: 1.6rem; }
-            .hero-answer { font-size: 2rem; }
             .site-header { flex-direction: column; align-items: flex-start; gap: 8px; }
         }
         @media (min-width: 641px) {
@@ -532,13 +514,13 @@
         <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
     </header>
 
-    <!-- Hero -->
+    <!-- Hero – open question, no answer -->
     <div class="hero-section">
         <div class="hero-problem">
             An autonomous AI agent wants to execute a production action.
             <span class="highlight">Should it be allowed?</span>
         </div>
-        <div class="hero-answer">No.</div>
+        <!-- "No." removed -->
         <div class="hero-flow">
             <span class="flow-item">Agent proposes action</span>
             <span class="flow-arrow">↓</span>
@@ -672,7 +654,7 @@
         </div>
     </div>
 
-    <!-- Footer with business-friendly message and website -->
+    <!-- Footer -->
     <footer>
         <p>
             ARF AI — <a href="https://www.arf-ai.com" target="_blank">Learn more at arf-ai.com</a> ·
