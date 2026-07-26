@@ -14,11 +14,9 @@
             --border-light: #334155;
             --result-bg: #0f172a;
             --expl-bg: #0f172a;
-            --social-bg: #1e293b;
             --footer-color: #94a3b8;
             --button-bg: #334155;
             --button-hover: #475569;
-            --input-bg: #0f172a;
             --counterfactual-bg: #1e293b;
             --glow-green: #22c55e;
             --glow-yellow: #fbbf24;
@@ -41,7 +39,7 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 14px; border-radius: 16px; margin-top: 12px; }
 
-        /* Hero – starts with the problem */
+        /* Hero */
         .hero-section { margin-bottom: 20px; }
         .hero-problem {
             font-size: 1.2rem;
@@ -70,6 +68,9 @@
             background: #0f2a44;
             color: #e2e8f0;
         }
+        .hero-flow .flow-item.approve { border-color: #22c55e; color: #22c55e; }
+        .hero-flow .flow-item.escalate { border-color: #fbbf24; color: #fbbf24; }
+        .hero-flow .flow-item.deny { border-color: #ef4444; color: #ef4444; }
         .hero-flow .flow-arrow { color: #475569; font-size: 1.2rem; }
         .hero-tagline {
             font-size: 0.95rem;
@@ -87,43 +88,98 @@
             letter-spacing: 0.3px;
         }
 
-        /* Decision hero – centerpiece */
+        /* Agent Request Card */
+        .agent-request {
+            background: #1e293b;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 3px solid #38bdf8;
+            font-size: 0.85rem;
+        }
+        .agent-request .req-label {
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .agent-request .req-action {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin: 2px 0;
+        }
+        .agent-request .req-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .agent-request .req-meta span strong { color: #cbd5e1; font-weight: 500; }
+
+        /* Decision Hero – now with Policy Engine badge */
         .decision-hero {
             text-align: center;
-            padding: 12px 0 8px;
-            margin: 0 0 8px;
+            padding: 8px 0 6px;
+            margin: 0 0 6px;
             outline: none;
             animation: pulse 1.5s infinite;
         }
         .decision-hero:focus { outline: 2px solid #38bdf8; }
+        .decision-hero .engine-badge {
+            display: inline-block;
+            background: #0f2a44;
+            color: #38bdf8;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 30px;
+            border: 1px solid #38bdf8;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
         .decision-hero .decision-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 400;
             color: #94a3b8;
             letter-spacing: 1px;
             text-transform: uppercase;
+            margin-top: 4px;
         }
         .decision-hero .decision-badge {
             font-size: 3.2rem;
             font-weight: 800;
             display: block;
-            margin: 2px 0;
+            margin: 0;
             line-height: 1.1;
         }
         .decision-hero .decision-reason {
-            font-size: 0.95rem;
-            color: #94a3b8;
+            font-size: 0.9rem;
+            color: #cbd5e1;
             font-weight: 400;
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
         }
-        .decision-hero .decision-confidence {
+        .decision-hero .decision-policy-trigger {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+            background: #0f172a;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid #1e293b;
+        }
+        .decision-hero .stat-certainty {
             display: inline-block;
             margin-top: 6px;
             padding: 2px 14px;
             border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 500;
             background: #1e293b;
             color: #38bdf8;
             border: 1px solid #334155;
@@ -132,49 +188,80 @@
         .escalate-hero .decision-badge { color: var(--glow-yellow); }
         .deny-hero .decision-badge { color: var(--glow-red); }
 
-        /* Incoming action */
-        .incoming-action {
-            background: #1e293b;
-            padding: 8px 16px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            border-left: 3px solid #38bdf8;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            text-align: center;
-        }
-        .incoming-action strong { color: #f1f5f9; }
-
-        /* Risk indicator – LOW/MEDIUM/HIGH */
-        .risk-indicator {
+        /* Risk Assessment – separate from decision */
+        .risk-assessment {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 16px;
+            flex-wrap: wrap;
             margin: 8px 0 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
+            padding: 6px 12px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+        }
+        .risk-assessment .ra-label {
+            font-size: 0.7rem;
+            font-weight: 600;
             color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .risk-indicator .risk-level {
-            padding: 2px 12px;
+        .risk-assessment .ra-level {
+            padding: 2px 14px;
             border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
-        .risk-level.low { background: #14532d; color: #bbf7d0; }
-        .risk-level.medium { background: #78350f; color: #fde68a; }
-        .risk-level.high { background: #7f1d1d; color: #fecaca; }
-
-        .risk-thermometer { width: 100%; height: 8px; background: #374151; border-radius: 4px; margin-top: 4px; overflow: hidden; }
-        .risk-thermometer-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.5s ease; }
+        .ra-level.low { background: #14532d; color: #bbf7d0; }
+        .ra-level.medium { background: #78350f; color: #fde68a; }
+        .ra-level.high { background: #7f1d1d; color: #fecaca; }
+        .risk-thermometer { flex: 1; min-width: 100px; height: 6px; background: #374151; border-radius: 3px; overflow: hidden; }
+        .risk-thermometer-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.5s ease; }
 
         .impact-message {
             margin-top: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.03);
-            font-size: 0.9rem; font-weight: 400; color: #cbd5e1; text-align: center;
+            font-size: 0.88rem; font-weight: 400; color: #cbd5e1; text-align: center;
             border: 1px solid #2a3a4a;
         }
 
-        /* Counterfactual – redesigned */
+        /* Outcome Box */
+        .outcome-box {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #0f172a;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 20px;
+            font-size: 0.85rem;
+        }
+        .outcome-box .outcome-title {
+            grid-column: 1 / -1;
+            font-weight: 600;
+            color: #4ade80;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .outcome-box .outcome-item {
+            color: #cbd5e1;
+        }
+        .outcome-box .outcome-item::before {
+            content: "✓ ";
+            color: #4ade80;
+            font-weight: 700;
+        }
+        @media (max-width: 480px) {
+            .outcome-box { grid-template-columns: 1fr; }
+        }
+
+        /* Counterfactual */
         .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 16px; margin: 16px 0; border: 1px solid #334155; }
-        .cf-toggle { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; }
+        .cf-toggle { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
         .cf-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
         .cf-btn.active { background: #38bdf8; color: #0a0c10; }
         .cf-content { text-align: center; padding: 8px 0; }
@@ -222,24 +309,27 @@
         }
         .scenario-card .scenario-desc { font-size: 0.75rem; margin-top: 4px; color: #94a3b8; }
 
-        /* Timeline with animation */
+        /* Timeline with durations */
         .timeline { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
         .timeline-step {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px solid #1e293b;
             opacity: 0;
             transform: translateX(-10px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        .timeline-step.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        .timeline-step.visible { opacity: 1; transform: translateX(0); }
         .timeline-step .step-icon { font-size: 0.9rem; min-width: 22px; text-align: center; }
         .timeline-step .step-desc { flex: 1; color: #cbd5e1; font-size: 0.82rem; }
+        .timeline-step .step-duration {
+            font-size: 0.7rem;
+            color: #475569;
+            font-family: monospace;
+            margin-right: 4px;
+        }
         .timeline-step .step-status {
             font-weight: 600;
             padding: 1px 10px;
@@ -257,6 +347,15 @@
 
         .timeline-arrow { text-align: center; color: #475569; font-size: 0.9rem; padding: 1px 0; opacity: 0; transition: opacity 0.3s ease; }
         .timeline-arrow.visible { opacity: 1; }
+        .timeline-total {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 6px 4px 0;
+            border-top: 1px solid #1e293b;
+            margin-top: 4px;
+        }
 
         .audit-id {
             text-align: center;
@@ -279,7 +378,6 @@
             padding-top: 8px;
         }
 
-        /* Policy source */
         .policy-source {
             font-size: 0.8rem;
             color: #94a3b8;
@@ -289,6 +387,10 @@
             display: inline-block;
             border: 1px solid #1e293b;
         }
+        .risk-group { background: #0f172a; padding: 8px 12px; border-radius: 8px; margin: 4px 0; border: 1px solid #1e293b; }
+        .risk-group .rg-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 0.82rem; }
+        .risk-group .rg-row .rg-label { color: #94a3b8; }
+        .risk-group .rg-row .rg-value { color: #e2e8f0; font-weight: 500; }
 
         @media (prefers-reduced-motion: reduce) {
             * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -301,6 +403,8 @@
             .decision-hero .decision-badge { font-size: 2.4rem; }
             .hero-flow { font-size: 0.75rem; gap: 4px; }
             .hero-flow .flow-item { padding: 2px 8px; }
+            .risk-assessment { flex-direction: column; align-items: stretch; }
+            .agent-request .req-meta { flex-direction: column; gap: 2px; }
         }
         @media (min-width: 641px) {
             body { padding: 16px; }
@@ -311,7 +415,7 @@
 <body>
 <div class="container">
 
-    <!-- Hero – starts with the problem, not ARF -->
+    <!-- Hero – starts with the problem -->
     <div class="hero-section">
         <div class="hero-problem">
             An autonomous AI agent wants to execute a production action.
@@ -322,9 +426,9 @@
             <span class="flow-arrow">↓</span>
             <span class="flow-item highlight">ARF evaluates</span>
             <span class="flow-arrow">↓</span>
-            <span class="flow-item" style="border-color:#22c55e;color:#22c55e;">APPROVE</span>
-            <span class="flow-item" style="border-color:#fbbf24;color:#fbbf24;">ESCALATE</span>
-            <span class="flow-item" style="border-color:#ef4444;color:#ef4444;">DENY</span>
+            <span class="flow-item approve">APPROVE</span>
+            <span class="flow-item escalate">ESCALATE</span>
+            <span class="flow-item deny">DENY</span>
         </div>
         <div class="hero-tagline">
             <strong>ARF is the governance layer making this decision.</strong>
@@ -332,7 +436,7 @@
         </div>
     </div>
 
-    <!-- Scenario Cards – now showing the action -->
+    <!-- Scenario Cards -->
     <div class="scenario-cards" id="scenarioCards">
         <div class="scenario-card" data-scenario="aircanada">
             <strong>✈️ Air Canada</strong>
@@ -355,52 +459,73 @@
     <!-- Governance Decision Card -->
     <div class="card" id="riskCard" style="display:none;">
         <div class="result">
-            <!-- Incoming action -->
-            <div class="incoming-action" id="incomingAction">
-                ⚡ <strong>Incoming autonomous action:</strong> <span id="actionDescription">—</span>
+            <!-- Agent Request – formatted as real request -->
+            <div class="agent-request">
+                <div class="req-label">Agent Request</div>
+                <div class="req-action" id="actionDescription">—</div>
+                <div class="req-meta">
+                    <span><strong>Target:</strong> <span id="reqTarget">—</span></span>
+                    <span><strong>Requested by:</strong> <span id="reqRequestor">—</span></span>
+                </div>
             </div>
 
-            <!-- Decision Hero – centerpiece -->
+            <!-- Decision Hero – with Policy Engine badge -->
             <div class="decision-hero" id="decisionHero" role="alert" aria-live="polite" tabindex="-1">
-                <div class="decision-label">Decision</div>
+                <div class="engine-badge">⚙️ Policy Engine</div>
+                <div class="decision-label">Governance Decision</div>
                 <div class="decision-badge" id="decisionBadge">—</div>
                 <div class="decision-reason" id="decisionReason"></div>
-                <div class="decision-confidence" id="decisionConfidence">—</div>
+                <div class="decision-policy-trigger" id="policyTrigger"></div>
+                <div class="stat-certainty" id="decisionConfidence">—</div>
             </div>
 
-            <!-- Risk indicator – LOW/MEDIUM/HIGH -->
-            <div class="risk-indicator" id="riskIndicator">
-                <span>Risk:</span>
-                <span class="risk-level" id="riskLevel">—</span>
+            <!-- Risk Assessment – separate from decision -->
+            <div class="risk-assessment">
+                <span class="ra-label">Risk Assessment</span>
+                <span class="ra-level" id="riskLevel">—</span>
+                <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
+                <span style="font-size:0.7rem;color:#94a3b8;" id="riskPercent">—</span>
             </div>
-            <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
 
-            <!-- Impact message -->
+            <!-- Impact message – now uses "would have" -->
             <div id="riskImpactMessage" class="impact-message"></div>
 
-            <!-- Governance Timeline (Audit Trail) - with animation -->
+            <!-- Outcome Box -->
+            <div id="outcomeBox" class="outcome-box">
+                <div class="outcome-title">Outcome</div>
+                <div class="outcome-item">Autonomous execution blocked</div>
+                <div class="outcome-item">Human reviewer notified</div>
+                <div class="outcome-item">Audit record stored</div>
+                <div class="outcome-item">Policy reference attached</div>
+                <div class="outcome-item" id="outcomeExec">No production change executed</div>
+            </div>
+
+            <!-- Governance Timeline (Audit Trail) -->
             <details id="auditDetails" style="margin-top:14px;">
                 <summary>📋 Audit Trail</summary>
                 <div style="text-align:center;margin:4px 0;">
                     <span class="audit-id" id="auditId">ARF-2026-00428</span>
                 </div>
                 <div id="auditTrailContent" class="detail-content timeline"></div>
+                <div class="timeline-total" id="latencyTotal">Total decision latency: —</div>
                 <div class="audit-footer">
                     ✓ Immutable audit log · Every decision recorded for compliance
                 </div>
             </details>
 
-            <!-- Technical Analysis – fully collapsed with numbers -->
+            <!-- Technical Analysis – regrouped -->
             <details id="technicalDetails" style="margin-top:10px;">
                 <summary>🔬 Technical Analysis</summary>
                 <div class="detail-content">
                     <div style="margin-bottom:6px;">
-                        <span class="policy-source">📋 Policy: <span id="policySource">Production Database Protection v3.4</span></span>
+                        <span class="policy-source">📋 Policy: <span id="policySource">—</span></span>
                     </div>
                     <strong>Policy Decision:</strong> <span id="policyDecision" class="status"></span><br>
-                    <strong>Operational Risk:</strong> <span id="riskScore"></span><br>
-                    <strong>Historical Baseline:</strong> <span id="priorMean"></span><br>
-                    <strong>95% Credible Interval:</strong> <span id="credibleInterval"></span><br>
+                    <div class="risk-group">
+                        <div class="rg-row"><span class="rg-label">Posterior Risk</span><span class="rg-value" id="techRisk">—</span></div>
+                        <div class="rg-row"><span class="rg-label">Historical Baseline</span><span class="rg-value" id="techPrior">—</span></div>
+                        <div class="rg-row"><span class="rg-label">95% Credible Interval</span><span class="rg-value" id="techInterval">—</span></div>
+                    </div>
                     <div id="decisionExplanation" class="explanation" style="margin-top:8px;background:var(--expl-bg);padding:10px;border-radius:12px;font-size:0.8rem;"></div>
                     <div id="posteriorChart" style="width:100%; height:200px; margin-top:10px;"></div>
                     <div style="margin-top:6px;font-size:0.75rem;color:#94a3b8;">
@@ -412,11 +537,11 @@
         </div>
     </div>
 
-    <!-- Counterfactual – redesigned -->
+    <!-- Counterfactual -->
     <div class="counterfactual-panel" id="cfPanel" style="display:none;">
         <div class="cf-toggle">
-            <button id="cfWithoutBtn" class="cf-btn active">Traditional Autonomous Agent</button>
-            <button id="cfWithBtn" class="cf-btn">Governed Autonomous Agent</button>
+            <button id="cfWithoutBtn" class="cf-btn active">Without Governance Layer</button>
+            <button id="cfWithBtn" class="cf-btn">With ARF Governance</button>
         </div>
         <div id="cfContent" class="cf-content"></div>
         <div class="pilot-cta">
@@ -482,53 +607,59 @@
         compute: [1.0, 12.0]
     };
 
-    // Action descriptions for each scenario
-    const actionDescriptions = {
-        aircanada: "publish customer policy (bereavement discount)",
-        cloudflare: "deploy BGP configuration (BYOIP prefix change)",
-        pocketos: "DELETE production database"
-    };
-
-    // Decision reasons
-    const decisionReasons = {
-        aircanada: "Customer-facing policy change requires human approval.",
-        cloudflare: "High-risk network change requires human approval.",
-        pocketos: "Destructive production action blocked."
-    };
-
-    // Policy sources
-    const policySources = {
-        aircanada: "Customer Policy v2.1",
-        cloudflare: "Network Infrastructure v3.2",
-        pocketos: "Production Database Protection v3.4"
-    };
-
-    // Impact messages
-    const impactMessages = {
-        aircanada: "The agent intended to publish an unauthorized customer policy. ARF escalated to prevent reputational damage.",
-        cloudflare: "The agent intended to deploy a BGP configuration change. ARF required human approval, preventing a global outage.",
-        pocketos: "The agent intended to delete production data. ARF blocked execution, protecting infrastructure."
-    };
-
-    const auditTrailData = {
-        aircanada: [
-            ["Intent received: publish customer policy (bereavement discount)", "Pending"],
-            ["Risk evaluated: posterior risk = 0.207", "Evaluated"],
-            ["Policy matched: Customer Policy v2.1 → escalate if risk >0.2", "Escalated"],
-            ["Decision recorded: ESCALATE to human review", "Complete"]
-        ],
-        cloudflare: [
-            ["Intent received: deploy BGP configuration (BYOIP)", "Pending"],
-            ["Risk evaluated: posterior risk = 0.671", "Evaluated"],
-            ["Policy matched: Network Infrastructure v3.2 → escalate if risk >0.2", "Escalated"],
-            ["Decision recorded: ESCALATE to network team", "Complete"]
-        ],
-        pocketos: [
-            ["Intent received: DELETE production database", "Pending"],
-            ["Risk evaluated: posterior risk = 0.927", "Evaluated"],
-            ["Policy matched: Production Database Protection v3.4 → deny", "Denied"],
-            ["Decision recorded: DENY – override required", "Complete"]
-        ]
+    // ---- Scenario data ----
+    const scenarioData = {
+        aircanada: {
+            action: 'Publish customer policy (bereavement discount)',
+            target: 'Customer-facing policy system',
+            requestor: 'Customer Support Agent',
+            reason: 'Customer-facing policy change requires human approval.',
+            policyTrigger: 'Policy triggered: Customer Policy v2.1 — autonomous policy publishing exceeds approval threshold. Action routed to human reviewer.',
+            impact: 'Under this simulated governance evaluation, ARF would have escalated the unauthorized customer policy for human validation before any commitment.',
+            outcome: 'No policy change published. Human review required.',
+            policySource: 'Customer Policy v2.1',
+            category: 'default', failures: 22, successes: 78,
+            audit: [
+                ['Intent received: publish customer policy (bereavement discount)', 'Pending', 12],
+                ['Risk evaluated: posterior risk = 0.207', 'Evaluated', 31],
+                ['Policy matched: Customer Policy v2.1 → escalate if risk >0.2', 'Escalated', 8],
+                ['Decision recorded: ESCALATE to human review', 'Complete', 5]
+            ]
+        },
+        cloudflare: {
+            action: 'Deploy BGP configuration (BYOIP prefix change)',
+            target: 'Customer BYOIP prefixes',
+            requestor: 'Network Operations Agent',
+            reason: 'High-risk network change requires human approval.',
+            policyTrigger: 'Policy triggered: Network Infrastructure v3.2 — production network changes exceed the autonomous approval threshold. Action routed to human reviewer.',
+            impact: 'Under this simulated governance evaluation, ARF would have required human approval before executing the BGP configuration change, preventing the global routing outage.',
+            outcome: 'No configuration deployed. Human review required.',
+            policySource: 'Network Infrastructure v3.2',
+            category: 'compute', failures: 60, successes: 40,
+            audit: [
+                ['Intent received: deploy BGP configuration (BYOIP)', 'Pending', 14],
+                ['Risk evaluated: posterior risk = 0.671', 'Evaluated', 28],
+                ['Policy matched: Network Infrastructure v3.2 → escalate if risk >0.2', 'Escalated', 9],
+                ['Decision recorded: ESCALATE to network team', 'Complete', 6]
+            ]
+        },
+        pocketos: {
+            action: 'DELETE production database',
+            target: 'Production Database (PostgreSQL)',
+            requestor: 'Software Development Agent',
+            reason: 'Destructive production action blocked.',
+            policyTrigger: 'Policy triggered: Production Database Protection v3.4 — destructive database operations require explicit human override. Action denied.',
+            impact: 'Under this simulated governance evaluation, ARF would have blocked the destructive database deletion before any infrastructure damage occurred.',
+            outcome: 'No database deletion executed. Production remains intact.',
+            policySource: 'Production Database Protection v3.4',
+            category: 'database', failures: 100, successes: 0,
+            audit: [
+                ['Intent received: DELETE production database', 'Pending', 18],
+                ['Risk evaluated: posterior risk = 0.927', 'Evaluated', 34],
+                ['Policy matched: Production Database Protection v3.4 → deny', 'Denied', 7],
+                ['Decision recorded: DENY – override required', 'Complete', 4]
+            ]
+        }
     };
 
     function computeRiskFromPrior(f, s, pa, pb) {
@@ -543,54 +674,64 @@
     let timelineTimer = null;
 
     function showResults(risk, lo, hi, priorMean, decision, alpha, beta) {
+        const data = scenarioData[currentScenario];
+        if (!data) return;
+
         document.getElementById('riskCard').style.display = 'block';
         document.getElementById('riskCard').classList.add('fade-in');
         document.getElementById('cfPanel').style.display = 'block';
         document.getElementById('cfPanel').classList.add('fade-in');
 
-        // Incoming action
-        document.getElementById('actionDescription').textContent = actionDescriptions[currentScenario] || '—';
+        // Agent Request
+        document.getElementById('actionDescription').textContent = data.action;
+        document.getElementById('reqTarget').textContent = data.target;
+        document.getElementById('reqRequestor').textContent = data.requestor;
 
-        // Decision hero
+        // Decision Hero
         const hero = document.getElementById('decisionHero');
         const badge = document.getElementById('decisionBadge');
         const reason = document.getElementById('decisionReason');
+        const trigger = document.getElementById('policyTrigger');
         const confidence = document.getElementById('decisionConfidence');
         const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
         hero.className = 'decision-hero ' + cls;
         badge.textContent = decision.toUpperCase();
-        reason.textContent = decisionReasons[currentScenario] || '—';
+        reason.textContent = data.reason;
+        trigger.textContent = data.policyTrigger;
 
-        // Confidence (derived from interval width – narrower = higher confidence)
+        // Statistical Certainty (not confidence)
         const intervalWidth = hi - lo;
-        const confidencePercent = Math.round((1 - intervalWidth) * 100);
-        const confidenceText = confidencePercent > 90 ? 'High' : confidencePercent > 70 ? 'Medium' : 'Low';
-        confidence.textContent = `Confidence: ${confidenceText} (${confidencePercent}%)`;
+        const certaintyPct = Math.round((1 - intervalWidth) * 100);
+        const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
+        confidence.textContent = `Statistical Certainty: ${certaintyText} (${certaintyPct}%)`;
 
-        // Risk indicator – LOW/MEDIUM/HIGH
+        // Risk Assessment
         const riskLevel = document.getElementById('riskLevel');
         let levelText, levelClass;
         if (risk < 0.2) { levelText = 'LOW'; levelClass = 'low'; }
         else if (risk > 0.8) { levelText = 'HIGH'; levelClass = 'high'; }
         else { levelText = 'MEDIUM'; levelClass = 'medium'; }
         riskLevel.textContent = levelText;
-        riskLevel.className = 'risk-level ' + levelClass;
+        riskLevel.className = 'ra-level ' + levelClass;
+        document.getElementById('riskPercent').textContent = `${(risk * 100).toFixed(1)}%`;
 
-        // Risk meter
         const fill = document.getElementById('riskThermometerFill');
         fill.style.width = `${risk * 100}%`;
         fill.style.background = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
 
         // Impact message
-        document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
+        document.getElementById('riskImpactMessage').innerHTML = data.impact;
 
-        // Technical details
-        document.getElementById('policySource').textContent = policySources[currentScenario] || '—';
+        // Outcome box
+        document.getElementById('outcomeExec').textContent = data.outcome;
+
+        // Technical Details
+        document.getElementById('policySource').textContent = data.policySource;
         document.getElementById('policyDecision').innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         document.getElementById('policyDecision').className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
-        document.getElementById('riskScore').innerText = risk.toFixed(4);
-        document.getElementById('priorMean').innerText = priorMean.toFixed(4);
-        document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
+        document.getElementById('techRisk').textContent = risk.toFixed(4);
+        document.getElementById('techPrior').textContent = priorMean.toFixed(4);
+        document.getElementById('techInterval').textContent = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
         const expl = document.getElementById('decisionExplanation');
         const th = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
         expl.innerHTML = `Because the risk (${(risk * 100).toFixed(1)}%) is ${th}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
@@ -604,8 +745,7 @@
         const x = Array.from({length: 100}, (_, i) => i / 100);
         const y = x.map(v => betaPDF(v, alpha, beta));
         const trace = {
-            x: x,
-            y: y,
+            x, y,
             type: 'scatter',
             fill: 'tozeroy',
             mode: 'lines',
@@ -623,11 +763,12 @@
         };
         Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
 
-        // Timeline with animation
-        const trail = auditTrailData[currentScenario] || [];
+        // Timeline with durations
+        const trail = data.audit;
         const timelineContainer = document.getElementById('auditTrailContent');
         timelineContainer.innerHTML = '';
         const icons = ['📩', '📊', '⚖️', '✅'];
+        let totalLatency = 0;
 
         trail.forEach((entry, index) => {
             const step = document.createElement('div');
@@ -639,11 +780,16 @@
             const desc = document.createElement('span');
             desc.className = 'step-desc';
             desc.textContent = entry[0];
+            const duration = document.createElement('span');
+            duration.className = 'step-duration';
+            duration.textContent = `${entry[2]}ms`;
+            totalLatency += entry[2];
             const status = document.createElement('span');
             status.className = `step-status ${entry[1].toLowerCase()}`;
             status.textContent = entry[1];
             step.appendChild(icon);
             step.appendChild(desc);
+            step.appendChild(duration);
             step.appendChild(status);
             timelineContainer.appendChild(step);
 
@@ -655,8 +801,9 @@
                 timelineContainer.appendChild(arrow);
             }
         });
+        document.getElementById('latencyTotal').textContent = `Total decision latency: ${totalLatency}ms`;
 
-        // Animate timeline (one step every 300ms)
+        // Animate timeline
         clearTimeout(timelineTimer);
         const steps = document.querySelectorAll('.timeline-step');
         const arrows = document.querySelectorAll('.timeline-arrow');
@@ -692,7 +839,7 @@
         const content = document.getElementById('cfContent');
         if (cfMode === "without") {
             content.innerHTML = `
-                <div class="cf-state">📉 Traditional Autonomous Agent</div>
+                <div class="cf-state">📉 Without Governance Layer</div>
                 <div class="cf-flow">
                     <div class="flow-step">Agent proposes action</div>
                     <div class="flow-arrow">↓</div>
@@ -703,7 +850,7 @@
             `;
         } else {
             content.innerHTML = `
-                <div class="cf-state">🛡️ Governed Autonomous Agent</div>
+                <div class="cf-state">🛡️ With ARF Governance</div>
                 <div class="cf-flow">
                     <div class="flow-step">Agent proposes action</div>
                     <div class="flow-arrow">↓</div>
@@ -730,18 +877,14 @@
         updateCounterfactual();
     });
 
-    const presets = {
-        aircanada: { category: "default", failures: 22, successes: 78 },
-        cloudflare: { category: "compute", failures: 60, successes: 40 },
-        pocketos: { category: "database", failures: 100, successes: 0 }
-    };
+    const presets = { aircanada: 'aircanada', cloudflare: 'cloudflare', pocketos: 'pocketos' };
 
     function applyPreset(id) {
-        const p = presets[id];
-        if (!p) return;
+        const data = scenarioData[id];
+        if (!data) return;
         currentScenario = id;
-        const [pa, pb] = categoryMap[p.category];
-        const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(p.failures, p.successes, pa, pb);
+        const [pa, pb] = categoryMap[data.category];
+        const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(data.failures, data.successes, pa, pb);
         const priorMean = pa / (pa + pb);
         const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
         showResults(risk, lo, hi, priorMean, decision, alpha, beta);
