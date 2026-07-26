@@ -21,110 +21,123 @@
             --glow-green: #22c55e;
             --glow-yellow: #fbbf24;
             --glow-red: #ef4444;
+            --cta-bg: #f97316;
+            --cta-hover: #fb923c;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
             background: linear-gradient(135deg, #0a1628 0%, #0a0c10 100%);
             color: var(--text-primary);
-            line-height: 1.5;
-            padding: 12px;
+            line-height: 1.6;
+            padding: 16px;
             min-height: 100vh;
             overflow-x: hidden;
+            font-size: 1.1rem;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
-        h1 { font-size: 1.4rem; margin: 0 0 0.25rem 0; color: #f1f5f9; }
-        .badge { background: #7f1d1d; border-radius: 40px; padding: 4px 10px; font-size: 0.65rem; font-weight: normal; margin-left: 8px; color: #fecaca; white-space: nowrap; }
-        .card { background: var(--card-bg); border-radius: 20px; box-shadow: var(--card-shadow); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-light); transition: border-color 0.2s; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 2rem; margin: 0 0 0.5rem 0; color: #f1f5f9; }
+        .badge { background: #7f1d1d; border-radius: 40px; padding: 4px 12px; font-size: 0.75rem; font-weight: normal; margin-left: 8px; color: #fecaca; white-space: nowrap; }
+        .card { background: var(--card-bg); border-radius: 20px; box-shadow: var(--card-shadow); padding: 20px; margin-bottom: 24px; border: 1px solid var(--border-light); transition: border-color 0.2s; }
         .card:hover { border-color: #38bdf8; }
-        .result { background: var(--result-bg); padding: 14px; border-radius: 16px; margin-top: 12px; }
+        .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* Hero */
-        .hero-section { margin-bottom: 20px; }
+        /* Hero – bigger, bolder, rhetorical */
+        .hero-section { margin-bottom: 24px; }
         .hero-problem {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 2.2rem;
+            font-weight: 700;
             color: #f1f5f9;
             margin-bottom: 4px;
+            line-height: 1.3;
         }
         .hero-problem .highlight { color: #38bdf8; }
+        .hero-answer {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #ef4444;
+            margin: 0 0 8px 0;
+            line-height: 1.2;
+        }
         .hero-flow {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin: 8px 0 4px;
-            font-size: 0.9rem;
+            margin: 12px 0 8px;
+            font-size: 1.1rem;
             color: #94a3b8;
         }
         .hero-flow .flow-item {
-            padding: 4px 12px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 8px;
             background: #1e293b;
-            border: 1px solid #334155;
+            border: 2px solid #334155;
+            font-weight: 500;
         }
         .hero-flow .flow-item.highlight {
             border-color: #38bdf8;
             background: #0f2a44;
             color: #e2e8f0;
+            font-weight: 600;
         }
         .hero-flow .flow-item.approve { border-color: #22c55e; color: #22c55e; }
         .hero-flow .flow-item.escalate { border-color: #fbbf24; color: #fbbf24; }
         .hero-flow .flow-item.deny { border-color: #ef4444; color: #ef4444; }
-        .hero-flow .flow-arrow { color: #475569; font-size: 1.2rem; }
+        .hero-flow .flow-arrow { color: #475569; font-size: 1.4rem; }
         .hero-tagline {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             color: #cbd5e1;
-            margin: 8px 0 4px;
+            margin: 12px 0 4px;
         }
         .intercept-badge {
             display: inline-block;
             background: #38bdf8;
             color: #0a0c10;
             font-weight: 700;
-            padding: 2px 12px;
+            padding: 4px 16px;
             border-radius: 30px;
-            font-size: 0.65rem;
-            letter-spacing: 0.3px;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
 
-        /* Agent Request Card */
+        /* Agent Request Card – larger */
         .agent-request {
             background: #1e293b;
-            padding: 10px 16px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            border-left: 3px solid #38bdf8;
-            font-size: 0.85rem;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            border-left: 4px solid #38bdf8;
+            font-size: 1rem;
         }
         .agent-request .req-label {
             font-weight: 600;
             color: #94a3b8;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
         .agent-request .req-action {
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #f1f5f9;
-            margin: 2px 0;
+            margin: 4px 0;
         }
         .agent-request .req-meta {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             flex-wrap: wrap;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #94a3b8;
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .agent-request .req-meta span strong { color: #cbd5e1; font-weight: 500; }
 
-        /* Decision Hero */
+        /* Decision Hero – bigger */
         .decision-hero {
             text-align: center;
-            padding: 8px 0 6px;
-            margin: 0 0 6px;
+            padding: 12px 0 8px;
+            margin: 0 0 8px;
             outline: none;
             animation: pulse 1.5s infinite;
         }
@@ -133,52 +146,52 @@
             display: inline-block;
             background: #0f2a44;
             color: #38bdf8;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            padding: 2px 12px;
+            padding: 4px 16px;
             border-radius: 30px;
             border: 1px solid #38bdf8;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
         }
         .decision-hero .decision-label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 400;
             color: #94a3b8;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .decision-hero .decision-badge {
-            font-size: 3.2rem;
+            font-size: 4rem;
             font-weight: 800;
             display: block;
             margin: 0;
             line-height: 1.1;
         }
         .decision-hero .decision-reason {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             color: #cbd5e1;
             font-weight: 400;
-            max-width: 550px;
+            max-width: 600px;
             margin: 0 auto;
         }
         .decision-hero .decision-policy-trigger {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #94a3b8;
-            margin-top: 4px;
+            margin-top: 6px;
             background: #0f172a;
-            padding: 4px 12px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 8px;
             display: inline-block;
             border: 1px solid #1e293b;
         }
         .decision-hero .stat-certainty {
             display: inline-block;
-            margin-top: 6px;
-            padding: 2px 14px;
+            margin-top: 8px;
+            padding: 4px 18px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: 500;
             background: #1e293b;
             color: #38bdf8;
@@ -188,64 +201,64 @@
         .escalate-hero .decision-badge { color: var(--glow-yellow); }
         .deny-hero .decision-badge { color: var(--glow-red); }
 
-        /* Risk Assessment */
+        /* Risk Assessment – larger */
         .risk-assessment {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             flex-wrap: wrap;
-            margin: 8px 0 4px;
-            padding: 6px 12px;
+            margin: 10px 0 6px;
+            padding: 8px 16px;
             background: #0f172a;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #1e293b;
         }
         .risk-assessment .ra-label {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
         .risk-assessment .ra-level {
-            padding: 2px 14px;
+            padding: 4px 18px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             font-weight: 600;
         }
         .ra-level.low { background: #14532d; color: #bbf7d0; }
         .ra-level.medium { background: #78350f; color: #fde68a; }
         .ra-level.high { background: #7f1d1d; color: #fecaca; }
-        .risk-thermometer { flex: 1; min-width: 100px; height: 6px; background: #374151; border-radius: 3px; overflow: hidden; }
-        .risk-thermometer-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.5s ease; }
+        .risk-thermometer { flex: 1; min-width: 120px; height: 8px; background: #374151; border-radius: 4px; overflow: hidden; }
+        .risk-thermometer-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.5s ease; }
 
         .impact-message {
-            margin-top: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.03);
-            font-size: 0.88rem; font-weight: 400; color: #cbd5e1; text-align: center;
+            margin-top: 12px; padding: 12px 16px; border-radius: 12px; background: rgba(255,255,255,0.03);
+            font-size: 1rem; font-weight: 400; color: #cbd5e1; text-align: center;
             border: 1px solid #2a3a4a;
         }
 
         /* Outcome Box */
         .outcome-box {
-            margin-top: 12px;
-            padding: 12px 16px;
+            margin-top: 14px;
+            padding: 14px 20px;
             background: #0f172a;
             border-radius: 12px;
             border: 1px solid #1e293b;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4px 20px;
-            font-size: 0.85rem;
+            gap: 4px 24px;
+            font-size: 0.95rem;
         }
         .outcome-box .outcome-title {
             grid-column: 1 / -1;
             font-weight: 600;
             color: #4ade80;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
         }
         .outcome-box .outcome-item {
             color: #cbd5e1;
@@ -259,84 +272,120 @@
             .outcome-box { grid-template-columns: 1fr; }
         }
 
-        /* Counterfactual */
-        .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 16px; margin: 16px 0; border: 1px solid #334155; }
-        .cf-toggle { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
-        .cf-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        /* Counterfactual – larger */
+        .counterfactual-panel { background: var(--counterfactual-bg); border-radius: 16px; padding: 20px; margin: 20px 0; border: 1px solid #334155; }
+        .cf-toggle { display: flex; gap: 20px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+        .cf-btn { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
         .cf-btn.active { background: #38bdf8; color: #0a0c10; }
-        .cf-content { text-align: center; padding: 8px 0; }
-        .cf-state { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+        .cf-content { text-align: center; padding: 10px 0; }
+        .cf-state { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; }
         .cf-flow {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 2px;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: #94a3b8;
         }
-        .cf-flow .flow-step { padding: 2px 0; }
-        .cf-flow .flow-arrow { color: #475569; font-size: 0.9rem; }
+        .cf-flow .flow-step { padding: 3px 0; }
+        .cf-flow .flow-arrow { color: #475569; font-size: 1rem; }
         .cf-flow .flow-outcome { font-weight: 600; color: #f1f5f9; }
         .cf-flow .flow-outcome.good { color: #4ade80; }
         .cf-flow .flow-outcome.bad { color: #f87171; }
 
-        .pilot-cta { text-align: center; margin-top: 16px; }
-        .pilot-cta a { background: #38bdf8; color: #0a0c10; font-weight: 700; padding: 10px 20px; border-radius: 2rem; text-decoration: none; display: inline-block; transition: background 0.2s; font-size: 0.9rem; }
-        .pilot-cta a:hover { background: #7dd3fc; }
+        /* Distinctive CTA – orange */
+        .pilot-cta { text-align: center; margin-top: 18px; }
+        .pilot-cta a {
+            background: var(--cta-bg);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 14px 28px;
+            border-radius: 2rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+        }
+        .pilot-cta a:hover {
+            background: var(--cta-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(249, 115, 22, 0.5);
+        }
 
-        footer { text-align: center; margin-top: 40px; font-size: 0.7rem; color: var(--footer-color); border-top: 1px solid var(--border-light); padding-top: 20px; }
+        footer { text-align: center; margin-top: 40px; font-size: 0.8rem; color: var(--footer-color); border-top: 1px solid var(--border-light); padding-top: 20px; }
 
         .fade-in { animation: fadeSlideIn 0.4s ease forwards; }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.85; } 100% { opacity: 1; } }
 
-        details summary { cursor: pointer; color: #38bdf8; font-weight: 500; margin-top: 12px; font-size: 0.85rem; padding: 4px 0; }
-        details[open] summary { margin-bottom: 6px; }
-        details .detail-content { padding: 6px 0; font-size: 0.82rem; line-height: 1.8; }
+        details summary { cursor: pointer; color: #38bdf8; font-weight: 500; margin-top: 14px; font-size: 0.95rem; padding: 6px 0; }
+        details[open] summary { margin-bottom: 8px; }
+        details .detail-content { padding: 8px 0; font-size: 0.92rem; line-height: 1.8; }
 
-        .scenario-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+        /* Scenario Cards – bigger with years as primary */
+        .scenario-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
         .scenario-card {
-            flex: 1; min-width: 140px; padding: 10px 12px; border: 2px solid #334155; border-radius: 14px;
+            flex: 1; min-width: 180px; padding: 14px 16px; border: 2px solid #334155; border-radius: 16px;
             cursor: pointer; text-align: center; background: #1e293b; transition: border-color 0.2s, transform 0.2s, background 0.2s;
         }
-        .scenario-card:hover { border-color: #38bdf8; transform: translateY(-2px); }
+        .scenario-card:hover { border-color: #38bdf8; transform: translateY(-3px); }
         .scenario-card.active { border-color: #38bdf8; background: #1e3a5f; }
-        .scenario-card .scenario-action {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-top: 4px;
-            font-style: italic;
+        .scenario-card .scenario-year {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #38bdf8;
+            display: block;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
         }
-        .scenario-card .scenario-desc { font-size: 0.75rem; margin-top: 4px; color: #94a3b8; }
+        .scenario-card .scenario-month {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+            display: block;
+            margin-top: -2px;
+        }
+        .scenario-card .scenario-action {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        .scenario-card .scenario-desc {
+            font-size: 0.85rem;
+            margin-top: 4px;
+            color: #94a3b8;
+        }
 
-        /* Timeline with durations */
-        .timeline { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
+        /* Timeline – bigger */
+        .timeline { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
         .timeline-step {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 5px 0;
+            gap: 12px;
+            padding: 6px 0;
             border-bottom: 1px solid #1e293b;
             opacity: 0;
             transform: translateX(-10px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
         .timeline-step.visible { opacity: 1; transform: translateX(0); }
-        .timeline-step .step-icon { font-size: 0.9rem; min-width: 22px; text-align: center; }
-        .timeline-step .step-desc { flex: 1; color: #cbd5e1; font-size: 0.82rem; }
+        .timeline-step .step-icon { font-size: 1rem; min-width: 26px; text-align: center; }
+        .timeline-step .step-desc { flex: 1; color: #cbd5e1; font-size: 0.92rem; }
         .timeline-step .step-duration {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: #475569;
             font-family: monospace;
-            margin-right: 4px;
+            margin-right: 6px;
         }
         .timeline-step .step-status {
             font-weight: 600;
-            padding: 1px 10px;
+            padding: 2px 12px;
             border-radius: 20px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
         .step-status.pending { background: #334155; color: #94a3b8; }
         .step-status.evaluated { background: #1e3a5f; color: #38bdf8; }
@@ -345,50 +394,50 @@
         .step-status.approved { background: #14532d; color: #bbf7d0; }
         .step-status.complete { background: #0f172a; color: #4ade80; border: 1px solid #4ade80; }
 
-        .timeline-arrow { text-align: center; color: #475569; font-size: 0.9rem; padding: 1px 0; opacity: 0; transition: opacity 0.3s ease; }
+        .timeline-arrow { text-align: center; color: #475569; font-size: 1rem; padding: 2px 0; opacity: 0; transition: opacity 0.3s ease; }
         .timeline-arrow.visible { opacity: 1; }
         .timeline-total {
             text-align: right;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #38bdf8;
             font-family: monospace;
-            padding: 6px 4px 0;
+            padding: 8px 4px 0;
             border-top: 1px solid #1e293b;
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
         .audit-id {
             text-align: center;
             font-family: monospace;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #38bdf8;
             background: #0f172a;
-            padding: 4px 12px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 8px;
             display: inline-block;
-            margin: 4px 0;
+            margin: 6px 0;
             border: 1px solid #1e293b;
         }
         .audit-footer {
-            margin-top: 8px;
-            font-size: 0.8rem;
+            margin-top: 10px;
+            font-size: 0.9rem;
             color: #94a3b8;
             text-align: center;
             border-top: 1px solid #1e293b;
-            padding-top: 8px;
+            padding-top: 10px;
         }
 
         .policy-source {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #94a3b8;
             background: #0f172a;
-            padding: 4px 12px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 8px;
             display: inline-block;
             border: 1px solid #1e293b;
         }
-        .risk-group { background: #0f172a; padding: 8px 12px; border-radius: 8px; margin: 4px 0; border: 1px solid #1e293b; }
-        .risk-group .rg-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 0.82rem; }
+        .risk-group { background: #0f172a; padding: 10px 16px; border-radius: 8px; margin: 6px 0; border: 1px solid #1e293b; }
+        .risk-group .rg-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.92rem; }
         .risk-group .rg-row .rg-label { color: #94a3b8; }
         .risk-group .rg-row .rg-value { color: #e2e8f0; font-weight: 500; }
 
@@ -400,27 +449,30 @@
         @media (max-width: 480px) {
             .scenario-card { min-width: 100%; }
             .cf-toggle { flex-direction: column; align-items: center; }
-            .decision-hero .decision-badge { font-size: 2.4rem; }
-            .hero-flow { font-size: 0.75rem; gap: 4px; }
-            .hero-flow .flow-item { padding: 2px 8px; }
+            .decision-hero .decision-badge { font-size: 2.8rem; }
+            .hero-flow { font-size: 0.85rem; gap: 6px; }
+            .hero-flow .flow-item { padding: 4px 10px; }
             .risk-assessment { flex-direction: column; align-items: stretch; }
-            .agent-request .req-meta { flex-direction: column; gap: 2px; }
+            .agent-request .req-meta { flex-direction: column; gap: 4px; }
+            .hero-problem { font-size: 1.6rem; }
+            .hero-answer { font-size: 2rem; }
         }
         @media (min-width: 641px) {
-            body { padding: 16px; }
-            h1 { font-size: 1.6rem; }
+            body { padding: 20px; }
+            h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- Hero – starts with the problem -->
+    <!-- Hero – rhetorical question with answer -->
     <div class="hero-section">
         <div class="hero-problem">
             An autonomous AI agent wants to execute a production action.
             <span class="highlight">Should it be allowed?</span>
         </div>
+        <div class="hero-answer">No.</div>
         <div class="hero-flow">
             <span class="flow-item">Agent proposes action</span>
             <span class="flow-arrow">↓</span>
@@ -436,25 +488,28 @@
         </div>
     </div>
 
-    <!-- Scenario Cards -->
+    <!-- Scenario Cards – with years as primary bold text -->
     <div class="scenario-cards" id="scenarioCards">
         <div class="scenario-card" data-scenario="aircanada">
-            <strong>✈️ Air Canada</strong>
-            <div class="scenario-action">Agent intends to publish customer policy</div>
+            <span class="scenario-year">2023</span>
+            <span class="scenario-month">Nov</span>
+            <div class="scenario-action">✈️ Publish customer policy</div>
             <div class="scenario-desc">Chatbot promised non‑existent bereavement discount; $812 damages.</div>
         </div>
         <div class="scenario-card" data-scenario="cloudflare">
-            <strong>🌩️ Cloudflare</strong>
-            <div class="scenario-action">Agent intends to deploy BGP configuration</div>
+            <span class="scenario-year">2026</span>
+            <span class="scenario-month">Feb</span>
+            <div class="scenario-action">🌩️ Deploy BGP configuration</div>
             <div class="scenario-desc">1,100+ customer prefixes withdrawn; global outage.</div>
         </div>
         <div class="scenario-card" data-scenario="pocketos">
-            <strong>💀 PocketOS</strong>
-            <div class="scenario-action">Agent intends to DELETE production database</div>
+            <span class="scenario-year">2026</span>
+            <span class="scenario-month">Apr</span>
+            <div class="scenario-action">💀 DELETE production database</div>
             <div class="scenario-desc">Production DB and backups deleted in 9 seconds.</div>
         </div>
     </div>
-    <p style="text-align:center; margin-bottom:16px; color:#94a3b8; font-size:0.85rem;">👆 Click a scenario to see ARF in action</p>
+    <p style="text-align:center; margin-bottom:18px; color:#94a3b8; font-size:0.95rem;">👆 Click a scenario to see ARF in action</p>
 
     <!-- Governance Decision Card -->
     <div class="card" id="riskCard" style="display:none;">
@@ -484,7 +539,7 @@
                 <span class="ra-label">Risk Assessment</span>
                 <span class="ra-level" id="riskLevel">—</span>
                 <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
-                <span style="font-size:0.7rem;color:#94a3b8;" id="riskPercent">—</span>
+                <span style="font-size:0.85rem;color:#94a3b8;" id="riskPercent">—</span>
             </div>
 
             <!-- Impact message -->
@@ -501,9 +556,9 @@
             </div>
 
             <!-- Governance Timeline (Audit Trail) -->
-            <details id="auditDetails" style="margin-top:14px;">
+            <details id="auditDetails" style="margin-top:16px;">
                 <summary>📋 Audit Trail</summary>
-                <div style="text-align:center;margin:4px 0;">
+                <div style="text-align:center;margin:6px 0;">
                     <span class="audit-id" id="auditId">ARF-2026-00428</span>
                 </div>
                 <div id="auditTrailContent" class="detail-content timeline"></div>
@@ -514,10 +569,10 @@
             </details>
 
             <!-- Technical Analysis -->
-            <details id="technicalDetails" style="margin-top:10px;">
+            <details id="technicalDetails" style="margin-top:12px;">
                 <summary>🔬 Technical Analysis</summary>
                 <div class="detail-content">
-                    <div style="margin-bottom:6px;">
+                    <div style="margin-bottom:8px;">
                         <span class="policy-source">📋 Policy: <span id="policySource">—</span></span>
                     </div>
                     <strong>Policy Decision:</strong> <span id="policyDecision" class="status"></span><br>
@@ -526,11 +581,11 @@
                         <div class="rg-row"><span class="rg-label">Historical Baseline</span><span class="rg-value" id="techPrior">—</span></div>
                         <div class="rg-row"><span class="rg-label">95% Credible Interval</span><span class="rg-value" id="techInterval">—</span></div>
                     </div>
-                    <div id="decisionExplanation" class="explanation" style="margin-top:8px;background:var(--expl-bg);padding:10px;border-radius:12px;font-size:0.8rem;"></div>
-                    <div id="posteriorChart" style="width:100%; height:200px; margin-top:10px;"></div>
-                    <div style="margin-top:6px;font-size:0.75rem;color:#94a3b8;">
+                    <div id="decisionExplanation" class="explanation" style="margin-top:8px;background:var(--expl-bg);padding:10px;border-radius:12px;font-size:0.9rem;"></div>
+                    <div id="posteriorChart" style="width:100%; height:200px; margin-top:12px;"></div>
+                    <div style="margin-top:8px;font-size:0.8rem;color:#94a3b8;">
                         📌 <strong>Governance policy:</strong> Approve if risk &lt;0.2 · Escalate if 0.2–0.8 · Deny if &gt;0.8
-                        <span style="display:inline-block;background:#78350f;color:#fde68a;padding:1px 8px;border-radius:30px;font-size:0.65rem;font-weight:bold;margin-left:6px;">👤 Escalate = human review</span>
+                        <span style="display:inline-block;background:#78350f;color:#fde68a;padding:2px 10px;border-radius:30px;font-size:0.7rem;font-weight:bold;margin-left:8px;">👤 Escalate = human review</span>
                     </div>
                 </div>
             </details>
