@@ -37,16 +37,8 @@
             overflow-x: hidden;
         }
         .container { max-width: 1000px; margin: 0 auto; }
-        .back-link { text-align: center; margin-bottom: 10px; }
-        .back-link a { color: #38bdf8; text-decoration: underline; font-size: 0.9rem; }
-        .warning-banner {
-            background: #332701; border-left: 6px solid #f0ad4e; padding: 12px;
-            margin-bottom: 20px; border-radius: 12px; font-size: 0.85rem; color: #fcd34d;
-            display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-        }
         h1 { font-size: 1.6rem; margin: 0 0 0.25rem 0; color: #f1f5f9; }
-        .badge { background: #e2e6ea; border-radius: 40px; padding: 4px 10px; font-size: 0.7rem; font-weight: normal; margin-left: 8px; white-space: nowrap; }
-        .simulated-badge { background: #7f1d1d; color: #fecaca; }
+        .badge { background: #7f1d1d; border-radius: 40px; padding: 4px 10px; font-size: 0.7rem; font-weight: normal; margin-left: 8px; color: #fecaca; white-space: nowrap; }
         .card { background: var(--card-bg); border-radius: 20px; box-shadow: var(--card-shadow); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-light); transition: border-color 0.2s; }
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 14px; border-radius: 16px; margin-top: 12px; }
@@ -133,7 +125,6 @@
         .scenario-card:hover { border-color: #38bdf8; transform: translateY(-2px); }
         .scenario-card.active { border-color: #38bdf8; background: #1e3a5f; }
         .scenario-card .event-desc { font-size: 0.85rem; margin-top: 8px; color: #cbd5e1; }
-        /* Timeline styling */
         .timeline {
             padding: 8px 0;
             display: flex;
@@ -170,7 +161,6 @@
         .step-status.denied { background: #7f1d1d; color: #fecaca; }
         .step-status.approved { background: #14532d; color: #bbf7d0; }
         .step-status.complete { background: #0f172a; color: #4ade80; border: 1px solid #4ade80; }
-        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
             * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
@@ -187,14 +177,8 @@
 </head>
 <body>
 <div class="container">
-    <div class="back-link"><a href="https://arf-foundation.github.io/pitch-deck/">← Back to presentation</a></div>
 
-    <div class="warning-banner">
-        <span>⚠️ <strong>Simulated client‑side demo</strong> – does NOT use the protected Bayesian engine. Proprietary, pilot‑only.</span>
-        <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank" style="margin-left:auto;white-space:nowrap;">Request Pilot Access →</a>
-    </div>
-
-    <h1>🛡️ ARF – Governance Layer for Autonomous AI <span class="badge simulated-badge">Simulated</span></h1>
+    <h1>🛡️ ARF – Governance Layer for Autonomous AI <span class="badge">Simulated</span></h1>
     <p style="margin-bottom:20px;color:#cbd5e1;"><strong>See how ARF governs autonomous actions: APPROVE, ESCALATE, or DENY.</strong></p>
 
     <!-- Scenario Cards -->
@@ -277,7 +261,7 @@
 </div>
 
 <script>
-    // ---------- Beta utilities (unchanged) ----------
+    // ---------- Beta utilities ----------
     function betaPDF(x, a, b) {
         if (x <= 0 || x >= 1) return 0;
         const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -327,14 +311,12 @@
         compute: [1.0, 12.0]
     };
 
-    // Operational impact messages (Task 7)
     const impactMessages = {
         aircanada: "The AI generated an unauthorized customer policy. ARF would have escalated the decision for human validation before any commitment.",
         cloudflare: "Without governance this configuration change would have reached production and caused a global outage. ARF would have required human approval before deployment.",
         pocketos: "The autonomous agent attempted a destructive production operation. ARF would have blocked execution before infrastructure damage occurred."
     };
 
-    // Audit trail data (unchanged)
     const auditTrailData = {
         aircanada: [
             ["2023-11-12 14:23:01", "Intent received: customer‑facing chatbot claim (bereavement discount)", "Pending"],
@@ -367,13 +349,11 @@
     let firstLoad = true;
 
     function showResults(risk, lo, hi, priorMean, decision, impact, alpha, beta) {
-        // Show cards
         document.getElementById('riskCard').style.display = 'block';
         document.getElementById('riskCard').classList.add('fade-in');
         document.getElementById('cfPanel').style.display = 'block';
         document.getElementById('cfPanel').classList.add('fade-in');
 
-        // Decision hero (Task 6)
         const hero = document.getElementById('decisionHero');
         const badge = document.getElementById('decisionBadge');
         const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
@@ -381,16 +361,13 @@
         let decisionText = decision === 'Approve' ? 'APPROVE' : (decision === 'Deny' ? 'DENY' : 'ESCALATE TO HUMAN REVIEW');
         badge.textContent = decisionText;
 
-        // Risk meter
         const fill = document.getElementById('riskThermometerFill');
         fill.style.width = `${risk * 100}%`;
         fill.style.background = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
         fill.className = risk > 0.8 ? 'risk-thermometer-fill glow' : 'risk-thermometer-fill';
 
-        // Impact message
         document.getElementById('riskImpactMessage').innerHTML = impactMessages[currentScenario];
 
-        // Technical details
         document.getElementById('riskScore').innerText = risk.toFixed(4);
         document.getElementById('credibleInterval').innerText = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
         document.getElementById('priorMean').innerText = priorMean.toFixed(4);
@@ -403,7 +380,6 @@
         const el = risk * impact;
         document.getElementById('expectedLossDisplay').innerHTML = `💰 Estimated Business Impact: <strong>${el.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</strong> (risk × impact estimate)`;
 
-        // Posterior chart (collapse by default) - Task 9
         const x = Array.from({length: 100}, (_, i) => i / 100);
         const y = x.map(v => betaPDF(v, alpha, beta));
         const trace = {
@@ -426,7 +402,6 @@
         };
         Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
 
-        // Governance Timeline (Task 5)
         const trail = auditTrailData[currentScenario] || [];
         const timelineContainer = document.getElementById('auditTrailContent');
         timelineContainer.innerHTML = '';
@@ -455,7 +430,6 @@
 
         if (firstLoad) {
             firstLoad = false;
-            // Keep technical details collapsed by default
             document.getElementById('technicalDetails').removeAttribute('open');
             document.getElementById('auditDetails').removeAttribute('open');
         }
@@ -464,7 +438,7 @@
     let cfMode = "without";
     function updateCounterfactual(risk, impact) {
         const wl = risk * impact;
-        const wl2 = 500; // fixed manual review cost
+        const wl2 = 500;
         const saved = wl - wl2;
         const content = document.getElementById('cfContent');
 
@@ -514,12 +488,10 @@
         const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
         showResults(risk, lo, hi, priorMean, decision, p.impact, alpha, beta);
 
-        // Highlight active scenario (Task 8)
         document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
         const activeCard = document.querySelector(`.scenario-card[data-scenario="${id}"]`);
         if (activeCard) activeCard.classList.add('active');
 
-        // Scroll to decision card on mobile (Task 8)
         if (window.innerWidth < 641) {
             const card = document.getElementById('riskCard');
             setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
@@ -530,7 +502,6 @@
         card.addEventListener('click', () => applyPreset(card.dataset.scenario));
     });
 
-    // Load Cloudflare by default
     applyPreset('cloudflare');
 </script>
 </body>
