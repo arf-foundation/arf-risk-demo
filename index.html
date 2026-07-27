@@ -86,46 +86,84 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
+        /* Hero – clear AI governance flow */
         .hero-section { margin-bottom: 24px; }
-        .hero-problem {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 4px;
-            line-height: 1.3;
+        .hero-flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 16px 0 8px;
         }
-        .hero-problem .highlight { color: #38bdf8; }
-        /* hero-answer removed entirely */
-        .hero-flow {
+        .hero-flow-diagram .flow-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             flex-wrap: wrap;
-            margin: 12px 0 8px;
-            font-size: 1.1rem;
-            color: #94a3b8;
+            justify-content: center;
         }
-        .hero-flow .flow-item {
-            padding: 6px 16px;
-            border-radius: 8px;
+        .hero-flow-diagram .flow-box {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.2rem;
             background: #1e293b;
             border: 2px solid #334155;
-            font-weight: 500;
         }
-        .hero-flow .flow-item.highlight {
+        .hero-flow-diagram .flow-box.agent {
             border-color: #38bdf8;
             background: #0f2a44;
-            color: #e2e8f0;
-            font-weight: 600;
+            color: #38bdf8;
         }
-        .hero-flow .flow-item.approve { border-color: #22c55e; color: #22c55e; }
-        .hero-flow .flow-item.escalate { border-color: #fbbf24; color: #fbbf24; }
-        .hero-flow .flow-item.deny { border-color: #ef4444; color: #ef4444; }
-        .hero-flow .flow-arrow { color: #475569; font-size: 1.4rem; }
+        .hero-flow-diagram .flow-box.governance {
+            border-color: #fbbf24;
+            background: #2a1f00;
+            color: #fbbf24;
+        }
+        .hero-flow-diagram .flow-box.production {
+            border-color: #22c55e;
+            background: #0a2a1a;
+            color: #22c55e;
+        }
+        .hero-flow-diagram .flow-arrow {
+            color: #475569;
+            font-size: 1.6rem;
+            padding: 2px 0;
+        }
+        .hero-flow-diagram .flow-decision-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 4px 0;
+        }
+        .hero-flow-diagram .flow-decision {
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: 2px solid;
+        }
+        .hero-flow-diagram .flow-decision.approve {
+            color: #22c55e;
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+        }
+        .hero-flow-diagram .flow-decision.escalate {
+            color: #fbbf24;
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.08);
+        }
+        .hero-flow-diagram .flow-decision.deny {
+            color: #ef4444;
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
         .hero-tagline {
             font-size: 1.1rem;
             color: #cbd5e1;
             margin: 12px 0 4px;
+            text-align: center;
         }
         .intercept-badge {
             display: inline-block;
@@ -369,7 +407,7 @@
 
         .scenario-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
         .scenario-card {
-            flex: 1; min-width: 180px; padding: 14px 16px; border: 2px solid #334155; border-radius: 16px;
+            flex: 1; min-width: 200px; max-width: 380px; padding: 14px 16px; border: 2px solid #334155; border-radius: 16px;
             cursor: pointer; text-align: center; background: #1e293b; transition: border-color 0.2s, transform 0.2s, background 0.2s;
         }
         .scenario-card:hover { border-color: #38bdf8; transform: translateY(-3px); }
@@ -489,15 +527,15 @@
             .timeline-arrow { opacity: 1 !important; }
         }
         @media (max-width: 480px) {
-            .scenario-card { min-width: 100%; }
+            .scenario-card { min-width: 100%; max-width: 100%; }
             .cf-toggle { flex-direction: column; align-items: center; }
             .decision-hero .decision-badge { font-size: 2.8rem; }
-            .hero-flow { font-size: 0.85rem; gap: 6px; }
-            .hero-flow .flow-item { padding: 4px 10px; }
+            .hero-flow-diagram .flow-box { font-size: 1rem; padding: 6px 14px; }
             .risk-assessment { flex-direction: column; align-items: stretch; }
             .agent-request .req-meta { flex-direction: column; gap: 4px; }
-            .hero-problem { font-size: 1.6rem; }
             .site-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .hero-flow-diagram .flow-decision-row { gap: 8px; }
+            .hero-flow-diagram .flow-decision { font-size: 0.85rem; padding: 3px 12px; }
         }
         @media (min-width: 641px) {
             body { padding: 20px; }
@@ -508,53 +546,54 @@
 <body>
 <div class="container">
 
-    <!-- Header with website link -->
+    <!-- Header -->
     <header class="site-header">
         <h1>🛡️ ARF – Governance Layer for Autonomous AI <span class="badge">Simulated</span></h1>
         <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
     </header>
 
-    <!-- Hero – open question, no answer -->
+    <!-- Hero – clear AI → Governance → Production flow -->
     <div class="hero-section">
-        <div class="hero-problem">
-            An autonomous AI agent wants to execute a production action.
-            <span class="highlight">Should it be allowed?</span>
-        </div>
-        <!-- "No." removed -->
-        <div class="hero-flow">
-            <span class="flow-item">Agent proposes action</span>
-            <span class="flow-arrow">↓</span>
-            <span class="flow-item highlight">ARF evaluates</span>
-            <span class="flow-arrow">↓</span>
-            <span class="flow-item approve">APPROVE</span>
-            <span class="flow-item escalate">ESCALATE</span>
-            <span class="flow-item deny">DENY</span>
+        <div class="hero-flow-diagram">
+            <div class="flow-row">
+                <span class="flow-box agent">AI Agent</span>
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <span class="flow-box governance">ARF Governance</span>
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-decision-row">
+                <span class="flow-decision approve">APPROVE</span>
+                <span class="flow-decision escalate">ESCALATE</span>
+                <span class="flow-decision deny">DENY</span>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <span class="flow-box production">Production</span>
+            </div>
         </div>
         <div class="hero-tagline">
-            <strong>ARF is the governance layer making this decision.</strong>
-            <span class="intercept-badge">⬡ Intercepts autonomous actions</span>
+            <strong>ARF intercepts autonomous actions before they reach production.</strong>
+            <span class="intercept-badge">⬡ Governance checkpoint</span>
         </div>
     </div>
 
-    <!-- Scenario Cards -->
+    <!-- Scenario Cards – only Air Canada and PocketOS -->
     <div class="scenario-cards" id="scenarioCards">
         <div class="scenario-card" data-scenario="aircanada">
             <span class="scenario-year">2023</span>
             <span class="scenario-month">Nov</span>
             <div class="scenario-action">✈️ Publish customer policy</div>
-            <div class="scenario-desc">Chatbot promised non‑existent bereavement discount; $812 damages.</div>
-        </div>
-        <div class="scenario-card" data-scenario="cloudflare">
-            <span class="scenario-year">2026</span>
-            <span class="scenario-month">Feb</span>
-            <div class="scenario-action">🌩️ Deploy BGP configuration</div>
-            <div class="scenario-desc">1,100+ customer prefixes withdrawn; global outage.</div>
+            <div class="scenario-desc">AI chatbot generated information that conflicted with official airline policy.</div>
         </div>
         <div class="scenario-card" data-scenario="pocketos">
             <span class="scenario-year">2026</span>
             <span class="scenario-month">Apr</span>
             <div class="scenario-action">💀 DELETE production database</div>
-            <div class="scenario-desc">Production DB and backups deleted in 9 seconds.</div>
+            <div class="scenario-desc">AI coding agent attempted an irreversible production operation.</div>
         </div>
     </div>
     <p style="text-align:center; margin-bottom:18px; color:#94a3b8; font-size:0.95rem;">👆 Click a scenario to see ARF in action</p>
@@ -564,7 +603,7 @@
         <div class="result">
             <!-- Agent Request -->
             <div class="agent-request">
-                <div class="req-label">Agent Request</div>
+                <div class="req-label">Incoming Autonomous Action</div>
                 <div class="req-action" id="actionDescription">—</div>
                 <div class="req-meta">
                     <span><strong>Target:</strong> <span id="reqTarget">—</span></span>
@@ -597,10 +636,10 @@
             <div id="outcomeBox" class="outcome-box">
                 <div class="outcome-title">Outcome</div>
                 <div class="outcome-item">Autonomous execution blocked</div>
-                <div class="outcome-item">Human reviewer notified</div>
+                <div class="outcome-item">Governance decision enforced</div>
                 <div class="outcome-item">Audit record stored</div>
                 <div class="outcome-item">Policy reference attached</div>
-                <div class="outcome-item" id="outcomeExec">No production change executed</div>
+                <div class="outcome-item" id="outcomeExec">Production remains protected</div>
             </div>
 
             <!-- Governance Timeline (Audit Trail) -->
@@ -612,7 +651,7 @@
                 <div id="auditTrailContent" class="detail-content timeline"></div>
                 <div class="timeline-total" id="latencyTotal">Total decision latency: —</div>
                 <div class="audit-footer">
-                    ✓ Immutable audit log · Every decision recorded for compliance
+                    ✓ Immutable audit log · Every governance decision recorded for compliance
                 </div>
             </details>
 
@@ -643,7 +682,7 @@
     <!-- Counterfactual -->
     <div class="counterfactual-panel" id="cfPanel" style="display:none;">
         <div class="cf-toggle">
-            <button id="cfWithoutBtn" class="cf-btn active">Without Governance Layer</button>
+            <button id="cfWithoutBtn" class="cf-btn active">Without ARF Governance</button>
             <button id="cfWithBtn" class="cf-btn">With ARF Governance</button>
         </div>
         <div id="cfContent" class="cf-content"></div>
@@ -710,60 +749,42 @@
 
     const categoryMap = {
         default: [1.0, 10.0],
-        database: [1.5, 8.0],
-        compute: [1.0, 12.0]
+        database: [1.5, 8.0]
     };
 
-    // ---- Scenario data ----
+    // ---- Scenario data - only AI governance incidents ----
     const scenarioData = {
         aircanada: {
-            action: 'Publish customer policy (bereavement discount)',
+            action: 'Publish customer policy',
             target: 'Customer-facing policy system',
-            requestor: 'Customer Support Agent',
-            reason: 'Customer-facing policy change requires human approval.',
-            policyTrigger: 'Policy triggered: Customer Policy v2.1 — autonomous policy publishing exceeds approval threshold. Action routed to human reviewer.',
-            impact: 'Under this simulated governance evaluation, ARF would have escalated the unauthorized customer policy for human validation before any commitment.',
-            outcome: 'No policy change published. Human review required.',
+            requestor: 'AI Chatbot Agent',
+            reason: 'AI-generated policy conflicts with enterprise policy.',
+            policyTrigger: 'Policy triggered: Customer Policy v2.1 — AI-generated customer-facing content requires human approval when conflicting with official policy.',
+            impact: 'The AI chatbot generated a bereavement policy that contradicted the airline\'s official policy. Under this governance evaluation, ARF would have escalated the response for human validation before it reached the customer.',
+            outcome: 'No unauthorized policy published. Human review required.',
             policySource: 'Customer Policy v2.1',
             category: 'default', failures: 22, successes: 78,
             audit: [
                 ['Intent received: publish customer policy (bereavement discount)', 'Pending', 12],
-                ['Risk evaluated: posterior risk = 0.207', 'Evaluated', 31],
-                ['Policy matched: Customer Policy v2.1 → escalate if risk >0.2', 'Escalated', 8],
+                ['Policy conflict detected: AI-generated content conflicts with official policy', 'Evaluated', 31],
+                ['Governance rule matched: Customer Policy v2.1 → escalate', 'Escalated', 8],
                 ['Decision recorded: ESCALATE to human review', 'Complete', 5]
-            ]
-        },
-        cloudflare: {
-            action: 'Deploy BGP configuration (BYOIP prefix change)',
-            target: 'Customer BYOIP prefixes',
-            requestor: 'Network Operations Agent',
-            reason: 'High-risk network change requires human approval.',
-            policyTrigger: 'Policy triggered: Network Infrastructure v3.2 — production network changes exceed the autonomous approval threshold. Action routed to human reviewer.',
-            impact: 'Under this simulated governance evaluation, ARF would have required human approval before executing the BGP configuration change, preventing the global routing outage.',
-            outcome: 'No configuration deployed. Human review required.',
-            policySource: 'Network Infrastructure v3.2',
-            category: 'compute', failures: 60, successes: 40,
-            audit: [
-                ['Intent received: deploy BGP configuration (BYOIP)', 'Pending', 14],
-                ['Risk evaluated: posterior risk = 0.671', 'Evaluated', 28],
-                ['Policy matched: Network Infrastructure v3.2 → escalate if risk >0.2', 'Escalated', 9],
-                ['Decision recorded: ESCALATE to network team', 'Complete', 6]
             ]
         },
         pocketos: {
             action: 'DELETE production database',
             target: 'Production Database (PostgreSQL)',
-            requestor: 'Software Development Agent',
-            reason: 'Destructive production action blocked.',
-            policyTrigger: 'Policy triggered: Production Database Protection v3.4 — destructive database operations require explicit human override. Action denied.',
-            impact: 'Under this simulated governance evaluation, ARF would have blocked the destructive database deletion before any infrastructure damage occurred.',
+            requestor: 'AI Coding Agent (Cursor / Claude)',
+            reason: 'Irreversible production action requires explicit human approval.',
+            policyTrigger: 'Policy triggered: Production Database Protection v3.4 — destructive database operations require explicit human override.',
+            impact: 'An AI coding agent attempted to delete the production database and all backups. Under this governance evaluation, ARF would have blocked this destructive action before any infrastructure damage occurred.',
             outcome: 'No database deletion executed. Production remains intact.',
             policySource: 'Production Database Protection v3.4',
             category: 'database', failures: 100, successes: 0,
             audit: [
                 ['Intent received: DELETE production database', 'Pending', 18],
-                ['Risk evaluated: posterior risk = 0.927', 'Evaluated', 34],
-                ['Policy matched: Production Database Protection v3.4 → deny', 'Denied', 7],
+                ['Destructive production action detected', 'Evaluated', 34],
+                ['Human approval required: Production Database Protection v3.4 → deny', 'Denied', 7],
                 ['Decision recorded: DENY – override required', 'Complete', 4]
             ]
         }
@@ -946,26 +967,26 @@
         const content = document.getElementById('cfContent');
         if (cfMode === "without") {
             content.innerHTML = `
-                <div class="cf-state">📉 Without Governance Layer</div>
+                <div class="cf-state">📉 Without ARF Governance</div>
                 <div class="cf-flow">
-                    <div class="flow-step">Agent proposes action</div>
+                    <div class="flow-step">AI proposes action</div>
                     <div class="flow-arrow">↓</div>
                     <div class="flow-step">Executes immediately</div>
                     <div class="flow-arrow">↓</div>
-                    <div class="flow-step flow-outcome bad">Incident occurs – uncontrolled disruption</div>
+                    <div class="flow-step flow-outcome bad">Incident occurs — customer impact or infrastructure damage</div>
                 </div>
             `;
         } else {
             content.innerHTML = `
                 <div class="cf-state">🛡️ With ARF Governance</div>
                 <div class="cf-flow">
-                    <div class="flow-step">Agent proposes action</div>
+                    <div class="flow-step">AI proposes action</div>
                     <div class="flow-arrow">↓</div>
                     <div class="flow-step">ARF intercepts and evaluates</div>
                     <div class="flow-arrow">↓</div>
                     <div class="flow-step">Policy enforced → ${currentDecision.toUpperCase()}</div>
                     <div class="flow-arrow">↓</div>
-                    <div class="flow-step flow-outcome good">Production protected – governed decision enforced</div>
+                    <div class="flow-step flow-outcome good">Production protected — governed decision enforced</div>
                 </div>
             `;
         }
@@ -984,7 +1005,10 @@
         updateCounterfactual();
     });
 
-    const presets = { aircanada: 'aircanada', cloudflare: 'cloudflare', pocketos: 'pocketos' };
+    const presets = {
+        aircanada: 'aircanada',
+        pocketos: 'pocketos'
+    };
 
     function applyPreset(id) {
         const data = scenarioData[id];
@@ -1010,8 +1034,8 @@
         card.addEventListener('click', () => applyPreset(card.dataset.scenario));
     });
 
-    // Load Cloudflare by default
-    applyPreset('cloudflare');
+    // Load Air Canada by default (now the primary example)
+    applyPreset('aircanada');
 </script>
 </body>
 </html>
