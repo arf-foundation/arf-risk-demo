@@ -27,7 +27,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
-            background: #0a1628; /* fallback, particles will overlay */
+            background: #0a1628;
             color: var(--text-primary);
             line-height: 1.6;
             padding: 16px;
@@ -36,7 +36,6 @@
             font-size: 1.1rem;
             position: relative;
         }
-        /* Fixed particle canvas background */
         #particleCanvas {
             position: fixed;
             top: 0;
@@ -52,6 +51,17 @@
             margin: 0 auto;
             position: relative;
             z-index: 1;
+        }
+
+        /* ===== DATA PULSE CANVAS (over hero) ===== */
+        #dataPulseCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .site-header {
@@ -105,7 +115,7 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* ===== HERO SECTION – COMPLEX ANIMATIONS (no particles inside) ===== */
+        /* ===== HERO SECTION ===== */
         .hero-section {
             position: relative;
             margin-bottom: 24px;
@@ -401,7 +411,95 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Agent Request, Decision, etc. unchanged */
+        /* ===== DECISION BURST CANVAS ===== */
+        #burstCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* ===== RISK METER – WAVE EFFECT ===== */
+        .risk-thermometer-fill {
+            position: relative;
+            overflow: hidden;
+        }
+        .risk-thermometer-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: waveSlide 1.2s ease-in-out infinite;
+            transform: skewX(-20deg);
+        }
+        @keyframes waveSlide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Digital number ticker – flicker */
+        .risk-percent-ticker {
+            display: inline-block;
+            font-variant-numeric: tabular-nums;
+            transition: opacity 0.1s;
+        }
+        .risk-percent-ticker.flicker {
+            animation: flicker 0.15s ease 2;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        /* ===== AUDIT TRAIL – SCANLINE & TYPEWRITER ===== */
+        .scanline-overlay {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanline-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.05) 2px,
+                rgba(0,0,0,0.05) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: scanlineMove 8s linear infinite;
+        }
+        @keyframes scanlineMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: #38bdf8;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ===== AGENT REQUEST, DECISION, ETC. ===== */
         .agent-request {
             background: #1e293b;
             padding: 14px 20px;
@@ -456,6 +554,7 @@
             padding: 12px 0 8px;
             margin: 0 0 8px;
             outline: none;
+            position: relative;
         }
         .decision-hero .engine-badge {
             display: inline-block;
@@ -484,6 +583,7 @@
             margin: 0;
             line-height: 1.1;
             transition: text-shadow 0.3s ease;
+            position: relative;
         }
         .decision-hero .decision-badge:hover {
             text-shadow: 0 0 40px currentColor;
@@ -587,8 +687,20 @@
         .ra-level.low { background: #14532d; color: #bbf7d0; }
         .ra-level.medium { background: #78350f; color: #fde68a; }
         .ra-level.high { background: #7f1d1d; color: #fecaca; }
-        .risk-thermometer { flex: 1; min-width: 120px; height: 8px; background: #374151; border-radius: 4px; overflow: hidden; }
-        .risk-thermometer-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.5s ease; }
+        .risk-thermometer {
+            flex: 1;
+            min-width: 120px;
+            height: 8px;
+            background: #374151;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .risk-thermometer-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease, background 0.5s ease;
+        }
 
         .impact-message {
             margin-top: 12px; padding: 12px 16px; border-radius: 12px; background: rgba(255,255,255,0.03);
@@ -713,7 +825,13 @@
         details[open] summary { margin-bottom: 8px; }
         details .detail-content { padding: 8px 0; font-size: 0.92rem; line-height: 1.8; }
 
-        .timeline { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 6px 0;
+            position: relative;
+        }
         .timeline-step {
             display: flex;
             align-items: center;
@@ -724,9 +842,18 @@
             transform: translateX(-10px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        .timeline-step.visible { opacity: 1; transform: translateX(0); }
+        .timeline-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
         .timeline-step .step-icon { font-size: 1rem; min-width: 26px; text-align: center; }
-        .timeline-step .step-desc { flex: 1; color: #cbd5e1; font-size: 0.92rem; }
+        .timeline-step .step-desc {
+            flex: 1;
+            color: #cbd5e1;
+            font-size: 0.92rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.3px;
+        }
         .timeline-step .step-duration {
             font-size: 0.8rem;
             color: #475569;
@@ -740,6 +867,7 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: background 0.3s, color 0.3s;
         }
         .step-status.pending { background: #334155; color: #94a3b8; }
         .step-status.evaluated { background: #1e3a5f; color: #38bdf8; }
@@ -812,6 +940,11 @@
             .hero-flow-diagram .flow-box.governance::before,
             .hero-flow-diagram .flow-box.governance::after { display: none; }
             #particleCanvas { display: none; }
+            #dataPulseCanvas { display: none; }
+            #burstCanvas { display: none; }
+            .risk-thermometer-fill::after { display: none; }
+            .scanline-overlay::before { display: none; }
+            .typewriter-cursor { display: none; }
         }
         @media (max-width: 480px) {
             .cf-toggle { flex-direction: column; align-items: center; }
@@ -841,16 +974,17 @@
             <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
         </header>
 
-        <!-- Hero – with complex animations (no particles inside) -->
+        <!-- Hero – with data pulse canvas overlay -->
         <div class="hero-section">
+            <canvas id="dataPulseCanvas"></canvas>
             <div class="hero-flow-diagram">
                 <div class="flow-row">
                     <span class="flow-box agent">AI Agent</span>
-                    <span class="flow-arrow">↓</span>
+                    <span class="flow-arrow" id="arrow1">↓</span>
                 </div>
                 <div class="flow-row">
                     <span class="flow-box governance">ARF Governance</span>
-                    <span class="flow-arrow">↓</span>
+                    <span class="flow-arrow" id="arrow2">↓</span>
                 </div>
                 <div class="flow-decision-row">
                     <span class="flow-decision approve">APPROVE</span>
@@ -858,7 +992,7 @@
                     <span class="flow-decision deny">DENY</span>
                 </div>
                 <div class="flow-row">
-                    <span class="flow-arrow">↓</span>
+                    <span class="flow-arrow" id="arrow3">↓</span>
                 </div>
                 <div class="flow-row">
                     <span class="flow-box production">Production</span>
@@ -870,13 +1004,13 @@
             </div>
             <!-- Integrated case cards -->
             <div class="hero-case-cards">
-                <div class="hero-case-card" data-scenario="aircanada">
+                <div class="hero-case-card" data-scenario="aircanada" id="card-aircanada">
                     <div class="hcc-year">✈️ 2023</div>
                     <div class="hcc-action">Publish customer policy</div>
                     <div class="hcc-desc">AI chatbot generated conflicting policy information. Air Canada held liable for $812.</div>
                     <span class="hcc-badge escalate">ESCALATE</span>
                 </div>
-                <div class="hero-case-card" data-scenario="pocketos">
+                <div class="hero-case-card" data-scenario="pocketos" id="card-pocketos">
                     <div class="hcc-year">💀 2026</div>
                     <div class="hcc-action">DELETE production database</div>
                     <div class="hcc-desc">AI coding agent deleted all data and backups in 9 seconds.</div>
@@ -887,7 +1021,9 @@
 
         <!-- Governance Decision Card -->
         <div class="card" id="riskCard" style="display:none;">
-            <div class="result">
+            <div class="result" style="position:relative; overflow:visible;">
+                <!-- Burst canvas overlay -->
+                <canvas id="burstCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;"></canvas>
                 <!-- Agent Request -->
                 <div class="agent-request">
                     <div class="req-label">Incoming Autonomous Action</div>
@@ -916,8 +1052,10 @@
                 <div class="risk-assessment">
                     <span class="ra-label">Risk Assessment</span>
                     <span class="ra-level" id="riskLevel">—</span>
-                    <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
-                    <span style="font-size:0.85rem;color:#94a3b8;" id="riskPercent">—</span>
+                    <div class="risk-thermometer">
+                        <div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div>
+                    </div>
+                    <span style="font-size:0.85rem;color:#94a3b8;" id="riskPercent"><span class="risk-percent-ticker" id="riskTicker">—</span></span>
                 </div>
 
                 <!-- Impact message -->
@@ -933,13 +1071,15 @@
                     <div class="outcome-item" id="outcomeExec">Production remains protected</div>
                 </div>
 
-                <!-- Governance Timeline (Audit Trail) -->
+                <!-- Governance Timeline (Audit Trail) with scanline -->
                 <details id="auditDetails" style="margin-top:16px;">
                     <summary>📋 Audit Trail</summary>
                     <div style="text-align:center;margin:6px 0;">
                         <span class="audit-id" id="auditId">ARF-2026-00428</span>
                     </div>
-                    <div id="auditTrailContent" class="detail-content timeline"></div>
+                    <div class="scanline-overlay" style="position:relative; overflow:hidden;">
+                        <div id="auditTrailContent" class="detail-content timeline"></div>
+                    </div>
                     <div class="timeline-total" id="latencyTotal">Total decision latency: —</div>
                     <div class="audit-footer">
                         ✓ Immutable audit log · Every governance decision recorded for compliance
@@ -994,7 +1134,9 @@
     </div>
 
     <script>
-        // ===== FULL-PAGE PARTICLE SYSTEM =====
+        // ============================================================
+        // FULL-PAGE PARTICLE SYSTEM (background)
+        // ============================================================
         (function initParticles() {
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
@@ -1022,7 +1164,6 @@
                     this.opacity = Math.random() * 0.4 + 0.1;
                     this.pulse = Math.random() * Math.PI * 2;
                     this.pulseSpeed = 0.01 + Math.random() * 0.02;
-                    // Use a more cohesive color palette
                     const colors = ['#38bdf8', '#7dd3fc', '#fbbf24', '#94a3b8', '#22c55e'];
                     this.color = colors[Math.floor(Math.random() * colors.length)];
                 }
@@ -1059,7 +1200,6 @@
                     p.update();
                     p.draw();
                 });
-                // Connecting lines
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
@@ -1082,7 +1222,6 @@
 
             window.addEventListener('resize', () => {
                 resize();
-                // Reset particles to new dimensions
                 particles.forEach(p => {
                     p.x = Math.random() * w;
                     p.y = Math.random() * h;
@@ -1097,7 +1236,237 @@
             });
         })();
 
-        // ===== BETA UTILITIES =====
+        // ============================================================
+        // DATA PULSE FLOW (hero arrows)
+        // ============================================================
+        (function dataPulse() {
+            const canvas = document.getElementById('dataPulseCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let pulseActive = false;
+            let pulseProgress = 0;
+            let pulseColor = '#38bdf8';
+            let animId = null;
+
+            function resize() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                width = rect.width;
+                height = rect.height;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function drawPulse(progress) {
+                ctx.clearRect(0, 0, width, height);
+                if (!pulseActive) return;
+                // Path definition – approximate arrow positions using fixed percentages
+                // We'll draw a curved path from the bottom of AI Agent box to top of ARF box,
+                // then through the decision row, down to Production.
+                // Simplified: we use a vertical line with a slight curve at decisions.
+                const startX = width * 0.5;
+                const startY = height * 0.08;
+                const endY = height * 0.92;
+                const midY1 = height * 0.3;
+                const midY2 = height * 0.5;
+                const midY3 = height * 0.7;
+                // Bezier curve points
+                const cp1x = startX + 20;
+                const cp1y = midY1;
+                const cp2x = startX - 20;
+                const cp2y = midY2;
+                const cp3x = startX + 20;
+                const cp3y = midY3;
+
+                // Draw the path (faint)
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, startX, endY);
+                ctx.strokeStyle = 'rgba(56,189,248,0.1)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw pulse orb along the path
+                const t = progress;
+                // Compute position using parametric bezier (simplified)
+                const p0 = {x: startX, y: startY};
+                const p1 = {x: cp1x, y: cp1y};
+                const p2 = {x: cp2x, y: cp2y};
+                const p3 = {x: startX, y: endY};
+                // Cubic Bezier
+                const u = 1 - t;
+                const x = u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x;
+                const y = u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y;
+                // Glow
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
+                gradient.addColorStop(0, pulseColor);
+                gradient.addColorStop(0.4, pulseColor);
+                gradient.addColorStop(1, 'rgba(56,189,248,0)');
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI*2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                // Solid core
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI*2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                // Trail – we can draw a fading trail by drawing multiple circles with decreasing opacity
+                for (let i = 0; i < 20; i++) {
+                    const trailT = Math.max(0, t - (i * 0.02));
+                    if (trailT < 0) break;
+                    const u2 = 1 - trailT;
+                    const tx = u2*u2*u2*p0.x + 3*u2*u2*trailT*p1.x + 3*u2*trailT*trailT*p2.x + trailT*trailT*trailT*p3.x;
+                    const ty = u2*u2*u2*p0.y + 3*u2*u2*trailT*p1.y + 3*u2*trailT*trailT*p2.y + trailT*trailT*trailT*p3.y;
+                    const alpha = 0.5 * (1 - i/20);
+                    ctx.beginPath();
+                    ctx.arc(tx, ty, 2 * (1 - i/20), 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(56,189,248,${alpha})`;
+                    ctx.fill();
+                }
+            }
+
+            function animatePulse() {
+                if (!pulseActive) {
+                    ctx.clearRect(0, 0, width, height);
+                    animId = null;
+                    return;
+                }
+                pulseProgress += 0.012;
+                if (pulseProgress > 1) {
+                    pulseActive = false;
+                    pulseProgress = 0;
+                    ctx.clearRect(0, 0, width, height);
+                    animId = null;
+                    return;
+                }
+                drawPulse(pulseProgress);
+                animId = requestAnimationFrame(animatePulse);
+            }
+
+            function triggerPulse(color = '#38bdf8') {
+                pulseColor = color;
+                pulseActive = true;
+                pulseProgress = 0;
+                if (animId) cancelAnimationFrame(animId);
+                animatePulse();
+            }
+
+            window.addEventListener('resize', () => {
+                resize();
+                if (pulseActive) {
+                    drawPulse(pulseProgress);
+                }
+            });
+
+            resize();
+            // Expose trigger globally
+            window.triggerDataPulse = triggerPulse;
+        })();
+
+        // ============================================================
+        // QUANTUM BURST DECISION REVEAL (particle burst)
+        // ============================================================
+        (function burst() {
+            const canvas = document.getElementById('burstCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animId = null;
+            let width, height;
+
+            function resize() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                width = rect.width;
+                height = rect.height;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            class BurstParticle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 6;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed - 1;
+                    this.size = 2 + Math.random() * 4;
+                    this.life = 1;
+                    this.decay = 0.01 + Math.random() * 0.02;
+                    this.color = color;
+                    this.gravity = 0.05;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy += this.gravity;
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+                    this.life -= this.decay;
+                    this.size *= 0.995;
+                }
+                draw(ctx) {
+                    if (this.life <= 0) return;
+                    ctx.globalAlpha = this.life * 0.8;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                isDead() { return this.life <= 0 || this.size < 0.2; }
+            }
+
+            function triggerBurst(decision) {
+                const colors = {
+                    'APPROVE': '#22c55e',
+                    'ESCALATE': '#fbbf24',
+                    'DENY': '#ef4444'
+                };
+                const color = colors[decision] || '#38bdf8';
+                const container = canvas.parentElement;
+                const rect = container.getBoundingClientRect();
+                // Center of the decision badge (approx)
+                const badge = container.querySelector('.decision-badge');
+                if (!badge) return;
+                const badgeRect = badge.getBoundingClientRect();
+                const cx = badgeRect.left - rect.left + badgeRect.width/2;
+                const cy = badgeRect.top - rect.top + badgeRect.height/2;
+                const count = 50;
+                particles = [];
+                for (let i = 0; i < count; i++) {
+                    particles.push(new BurstParticle(cx, cy, color));
+                }
+                if (animId) cancelAnimationFrame(animId);
+                animateBurst();
+            }
+
+            function animateBurst() {
+                ctx.clearRect(0, 0, width, height);
+                let alive = false;
+                particles.forEach(p => {
+                    p.update();
+                    if (!p.isDead()) {
+                        p.draw(ctx);
+                        alive = true;
+                    }
+                });
+                if (alive) {
+                    animId = requestAnimationFrame(animateBurst);
+                } else {
+                    ctx.clearRect(0, 0, width, height);
+                    animId = null;
+                }
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            window.triggerBurst = triggerBurst;
+        })();
+
+        // ============================================================
+        // BETA UTILITIES (unchanged)
+        // ============================================================
         function betaPDF(x, a, b) {
             if (x <= 0 || x >= 1) return 0;
             const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -1146,7 +1515,9 @@
             database: [1.5, 8.0]
         };
 
-        // ---- Scenario data ----
+        // ============================================================
+        // SCENARIO DATA (unchanged)
+        // ============================================================
         const scenarioData = {
             aircanada: {
                 action: 'Publish customer policy (bereavement discount)',
@@ -1196,9 +1567,41 @@
         let timelineTimer = null;
         let decisionTimer = null;
 
+        // ============================================================
+        // TYPEWRITER EFFECT for audit trail
+        // ============================================================
+        function typeWriter(element, text, speed = 20, callback) {
+            let index = 0;
+            element.innerHTML = '';
+            const cursor = document.createElement('span');
+            cursor.className = 'typewriter-cursor';
+            element.appendChild(cursor);
+
+            function typeChar() {
+                if (index < text.length) {
+                    const char = text.charAt(index);
+                    const textNode = document.createTextNode(char);
+                    element.insertBefore(textNode, cursor);
+                    index++;
+                    setTimeout(typeChar, speed);
+                } else {
+                    cursor.remove();
+                    if (callback) callback();
+                }
+            }
+            typeChar();
+        }
+
+        // ============================================================
+        // MAIN LOGIC (with animation triggers)
+        // ============================================================
         function showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta) {
             const data = scenarioData[currentScenario];
             if (!data) return;
+
+            // Trigger data pulse
+            const pulseColor = decision === 'Approve' ? '#22c55e' : (decision === 'Deny' ? '#ef4444' : '#fbbf24');
+            if (window.triggerDataPulse) window.triggerDataPulse(pulseColor);
 
             const decisionContent = document.getElementById('decisionContent');
 
@@ -1242,6 +1645,9 @@
                 </div>
             `;
 
+            // Quantum Burst
+            if (window.triggerBurst) window.triggerBurst(decisionText);
+
             const hero = document.getElementById('decisionHero');
             hero.className = 'decision-hero ' + cls;
 
@@ -1250,6 +1656,7 @@
             const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
             document.getElementById('decisionConfidence').textContent = `Statistical Certainty: ${certaintyText} (${certaintyPct}%)`;
 
+            // Risk Meter – wave effect and ticker
             const riskLevel = document.getElementById('riskLevel');
             let levelText, levelClass;
             if (risk < 0.2) { levelText = 'LOW'; levelClass = 'low'; }
@@ -1257,7 +1664,24 @@
             else { levelText = 'MEDIUM'; levelClass = 'medium'; }
             riskLevel.textContent = levelText;
             riskLevel.className = 'ra-level ' + levelClass;
-            document.getElementById('riskPercent').textContent = `${(risk * 100).toFixed(1)}%`;
+
+            const ticker = document.getElementById('riskTicker');
+            const targetPercent = (risk * 100).toFixed(1);
+            // Animate count-up with flicker
+            let currentCount = 0;
+            const interval = setInterval(() => {
+                if (currentCount >= parseFloat(targetPercent)) {
+                    clearInterval(interval);
+                    ticker.textContent = targetPercent + '%';
+                    return;
+                }
+                currentCount += 0.5;
+                if (currentCount > parseFloat(targetPercent)) currentCount = parseFloat(targetPercent);
+                ticker.textContent = currentCount.toFixed(1) + '%';
+                // flicker effect
+                ticker.classList.add('flicker');
+                setTimeout(() => ticker.classList.remove('flicker'), 50);
+            }, 30);
 
             const fill = document.getElementById('riskThermometerFill');
             fill.style.width = `${risk * 100}%`;
@@ -1280,6 +1704,7 @@
             const auditId = `ARF-${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
             document.getElementById('auditId').textContent = auditId;
 
+            // Posterior chart (unchanged)
             const x = Array.from({length: 100}, (_, i) => i / 100);
             const y = x.map(v => betaPDF(v, alpha, beta));
             const trace = {
@@ -1301,11 +1726,13 @@
             };
             Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
 
+            // ----- AUDIT TRAIL with typewriter effect -----
             const trail = data.audit;
             const timelineContainer = document.getElementById('auditTrailContent');
             timelineContainer.innerHTML = '';
             const icons = ['📩', '📊', '⚖️', '✅'];
             let totalLatency = 0;
+            const stepElements = [];
 
             trail.forEach((entry, index) => {
                 const step = document.createElement('div');
@@ -1316,7 +1743,7 @@
                 icon.textContent = icons[index] || '•';
                 const desc = document.createElement('span');
                 desc.className = 'step-desc';
-                desc.textContent = entry[0];
+                desc.textContent = ''; // will be typed
                 const duration = document.createElement('span');
                 duration.className = 'step-duration';
                 duration.textContent = `${entry[2]}ms`;
@@ -1329,35 +1756,44 @@
                 step.appendChild(duration);
                 step.appendChild(status);
                 timelineContainer.appendChild(step);
-
-                if (index < trail.length - 1) {
-                    const arrow = document.createElement('div');
-                    arrow.className = 'timeline-arrow';
-                    arrow.id = `arrow-${index}`;
-                    arrow.textContent = '↓';
-                    timelineContainer.appendChild(arrow);
-                }
+                stepElements.push({ element: desc, text: entry[0], statusEl: status });
             });
             document.getElementById('latencyTotal').textContent = `Total decision latency: ${totalLatency}ms`;
 
+            // Animate steps with typewriter
             clearTimeout(timelineTimer);
-            const steps = document.querySelectorAll('.timeline-step');
-            const arrows = document.querySelectorAll('.timeline-arrow');
-            steps.forEach(s => s.classList.remove('visible'));
-            arrows.forEach(a => a.classList.remove('visible'));
-
             let idx = 0;
-            function showNext() {
-                if (idx < steps.length) {
-                    steps[idx].classList.add('visible');
+            function showNextStep() {
+                if (idx >= stepElements.length) {
+                    // All steps done
+                    return;
+                }
+                const stepEl = document.querySelectorAll('.timeline-step')[idx];
+                stepEl.classList.add('visible');
+                // Type the text
+                const desc = stepElements[idx].element;
+                const text = stepElements[idx].text;
+                typeWriter(desc, text, 15, () => {
+                    // After typing, flash status
+                    const status = stepElements[idx].statusEl;
+                    status.style.transition = 'background 0.3s, color 0.3s';
+                    status.style.background = '#1e293b';
+                    status.style.color = '#38bdf8';
+                    setTimeout(() => {
+                        status.style.background = '';
+                        status.style.color = '';
+                    }, 300);
+                    // Show arrow after step (except last)
+                    const arrows = document.querySelectorAll('.timeline-arrow');
                     if (idx < arrows.length) {
                         arrows[idx].classList.add('visible');
                     }
                     idx++;
-                    timelineTimer = setTimeout(showNext, 300);
-                }
+                    timelineTimer = setTimeout(showNextStep, 300);
+                });
             }
-            showNext();
+            // Start the sequence after a short delay
+            setTimeout(showNextStep, 400);
 
             currentRisk = risk;
             currentDecision = decision;
@@ -1418,11 +1854,46 @@
             updateCounterfactual();
         });
 
-        // Hero case cards – clickable
+        // ============================================================
+        // MORPHING SCENARIO CARDS (flip transition)
+        // ============================================================
         document.querySelectorAll('.hero-case-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const scenario = card.dataset.scenario;
-                if (scenario) applyPreset(scenario);
+            card.addEventListener('click', function(e) {
+                const scenario = this.dataset.scenario;
+                if (!scenario) return;
+                // Morph: capture the card's rect, then animate to decision card position
+                const rect = this.getBoundingClientRect();
+                const clone = this.cloneNode(true);
+                clone.style.position = 'fixed';
+                clone.style.top = rect.top + 'px';
+                clone.style.left = rect.left + 'px';
+                clone.style.width = rect.width + 'px';
+                clone.style.height = rect.height + 'px';
+                clone.style.margin = '0';
+                clone.style.zIndex = '1000';
+                clone.style.pointerEvents = 'none';
+                clone.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                clone.style.borderColor = '#38bdf8';
+                clone.style.boxShadow = '0 20px 60px rgba(56,189,248,0.3)';
+                document.body.appendChild(clone);
+
+                // After the transition, remove clone and apply the scenario
+                const targetCard = document.getElementById('riskCard');
+                const targetRect = targetCard.getBoundingClientRect();
+                // Animate clone to target position
+                requestAnimationFrame(() => {
+                    clone.style.top = targetRect.top + 'px';
+                    clone.style.left = targetRect.left + 'px';
+                    clone.style.width = targetRect.width + 'px';
+                    clone.style.height = targetRect.height + 'px';
+                    clone.style.opacity = '0.8';
+                    clone.style.transform = 'scale(0.95)';
+                });
+
+                setTimeout(() => {
+                    clone.remove();
+                    applyPreset(scenario);
+                }, 700);
             });
         });
 
