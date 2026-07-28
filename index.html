@@ -86,7 +86,7 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* ===== IMPROVEMENT 1: Hero with integrated case cards ===== */
+        /* Hero – animated flow with integrated case cards */
         .hero-section { margin-bottom: 24px; }
         .hero-flow-diagram {
             display: flex;
@@ -204,7 +204,7 @@
             50% { opacity: 1; }
         }
 
-        /* Integrated case cards – larger, hoverable */
+        /* Hero case cards – integrated, clickable, with badges */
         .hero-case-cards {
             display: flex;
             gap: 16px;
@@ -283,7 +283,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== IMPROVEMENT 2: Agent Request with proposed action pill ===== */
+        /* Agent Request */
         .agent-request {
             background: #1e293b;
             padding: 14px 20px;
@@ -333,7 +333,7 @@
             color: #e2e8f0;
         }
 
-        /* ===== IMPROVEMENT 3: Bigger decision badge (5rem) with glow ===== */
+        /* Decision hero – bigger badge (5rem) with glow */
         .decision-hero {
             text-align: center;
             padding: 12px 0 8px;
@@ -400,7 +400,6 @@
             border: 1px solid #334155;
         }
 
-        /* Decision badge colors with glow */
         .approve-hero .decision-badge {
             color: var(--glow-green);
             animation: pulseDecision 2s ease-in-out infinite;
@@ -414,7 +413,7 @@
             animation: pulseDecision 2s ease-in-out infinite 0.6s;
         }
 
-        /* ===== Evaluation state animation ===== */
+        /* Evaluating state animation */
         .evaluating-state {
             text-align: center;
             padding: 20px 0;
@@ -780,7 +779,7 @@
             <strong>ARF intercepts autonomous actions before they reach production.</strong>
             <span class="intercept-badge">⬡ Governance checkpoint</span>
         </div>
-        <!-- Integrated case cards – clickable, larger, with badges -->
+        <!-- Integrated case cards – clickable, with badges -->
         <div class="hero-case-cards">
             <div class="hero-case-card" data-scenario="aircanada">
                 <div class="hcc-year">✈️ 2023</div>
@@ -1022,7 +1021,7 @@
     let timelineTimer = null;
     let decisionTimer = null;
 
-    // ===== IMPROVEMENT 2: Evaluation animation before decision appears =====
+    // Evaluation animation then decision
     function showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta) {
         const data = scenarioData[currentScenario];
         if (!data) return;
@@ -1037,7 +1036,7 @@
             </div>
         `;
 
-        // Show the card (hidden until now)
+        // Show the card
         document.getElementById('riskCard').style.display = 'block';
         document.getElementById('riskCard').classList.add('fade-in');
         document.getElementById('cfPanel').style.display = 'block';
@@ -1051,7 +1050,7 @@
         // Proposed Action Pill
         document.getElementById('proposedActionPill').textContent = data.action;
 
-        // Show decision after 600ms (simulating real evaluation)
+        // Show decision after 600ms
         clearTimeout(decisionTimer);
         decisionTimer = setTimeout(() => {
             renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data);
@@ -1061,7 +1060,6 @@
     function renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data) {
         const decisionContent = document.getElementById('decisionContent');
 
-        // Build decision HTML
         const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
         const decisionText = decision.toUpperCase();
 
@@ -1076,7 +1074,7 @@
             </div>
         `;
 
-        // Re-attach references for later updates
+        // Re-attach references
         const hero = document.getElementById('decisionHero');
         hero.className = 'decision-hero ' + cls;
 
@@ -1144,7 +1142,7 @@
         };
         Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
 
-        // Timeline with durations
+        // Timeline
         const trail = data.audit;
         const timelineContainer = document.getElementById('auditTrailContent');
         timelineContainer.innerHTML = '';
@@ -1215,11 +1213,8 @@
         }
     }
 
-    // Wrapper function that calls the evaluation animation
     function showResults(risk, lo, hi, priorMean, decision, alpha, beta) {
-        // If there's a previous decision, clear the evaluation timer
         clearTimeout(decisionTimer);
-        // Call the evaluation flow
         showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta);
     }
 
