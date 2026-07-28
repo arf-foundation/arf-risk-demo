@@ -35,7 +35,7 @@
             overflow-x: hidden;
             font-size: 1.1rem;
         }
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; }
 
         .site-header {
             display: flex;
@@ -86,15 +86,38 @@
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* Hero – animated flow with integrated case cards */
-        .hero-section { margin-bottom: 24px; }
+        /* ===== HERO SECTION – COMPLEX ANIMATIONS ===== */
+        .hero-section {
+            position: relative;
+            margin-bottom: 24px;
+            overflow: visible;
+            padding: 10px 0 5px;
+        }
+
+        /* Particle canvas overlay */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 12px;
+            opacity: 0.5;
+        }
+
         .hero-flow-diagram {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
             padding: 16px 0 8px;
         }
+
+        /* Flow rows – entrance animations */
         .hero-flow-diagram .flow-row {
             display: flex;
             align-items: center;
@@ -102,20 +125,21 @@
             flex-wrap: wrap;
             justify-content: center;
             opacity: 0;
-            transform: translateY(12px);
-            animation: fadeSlideUp 0.6s ease forwards;
+            transform: translateY(20px) scale(0.96);
+            animation: flowEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        .hero-flow-diagram .flow-row:nth-child(1) { animation-delay: 0.1s; }
-        .hero-flow-diagram .flow-row:nth-child(2) { animation-delay: 0.3s; }
-        .hero-flow-diagram .flow-row:nth-child(3) { animation-delay: 0.5s; }
-        .hero-flow-diagram .flow-row:nth-child(4) { animation-delay: 0.7s; }
-        .hero-flow-diagram .flow-row:nth-child(5) { animation-delay: 0.9s; }
+        .hero-flow-diagram .flow-row:nth-child(1) { animation-delay: 0.2s; }
+        .hero-flow-diagram .flow-row:nth-child(2) { animation-delay: 0.5s; }
+        .hero-flow-diagram .flow-row:nth-child(3) { animation-delay: 0.8s; }
+        .hero-flow-diagram .flow-row:nth-child(4) { animation-delay: 1.1s; }
+        .hero-flow-diagram .flow-row:nth-child(5) { animation-delay: 1.4s; }
 
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes flowEntrance {
+            0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        /* Flow boxes – floating effect */
         .hero-flow-diagram .flow-box {
             padding: 8px 20px;
             border-radius: 10px;
@@ -123,51 +147,105 @@
             font-size: 1.2rem;
             background: #1e293b;
             border: 2px solid #334155;
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+            animation: floatBox 4s ease-in-out infinite;
+            position: relative;
         }
         .hero-flow-diagram .flow-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            transform: translateY(-4px) scale(1.02);
         }
         .hero-flow-diagram .flow-box.agent {
             border-color: #38bdf8;
             background: #0f2a44;
             color: #38bdf8;
+            animation-delay: 0.2s;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.05);
         }
         .hero-flow-diagram .flow-box.governance {
             border-color: #fbbf24;
-            background: #2a1f00;
+            background: linear-gradient(135deg, #2a1f00, #1a1200);
             color: #fbbf24;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.1);
-            animation: pulseGlow 2s ease-in-out infinite;
+            animation-delay: 0.5s;
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.15);
         }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.05); }
-            50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.2); }
+        /* Expanding ring pulse around governance */
+        .hero-flow-diagram .flow-box.governance::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 14px;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+            animation: expandRing 2.5s ease-out infinite;
+            pointer-events: none;
+        }
+        .hero-flow-diagram .flow-box.governance::after {
+            content: '';
+            position: absolute;
+            inset: -12px;
+            border-radius: 18px;
+            border: 2px solid rgba(251, 191, 36, 0.1);
+            animation: expandRing 2.5s ease-out infinite 0.8s;
+            pointer-events: none;
+        }
+        @keyframes expandRing {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.25); opacity: 0; }
         }
         .hero-flow-diagram .flow-box.production {
             border-color: #22c55e;
             background: #0a2a1a;
             color: #22c55e;
+            animation-delay: 0.8s;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.05);
         }
 
+        @keyframes floatBox {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Animated arrows with glow dot */
         .hero-flow-diagram .flow-arrow {
             color: #475569;
             font-size: 1.6rem;
             padding: 2px 0;
+            position: relative;
             animation: bounceArrow 2s ease-in-out infinite;
+        }
+        /* Glowing dot on arrow */
+        .hero-flow-diagram .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #475569;
+            transform: translateX(-50%);
+            animation: arrowDot 1.5s ease-in-out infinite;
+        }
+        .hero-flow-diagram .flow-arrow:nth-child(2)::after { background: #38bdf8; animation-delay: 0.2s; }
+        .hero-flow-diagram .flow-arrow:nth-child(4)::after { background: #fbbf24; animation-delay: 0.6s; }
+        .hero-flow-diagram .flow-arrow:nth-child(6)::after { background: #22c55e; animation-delay: 1.0s; }
+
+        @keyframes arrowDot {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.4); }
         }
         @keyframes bounceArrow {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(4px); }
         }
 
+        /* Decision badges – 3D flip entrance + pulse */
         .hero-flow-diagram .flow-decision-row {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
             margin: 4px 0;
+            perspective: 800px;
         }
         .hero-flow-diagram .flow-decision {
             padding: 4px 16px;
@@ -177,34 +255,72 @@
             border: 2px solid;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: default;
+            opacity: 0;
+            animation: decisionFlip 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        .hero-flow-diagram .flow-decision:nth-child(1) { animation-delay: 1.0s; }
+        .hero-flow-diagram .flow-decision:nth-child(2) { animation-delay: 1.2s; }
+        .hero-flow-diagram .flow-decision:nth-child(3) { animation-delay: 1.4s; }
+
+        @keyframes decisionFlip {
+            0% { opacity: 0; transform: rotateX(-60deg) scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: rotateX(0deg) scale(1) translateY(0); }
+        }
+
         .hero-flow-diagram .flow-decision:hover {
-            transform: scale(1.05);
+            transform: scale(1.08) translateY(-2px);
         }
         .hero-flow-diagram .flow-decision.approve {
             color: #22c55e;
             border-color: #22c55e;
             background: rgba(34, 197, 94, 0.08);
-            animation: pulseDecision 3s ease-in-out infinite;
+            animation: decisionFlip 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulseDecision 3s ease-in-out infinite 1.6s;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.05);
         }
         .hero-flow-diagram .flow-decision.escalate {
             color: #fbbf24;
             border-color: #fbbf24;
             background: rgba(251, 191, 36, 0.08);
-            animation: pulseDecision 3s ease-in-out infinite 0.5s;
+            animation: decisionFlip 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulseDecision 3s ease-in-out infinite 1.8s;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.05);
         }
         .hero-flow-diagram .flow-decision.deny {
             color: #ef4444;
             border-color: #ef4444;
             background: rgba(239, 68, 68, 0.08);
-            animation: pulseDecision 3s ease-in-out infinite 1s;
+            animation: decisionFlip 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulseDecision 3s ease-in-out infinite 2.0s;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.05);
         }
         @keyframes pulseDecision {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.04); }
         }
 
-        /* Hero case cards – integrated, clickable, with badges */
+        .hero-tagline {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin: 12px 0 4px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeSlideUp 0.6s ease forwards 1.6s;
+        }
+        .intercept-badge {
+            display: inline-block;
+            background: #38bdf8;
+            color: #0a0c10;
+            font-weight: 700;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .intercept-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+        }
+
+        /* ===== HERO CASE CARDS – 3D tilt and reveal ===== */
         .hero-case-cards {
             display: flex;
             gap: 16px;
@@ -212,7 +328,8 @@
             justify-content: center;
             margin: 12px 0 0;
             opacity: 0;
-            animation: fadeSlideUp 0.6s ease forwards 1.1s;
+            animation: fadeSlideUp 0.6s ease forwards 1.8s;
+            perspective: 1000px;
         }
         .hero-case-card {
             flex: 1;
@@ -223,13 +340,25 @@
             border-radius: 14px;
             padding: 12px 16px;
             text-align: center;
-            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.4s ease;
             cursor: pointer;
+            transform-style: preserve-3d;
+            will-change: transform;
+            opacity: 0;
+            animation: cardReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        .hero-case-card:nth-child(1) { animation-delay: 2.0s; }
+        .hero-case-card:nth-child(2) { animation-delay: 2.2s; }
+
+        @keyframes cardReveal {
+            0% { opacity: 0; transform: rotateY(-10deg) translateX(-20px) scale(0.95); }
+            100% { opacity: 1; transform: rotateY(0deg) translateX(0) scale(1); }
+        }
+
         .hero-case-card:hover {
             border-color: #38bdf8;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(56, 189, 248, 0.15), 0 0 60px rgba(56, 189, 248, 0.05);
         }
         .hero-case-card .hcc-year {
             font-size: 1.3rem;
@@ -254,6 +383,10 @@
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 700;
+            transition: transform 0.3s ease;
+        }
+        .hero-case-card:hover .hcc-badge {
+            transform: scale(1.1);
         }
         .hero-case-card .hcc-badge.escalate {
             background: #78350f;
@@ -264,23 +397,9 @@
             color: #fecaca;
         }
 
-        .hero-tagline {
-            font-size: 1.1rem;
-            color: #cbd5e1;
-            margin: 12px 0 4px;
-            text-align: center;
-            opacity: 0;
-            animation: fadeSlideUp 0.6s ease forwards 1.1s;
-        }
-        .intercept-badge {
-            display: inline-block;
-            background: #38bdf8;
-            color: #0a0c10;
-            font-weight: 700;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Agent Request */
@@ -291,6 +410,7 @@
             margin-bottom: 14px;
             border-left: 4px solid #38bdf8;
             font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
         .agent-request .req-label {
             font-weight: 600;
@@ -315,7 +435,6 @@
         }
         .agent-request .req-meta span strong { color: #cbd5e1; font-weight: 500; }
 
-        /* Proposed Action pill – stands out above decision */
         .proposed-action-pill {
             text-align: center;
             margin-bottom: 6px;
@@ -333,7 +452,6 @@
             color: #e2e8f0;
         }
 
-        /* Decision hero – bigger badge (5rem) with glow */
         .decision-hero {
             text-align: center;
             padding: 12px 0 8px;
@@ -413,7 +531,6 @@
             animation: pulseDecision 2s ease-in-out infinite 0.6s;
         }
 
-        /* Evaluating state animation */
         .evaluating-state {
             text-align: center;
             padding: 20px 0;
@@ -597,40 +714,6 @@
         details[open] summary { margin-bottom: 8px; }
         details .detail-content { padding: 8px 0; font-size: 0.92rem; line-height: 1.8; }
 
-        .scenario-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
-        .scenario-card {
-            flex: 1; min-width: 200px; max-width: 380px; padding: 14px 16px; border: 2px solid #334155; border-radius: 16px;
-            cursor: pointer; text-align: center; background: #1e293b; transition: border-color 0.2s, transform 0.2s, background 0.2s;
-        }
-        .scenario-card:hover { border-color: #38bdf8; transform: translateY(-3px); }
-        .scenario-card.active { border-color: #38bdf8; background: #1e3a5f; }
-        .scenario-card .scenario-year {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #38bdf8;
-            display: block;
-            line-height: 1.1;
-            letter-spacing: -0.5px;
-        }
-        .scenario-card .scenario-month {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            font-weight: 500;
-            display: block;
-            margin-top: -2px;
-        }
-        .scenario-card .scenario-action {
-            font-size: 0.95rem;
-            color: #e2e8f0;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-        .scenario-card .scenario-desc {
-            font-size: 0.85rem;
-            margin-top: 4px;
-            color: #94a3b8;
-        }
-
         .timeline { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
         .timeline-step {
             display: flex;
@@ -718,15 +801,19 @@
             .timeline-step { opacity: 1 !important; transform: none !important; }
             .timeline-arrow { opacity: 1 !important; }
             .hero-flow-diagram .flow-row { opacity: 1 !important; transform: none !important; animation: none !important; }
+            .hero-flow-diagram .flow-box { animation: none !important; }
+            .hero-flow-diagram .flow-decision { opacity: 1 !important; animation: none !important; }
+            .hero-case-card { opacity: 1 !important; animation: none !important; }
             .hero-tagline { opacity: 1 !important; animation: none !important; }
             .hero-case-cards { opacity: 1 !important; animation: none !important; }
             .cf-flow .flow-step { opacity: 1 !important; transform: none !important; animation: none !important; }
             .cf-flow .flow-arrow { opacity: 1 !important; animation: none !important; }
             .hero-flow-diagram .flow-arrow { animation: none !important; }
             .decision-hero .decision-badge { animation: none !important; }
+            .hero-flow-diagram .flow-box.governance::before,
+            .hero-flow-diagram .flow-box.governance::after { display: none; }
         }
         @media (max-width: 480px) {
-            .scenario-card { min-width: 100%; max-width: 100%; }
             .cf-toggle { flex-direction: column; align-items: center; }
             .decision-hero .decision-badge { font-size: 3.5rem; }
             .hero-flow-diagram .flow-box { font-size: 1rem; padding: 6px 14px; }
@@ -752,8 +839,11 @@
         <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
     </header>
 
-    <!-- Hero – with integrated case cards -->
+    <!-- Hero – with complex animations -->
     <div class="hero-section">
+        <!-- Particle canvas -->
+        <canvas id="particleCanvas"></canvas>
+
         <div class="hero-flow-diagram">
             <div class="flow-row">
                 <span class="flow-box agent">AI Agent</span>
@@ -779,7 +869,7 @@
             <strong>ARF intercepts autonomous actions before they reach production.</strong>
             <span class="intercept-badge">⬡ Governance checkpoint</span>
         </div>
-        <!-- Integrated case cards – clickable, with badges -->
+        <!-- Integrated case cards – clickable -->
         <div class="hero-case-cards">
             <div class="hero-case-card" data-scenario="aircanada">
                 <div class="hcc-year">✈️ 2023</div>
@@ -796,23 +886,6 @@
         </div>
     </div>
 
-    <!-- Scenario Cards -->
-    <div class="scenario-cards" id="scenarioCards">
-        <div class="scenario-card" data-scenario="aircanada">
-            <span class="scenario-year">2023</span>
-            <span class="scenario-month">Nov</span>
-            <div class="scenario-action">✈️ Publish customer policy</div>
-            <div class="scenario-desc">AI chatbot generated information that conflicted with official airline policy. Air Canada was held liable for $812 in damages.</div>
-        </div>
-        <div class="scenario-card" data-scenario="pocketos">
-            <span class="scenario-year">2026</span>
-            <span class="scenario-month">Apr</span>
-            <div class="scenario-action">💀 DELETE production database</div>
-            <div class="scenario-desc">AI coding agent attempted an irreversible production operation. All production data and backups were deleted in 9 seconds.</div>
-        </div>
-    </div>
-    <p style="text-align:center; margin-bottom:18px; color:#94a3b8; font-size:0.95rem;">👆 Click a scenario to see ARF in action</p>
-
     <!-- Governance Decision Card -->
     <div class="card" id="riskCard" style="display:none;">
         <div class="result">
@@ -826,7 +899,7 @@
                 </div>
             </div>
 
-            <!-- Proposed Action Pill – stands out above decision -->
+            <!-- Proposed Action Pill -->
             <div style="text-align:center;">
                 <span class="proposed-action-pill">⚡ Proposed Action: <strong id="proposedActionPill">—</strong></span>
             </div>
@@ -922,7 +995,108 @@
 </div>
 
 <script>
-    // ---------- Beta utilities ----------
+    // ===== PARTICLE SYSTEM =====
+    (function initParticles() {
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId = null;
+
+        function resize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.pulse = Math.random() * Math.PI * 2;
+                this.pulseSpeed = 0.01 + Math.random() * 0.02;
+                this.color = ['#38bdf8', '#fbbf24', '#22c55e', '#ef4444', '#94a3b8'][Math.floor(Math.random() * 5)];
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.pulse += this.pulseSpeed;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                const alpha = this.opacity * (0.7 + 0.3 * Math.sin(this.pulse));
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = alpha;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function init() {
+            resize();
+            particles = [];
+            const count = Math.min(60, Math.floor(canvas.width * canvas.height / 15000));
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            // Draw subtle connecting lines between nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const maxDist = 120;
+                    if (dist < maxDist) {
+                        const alpha = 0.08 * (1 - dist / maxDist);
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            animationId = requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+        });
+
+        // Use ResizeObserver for more reliable parent size tracking
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(() => resize());
+            ro.observe(canvas.parentElement);
+        }
+
+        init();
+        animate();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (animationId) cancelAnimationFrame(animationId);
+        });
+    })();
+
+    // ===== BETA UTILITIES =====
     function betaPDF(x, a, b) {
         if (x <= 0 || x >= 1) return 0;
         const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
@@ -1021,14 +1195,12 @@
     let timelineTimer = null;
     let decisionTimer = null;
 
-    // Evaluation animation then decision
     function showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta) {
         const data = scenarioData[currentScenario];
         if (!data) return;
 
         const decisionContent = document.getElementById('decisionContent');
 
-        // Show evaluating state
         decisionContent.innerHTML = `
             <div class="evaluating-state">
                 <span class="eval-spinner"></span>
@@ -1036,21 +1208,16 @@
             </div>
         `;
 
-        // Show the card
         document.getElementById('riskCard').style.display = 'block';
         document.getElementById('riskCard').classList.add('fade-in');
         document.getElementById('cfPanel').style.display = 'block';
         document.getElementById('cfPanel').classList.add('fade-in');
 
-        // Agent Request
         document.getElementById('actionDescription').textContent = data.action;
         document.getElementById('reqTarget').textContent = data.target;
         document.getElementById('reqRequestor').textContent = data.requestor;
-
-        // Proposed Action Pill
         document.getElementById('proposedActionPill').textContent = data.action;
 
-        // Show decision after 600ms
         clearTimeout(decisionTimer);
         decisionTimer = setTimeout(() => {
             renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data);
@@ -1074,17 +1241,14 @@
             </div>
         `;
 
-        // Re-attach references
         const hero = document.getElementById('decisionHero');
         hero.className = 'decision-hero ' + cls;
 
-        // Statistical Certainty
         const intervalWidth = hi - lo;
         const certaintyPct = Math.round((1 - intervalWidth) * 100);
         const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
         document.getElementById('decisionConfidence').textContent = `Statistical Certainty: ${certaintyText} (${certaintyPct}%)`;
 
-        // Risk Assessment
         const riskLevel = document.getElementById('riskLevel');
         let levelText, levelClass;
         if (risk < 0.2) { levelText = 'LOW'; levelClass = 'low'; }
@@ -1098,13 +1262,9 @@
         fill.style.width = `${risk * 100}%`;
         fill.style.background = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
 
-        // Impact message
         document.getElementById('riskImpactMessage').innerHTML = data.impact;
-
-        // Outcome box
         document.getElementById('outcomeExec').textContent = data.outcome;
 
-        // Technical Details
         document.getElementById('policySource').textContent = data.policySource;
         document.getElementById('policyDecision').innerText = `${decision} (risk = ${risk.toFixed(4)})`;
         document.getElementById('policyDecision').className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
@@ -1115,12 +1275,10 @@
         const th = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
         expl.innerHTML = `Because the risk (${(risk * 100).toFixed(1)}%) is ${th}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
 
-        // Audit ID
         const date = new Date();
         const auditId = `ARF-${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
         document.getElementById('auditId').textContent = auditId;
 
-        // Posterior chart
         const x = Array.from({length: 100}, (_, i) => i / 100);
         const y = x.map(v => betaPDF(v, alpha, beta));
         const trace = {
@@ -1142,7 +1300,6 @@
         };
         Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
 
-        // Timeline
         const trail = data.audit;
         const timelineContainer = document.getElementById('auditTrailContent');
         timelineContainer.innerHTML = '';
@@ -1182,7 +1339,6 @@
         });
         document.getElementById('latencyTotal').textContent = `Total decision latency: ${totalLatency}ms`;
 
-        // Animate timeline
         clearTimeout(timelineTimer);
         const steps = document.querySelectorAll('.timeline-step');
         const arrows = document.querySelectorAll('.timeline-arrow');
@@ -1284,9 +1440,9 @@
         const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
         showResults(risk, lo, hi, priorMean, decision, alpha, beta);
 
-        document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
-        const activeCard = document.querySelector(`.scenario-card[data-scenario="${id}"]`);
-        if (activeCard) activeCard.classList.add('active');
+        document.querySelectorAll('.hero-case-card').forEach(c => c.style.borderColor = '#334155');
+        const activeCard = document.querySelector(`.hero-case-card[data-scenario="${id}"]`);
+        if (activeCard) activeCard.style.borderColor = '#38bdf8';
 
         if (window.innerWidth < 641) {
             const card = document.getElementById('riskCard');
@@ -1294,7 +1450,7 @@
         }
     }
 
-    document.querySelectorAll('.scenario-card').forEach(card => {
+    document.querySelectorAll('.hero-case-card').forEach(card => {
         card.addEventListener('click', () => applyPreset(card.dataset.scenario));
     });
 
