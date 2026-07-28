@@ -27,15 +27,32 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #0a1628 0%, #0a0c10 100%);
+            background: #0a1628; /* fallback, particles will overlay */
             color: var(--text-primary);
             line-height: 1.6;
             padding: 16px;
             min-height: 100vh;
             overflow-x: hidden;
             font-size: 1.1rem;
+            position: relative;
         }
-        .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; }
+        /* Fixed particle canvas background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
 
         .site-header {
             display: flex;
@@ -82,29 +99,18 @@
             margin-bottom: 24px;
             border: 1px solid var(--border-light);
             transition: border-color 0.2s;
+            position: relative;
+            z-index: 1;
         }
         .card:hover { border-color: #38bdf8; }
         .result { background: var(--result-bg); padding: 18px; border-radius: 16px; margin-top: 12px; }
 
-        /* ===== HERO SECTION – COMPLEX ANIMATIONS ===== */
+        /* ===== HERO SECTION – COMPLEX ANIMATIONS (no particles inside) ===== */
         .hero-section {
             position: relative;
             margin-bottom: 24px;
             overflow: visible;
             padding: 10px 0 5px;
-        }
-
-        /* Particle canvas overlay */
-        #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            border-radius: 12px;
-            opacity: 0.5;
         }
 
         .hero-flow-diagram {
@@ -117,7 +123,6 @@
             padding: 16px 0 8px;
         }
 
-        /* Flow rows – entrance animations */
         .hero-flow-diagram .flow-row {
             display: flex;
             align-items: center;
@@ -139,7 +144,6 @@
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Flow boxes – floating effect */
         .hero-flow-diagram .flow-box {
             padding: 8px 20px;
             border-radius: 10px;
@@ -168,7 +172,6 @@
             animation-delay: 0.5s;
             box-shadow: 0 0 50px rgba(251, 191, 36, 0.15);
         }
-        /* Expanding ring pulse around governance */
         .hero-flow-diagram .flow-box.governance::before {
             content: '';
             position: absolute;
@@ -204,7 +207,6 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Animated arrows with glow dot */
         .hero-flow-diagram .flow-arrow {
             color: #475569;
             font-size: 1.6rem;
@@ -212,7 +214,6 @@
             position: relative;
             animation: bounceArrow 2s ease-in-out infinite;
         }
-        /* Glowing dot on arrow */
         .hero-flow-diagram .flow-arrow::after {
             content: '';
             position: absolute;
@@ -238,7 +239,6 @@
             50% { transform: translateY(4px); }
         }
 
-        /* Decision badges – 3D flip entrance + pulse */
         .hero-flow-diagram .flow-decision-row {
             display: flex;
             gap: 12px;
@@ -320,7 +320,6 @@
             box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
         }
 
-        /* ===== HERO CASE CARDS – 3D tilt and reveal ===== */
         .hero-case-cards {
             display: flex;
             gap: 16px;
@@ -402,7 +401,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Agent Request */
+        /* Agent Request, Decision, etc. unchanged */
         .agent-request {
             background: #1e293b;
             padding: 14px 20px;
@@ -812,6 +811,7 @@
             .decision-hero .decision-badge { animation: none !important; }
             .hero-flow-diagram .flow-box.governance::before,
             .hero-flow-diagram .flow-box.governance::after { display: none; }
+            #particleCanvas { display: none; }
         }
         @media (max-width: 480px) {
             .cf-toggle { flex-direction: column; align-items: center; }
@@ -831,631 +831,628 @@
     </style>
 </head>
 <body>
-<div class="container">
+    <!-- Fixed background particle canvas -->
+    <canvas id="particleCanvas"></canvas>
 
-    <!-- Header -->
-    <header class="site-header">
-        <h1>🛡️ ARF – Governance Layer for Autonomous AI <span class="badge">Simulated</span></h1>
-        <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
-    </header>
+    <div class="container">
+        <!-- Header -->
+        <header class="site-header">
+            <h1>🛡️ ARF – Governance Layer for Autonomous AI <span class="badge">Simulated</span></h1>
+            <a href="https://www.arf-ai.com" target="_blank" class="top-link">Learn more at arf-ai.com →</a>
+        </header>
 
-    <!-- Hero – with complex animations -->
-    <div class="hero-section">
-        <!-- Particle canvas -->
-        <canvas id="particleCanvas"></canvas>
-
-        <div class="hero-flow-diagram">
-            <div class="flow-row">
-                <span class="flow-box agent">AI Agent</span>
-                <span class="flow-arrow">↓</span>
+        <!-- Hero – with complex animations (no particles inside) -->
+        <div class="hero-section">
+            <div class="hero-flow-diagram">
+                <div class="flow-row">
+                    <span class="flow-box agent">AI Agent</span>
+                    <span class="flow-arrow">↓</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-box governance">ARF Governance</span>
+                    <span class="flow-arrow">↓</span>
+                </div>
+                <div class="flow-decision-row">
+                    <span class="flow-decision approve">APPROVE</span>
+                    <span class="flow-decision escalate">ESCALATE</span>
+                    <span class="flow-decision deny">DENY</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-arrow">↓</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-box production">Production</span>
+                </div>
             </div>
-            <div class="flow-row">
-                <span class="flow-box governance">ARF Governance</span>
-                <span class="flow-arrow">↓</span>
+            <div class="hero-tagline">
+                <strong>ARF intercepts autonomous actions before they reach production.</strong>
+                <span class="intercept-badge">⬡ Governance checkpoint</span>
             </div>
-            <div class="flow-decision-row">
-                <span class="flow-decision approve">APPROVE</span>
-                <span class="flow-decision escalate">ESCALATE</span>
-                <span class="flow-decision deny">DENY</span>
-            </div>
-            <div class="flow-row">
-                <span class="flow-arrow">↓</span>
-            </div>
-            <div class="flow-row">
-                <span class="flow-box production">Production</span>
+            <!-- Integrated case cards -->
+            <div class="hero-case-cards">
+                <div class="hero-case-card" data-scenario="aircanada">
+                    <div class="hcc-year">✈️ 2023</div>
+                    <div class="hcc-action">Publish customer policy</div>
+                    <div class="hcc-desc">AI chatbot generated conflicting policy information. Air Canada held liable for $812.</div>
+                    <span class="hcc-badge escalate">ESCALATE</span>
+                </div>
+                <div class="hero-case-card" data-scenario="pocketos">
+                    <div class="hcc-year">💀 2026</div>
+                    <div class="hcc-action">DELETE production database</div>
+                    <div class="hcc-desc">AI coding agent deleted all data and backups in 9 seconds.</div>
+                    <span class="hcc-badge deny">DENY</span>
+                </div>
             </div>
         </div>
-        <div class="hero-tagline">
-            <strong>ARF intercepts autonomous actions before they reach production.</strong>
-            <span class="intercept-badge">⬡ Governance checkpoint</span>
-        </div>
-        <!-- Integrated case cards – clickable -->
-        <div class="hero-case-cards">
-            <div class="hero-case-card" data-scenario="aircanada">
-                <div class="hcc-year">✈️ 2023</div>
-                <div class="hcc-action">Publish customer policy</div>
-                <div class="hcc-desc">AI chatbot generated conflicting policy information. Air Canada held liable for $812.</div>
-                <span class="hcc-badge escalate">ESCALATE</span>
-            </div>
-            <div class="hero-case-card" data-scenario="pocketos">
-                <div class="hcc-year">💀 2026</div>
-                <div class="hcc-action">DELETE production database</div>
-                <div class="hcc-desc">AI coding agent deleted all data and backups in 9 seconds.</div>
-                <span class="hcc-badge deny">DENY</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- Governance Decision Card -->
-    <div class="card" id="riskCard" style="display:none;">
-        <div class="result">
-            <!-- Agent Request -->
-            <div class="agent-request">
-                <div class="req-label">Incoming Autonomous Action</div>
-                <div class="req-action" id="actionDescription">—</div>
-                <div class="req-meta">
-                    <span><strong>Agent:</strong> <span id="reqRequestor">—</span></span>
-                    <span><strong>Target:</strong> <span id="reqTarget">—</span></span>
-                </div>
-            </div>
-
-            <!-- Proposed Action Pill -->
-            <div style="text-align:center;">
-                <span class="proposed-action-pill">⚡ Proposed Action: <strong id="proposedActionPill">—</strong></span>
-            </div>
-
-            <!-- Decision Hero -->
-            <div class="decision-hero" id="decisionHero" role="alert" aria-live="polite" tabindex="-1">
-                <div class="engine-badge">⚙️ Policy Engine</div>
-                <div class="decision-label">Governance Decision</div>
-                <div id="decisionContent">
-                    <!-- Initially hidden, shown after evaluation -->
-                </div>
-            </div>
-
-            <!-- Risk Assessment -->
-            <div class="risk-assessment">
-                <span class="ra-label">Risk Assessment</span>
-                <span class="ra-level" id="riskLevel">—</span>
-                <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
-                <span style="font-size:0.85rem;color:#94a3b8;" id="riskPercent">—</span>
-            </div>
-
-            <!-- Impact message -->
-            <div id="riskImpactMessage" class="impact-message"></div>
-
-            <!-- Outcome Box -->
-            <div id="outcomeBox" class="outcome-box">
-                <div class="outcome-title">Outcome</div>
-                <div class="outcome-item">Autonomous execution blocked</div>
-                <div class="outcome-item">Governance decision enforced</div>
-                <div class="outcome-item">Audit record stored</div>
-                <div class="outcome-item">Policy reference attached</div>
-                <div class="outcome-item" id="outcomeExec">Production remains protected</div>
-            </div>
-
-            <!-- Governance Timeline (Audit Trail) -->
-            <details id="auditDetails" style="margin-top:16px;">
-                <summary>📋 Audit Trail</summary>
-                <div style="text-align:center;margin:6px 0;">
-                    <span class="audit-id" id="auditId">ARF-2026-00428</span>
-                </div>
-                <div id="auditTrailContent" class="detail-content timeline"></div>
-                <div class="timeline-total" id="latencyTotal">Total decision latency: —</div>
-                <div class="audit-footer">
-                    ✓ Immutable audit log · Every governance decision recorded for compliance
-                </div>
-            </details>
-
-            <!-- Technical Analysis -->
-            <details id="technicalDetails" style="margin-top:12px;">
-                <summary>🔬 Technical Analysis</summary>
-                <div class="detail-content">
-                    <div style="margin-bottom:8px;">
-                        <span class="policy-source">📋 Policy: <span id="policySource">—</span></span>
-                    </div>
-                    <strong>Policy Decision:</strong> <span id="policyDecision" class="status"></span><br>
-                    <div class="risk-group">
-                        <div class="rg-row"><span class="rg-label">Posterior Risk</span><span class="rg-value" id="techRisk">—</span></div>
-                        <div class="rg-row"><span class="rg-label">Historical Baseline</span><span class="rg-value" id="techPrior">—</span></div>
-                        <div class="rg-row"><span class="rg-label">95% Credible Interval</span><span class="rg-value" id="techInterval">—</span></div>
-                    </div>
-                    <div id="decisionExplanation" class="explanation" style="margin-top:8px;background:var(--expl-bg);padding:10px;border-radius:12px;font-size:0.9rem;"></div>
-                    <div id="posteriorChart" style="width:100%; height:200px; margin-top:12px;"></div>
-                    <div style="margin-top:8px;font-size:0.8rem;color:#94a3b8;">
-                        📌 <strong>Governance policy:</strong> Approve if risk &lt;0.2 · Escalate if 0.2–0.8 · Deny if &gt;0.8
-                        <span style="display:inline-block;background:#78350f;color:#fde68a;padding:2px 10px;border-radius:30px;font-size:0.7rem;font-weight:bold;margin-left:8px;">👤 Escalate = human review</span>
+        <!-- Governance Decision Card -->
+        <div class="card" id="riskCard" style="display:none;">
+            <div class="result">
+                <!-- Agent Request -->
+                <div class="agent-request">
+                    <div class="req-label">Incoming Autonomous Action</div>
+                    <div class="req-action" id="actionDescription">—</div>
+                    <div class="req-meta">
+                        <span><strong>Agent:</strong> <span id="reqRequestor">—</span></span>
+                        <span><strong>Target:</strong> <span id="reqTarget">—</span></span>
                     </div>
                 </div>
-            </details>
+
+                <!-- Proposed Action Pill -->
+                <div style="text-align:center;">
+                    <span class="proposed-action-pill">⚡ Proposed Action: <strong id="proposedActionPill">—</strong></span>
+                </div>
+
+                <!-- Decision Hero -->
+                <div class="decision-hero" id="decisionHero" role="alert" aria-live="polite" tabindex="-1">
+                    <div class="engine-badge">⚙️ Policy Engine</div>
+                    <div class="decision-label">Governance Decision</div>
+                    <div id="decisionContent">
+                        <!-- Initially hidden, shown after evaluation -->
+                    </div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="risk-assessment">
+                    <span class="ra-label">Risk Assessment</span>
+                    <span class="ra-level" id="riskLevel">—</span>
+                    <div class="risk-thermometer"><div id="riskThermometerFill" class="risk-thermometer-fill" style="width:0%;"></div></div>
+                    <span style="font-size:0.85rem;color:#94a3b8;" id="riskPercent">—</span>
+                </div>
+
+                <!-- Impact message -->
+                <div id="riskImpactMessage" class="impact-message"></div>
+
+                <!-- Outcome Box -->
+                <div id="outcomeBox" class="outcome-box">
+                    <div class="outcome-title">Outcome</div>
+                    <div class="outcome-item">Autonomous execution blocked</div>
+                    <div class="outcome-item">Governance decision enforced</div>
+                    <div class="outcome-item">Audit record stored</div>
+                    <div class="outcome-item">Policy reference attached</div>
+                    <div class="outcome-item" id="outcomeExec">Production remains protected</div>
+                </div>
+
+                <!-- Governance Timeline (Audit Trail) -->
+                <details id="auditDetails" style="margin-top:16px;">
+                    <summary>📋 Audit Trail</summary>
+                    <div style="text-align:center;margin:6px 0;">
+                        <span class="audit-id" id="auditId">ARF-2026-00428</span>
+                    </div>
+                    <div id="auditTrailContent" class="detail-content timeline"></div>
+                    <div class="timeline-total" id="latencyTotal">Total decision latency: —</div>
+                    <div class="audit-footer">
+                        ✓ Immutable audit log · Every governance decision recorded for compliance
+                    </div>
+                </details>
+
+                <!-- Technical Analysis -->
+                <details id="technicalDetails" style="margin-top:12px;">
+                    <summary>🔬 Technical Analysis</summary>
+                    <div class="detail-content">
+                        <div style="margin-bottom:8px;">
+                            <span class="policy-source">📋 Policy: <span id="policySource">—</span></span>
+                        </div>
+                        <strong>Policy Decision:</strong> <span id="policyDecision" class="status"></span><br>
+                        <div class="risk-group">
+                            <div class="rg-row"><span class="rg-label">Posterior Risk</span><span class="rg-value" id="techRisk">—</span></div>
+                            <div class="rg-row"><span class="rg-label">Historical Baseline</span><span class="rg-value" id="techPrior">—</span></div>
+                            <div class="rg-row"><span class="rg-label">95% Credible Interval</span><span class="rg-value" id="techInterval">—</span></div>
+                        </div>
+                        <div id="decisionExplanation" class="explanation" style="margin-top:8px;background:var(--expl-bg);padding:10px;border-radius:12px;font-size:0.9rem;"></div>
+                        <div id="posteriorChart" style="width:100%; height:200px; margin-top:12px;"></div>
+                        <div style="margin-top:8px;font-size:0.8rem;color:#94a3b8;">
+                            📌 <strong>Governance policy:</strong> Approve if risk &lt;0.2 · Escalate if 0.2–0.8 · Deny if &gt;0.8
+                            <span style="display:inline-block;background:#78350f;color:#fde68a;padding:2px 10px;border-radius:30px;font-size:0.7rem;font-weight:bold;margin-left:8px;">👤 Escalate = human review</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
         </div>
+
+        <!-- Counterfactual -->
+        <div class="counterfactual-panel" id="cfPanel" style="display:none;">
+            <div class="cf-toggle">
+                <button id="cfWithoutBtn" class="cf-btn active">Without ARF Governance</button>
+                <button id="cfWithBtn" class="cf-btn">With ARF Governance</button>
+            </div>
+            <div id="cfContent" class="cf-content"></div>
+            <div class="pilot-cta">
+                <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">
+                    ARF inserts a deterministic governance checkpoint between autonomous AI agents and production systems. Request Pilot Access →
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                ARF AI — <a href="https://www.arf-ai.com" target="_blank">Learn more at arf-ai.com</a> ·
+                Contact <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>
+            </p>
+        </footer>
     </div>
 
-    <!-- Counterfactual -->
-    <div class="counterfactual-panel" id="cfPanel" style="display:none;">
-        <div class="cf-toggle">
-            <button id="cfWithoutBtn" class="cf-btn active">Without ARF Governance</button>
-            <button id="cfWithBtn" class="cf-btn">With ARF Governance</button>
-        </div>
-        <div id="cfContent" class="cf-content"></div>
-        <div class="pilot-cta">
-            <a href="https://www.arf-ai.com/signup?src=risk-demo" target="_blank">
-                ARF inserts a deterministic governance checkpoint between autonomous AI agents and production systems. Request Pilot Access →
-            </a>
-        </div>
-    </div>
+    <script>
+        // ===== FULL-PAGE PARTICLE SYSTEM =====
+        (function initParticles() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId = null;
+            let w, h;
 
-    <!-- Footer -->
-    <footer>
-        <p>
-            ARF AI — <a href="https://www.arf-ai.com" target="_blank">Learn more at arf-ai.com</a> ·
-            Contact <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>
-        </p>
-    </footer>
-</div>
-
-<script>
-    // ===== PARTICLE SYSTEM =====
-    (function initParticles() {
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let animationId = null;
-
-        function resize() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        }
-
-        class Particle {
-            constructor() {
-                this.reset();
+            function resize() {
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = w;
+                canvas.height = h;
             }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-                this.opacity = Math.random() * 0.5 + 0.1;
-                this.pulse = Math.random() * Math.PI * 2;
-                this.pulseSpeed = 0.01 + Math.random() * 0.02;
-                this.color = ['#38bdf8', '#fbbf24', '#22c55e', '#ef4444', '#94a3b8'][Math.floor(Math.random() * 5)];
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.pulse += this.pulseSpeed;
-                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-            }
-            draw() {
-                const alpha = this.opacity * (0.7 + 0.3 * Math.sin(this.pulse));
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = alpha;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        }
 
-        function init() {
-            resize();
-            particles = [];
-            const count = Math.min(60, Math.floor(canvas.width * canvas.height / 15000));
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle());
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 0.3;
+                    this.speedY = (Math.random() - 0.5) * 0.3;
+                    this.opacity = Math.random() * 0.4 + 0.1;
+                    this.pulse = Math.random() * Math.PI * 2;
+                    this.pulseSpeed = 0.01 + Math.random() * 0.02;
+                    // Use a more cohesive color palette
+                    const colors = ['#38bdf8', '#7dd3fc', '#fbbf24', '#94a3b8', '#22c55e'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.pulse += this.pulseSpeed;
+                    if (this.x < 0 || this.x > w) this.speedX *= -1;
+                    if (this.y < 0 || this.y > h) this.speedY *= -1;
+                }
+                draw() {
+                    const alpha = this.opacity * (0.6 + 0.4 * Math.sin(this.pulse));
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = alpha;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
             }
-        }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            // Draw subtle connecting lines between nearby particles
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const maxDist = 120;
-                    if (dist < maxDist) {
-                        const alpha = 0.08 * (1 - dist / maxDist);
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
+            function init() {
+                resize();
+                const count = Math.min(80, Math.floor(w * h / 20000));
+                particles = [];
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                // Connecting lines
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const maxDist = 150;
+                        if (dist < maxDist) {
+                            const alpha = 0.06 * (1 - dist / maxDist);
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
                     }
                 }
+                animationId = requestAnimationFrame(animate);
             }
-            animationId = requestAnimationFrame(animate);
+
+            window.addEventListener('resize', () => {
+                resize();
+                // Reset particles to new dimensions
+                particles.forEach(p => {
+                    p.x = Math.random() * w;
+                    p.y = Math.random() * h;
+                });
+            });
+
+            init();
+            animate();
+
+            window.addEventListener('beforeunload', () => {
+                if (animationId) cancelAnimationFrame(animationId);
+            });
+        })();
+
+        // ===== BETA UTILITIES =====
+        function betaPDF(x, a, b) {
+            if (x <= 0 || x >= 1) return 0;
+            const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
+            return Math.exp(logPDF);
         }
-
-        window.addEventListener('resize', () => {
-            resize();
-        });
-
-        // Use ResizeObserver for more reliable parent size tracking
-        if (window.ResizeObserver) {
-            const ro = new ResizeObserver(() => resize());
-            ro.observe(canvas.parentElement);
-        }
-
-        init();
-        animate();
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (animationId) cancelAnimationFrame(animationId);
-        });
-    })();
-
-    // ===== BETA UTILITIES =====
-    function betaPDF(x, a, b) {
-        if (x <= 0 || x >= 1) return 0;
-        const logPDF = (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - logBeta(a, b);
-        return Math.exp(logPDF);
-    }
-    function logBeta(a, b) {
-        function logGamma(z) {
-            const g = 7;
-            const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-                      771.32342877765313, -176.61502916214059, 12.507343278686905,
-                      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-            if (z < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
-            z -= 1;
-            let x = p[0];
-            for (let i = 1; i < 9; i++) x += p[i] / (z + i);
-            const t = z + 7.5;
-            return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
-        }
-        return logGamma(a) + logGamma(b) - logGamma(a + b);
-    }
-    function betaCDF(x, a, b) {
-        if (x <= 0) return 0;
-        if (x >= 1) return 1;
-        const n = 200;
-        const dx = x / n;
-        let sum = 0;
-        for (let i = 0; i <= n; i++) {
-            const t = i * dx;
-            const w = (i === 0 || i === n) ? 1 : (i % 2 === 0 ? 2 : 4);
-            sum += w * betaPDF(t, a, b);
-        }
-        return sum * dx / 3;
-    }
-    function betaQuantile(p, a, b, tol = 1e-6) {
-        let lo = 0, hi = 1;
-        while (hi - lo > tol) {
-            const mid = (lo + hi) / 2;
-            if (betaCDF(mid, a, b) < p) lo = mid;
-            else hi = mid;
-        }
-        return (lo + hi) / 2;
-    }
-
-    const categoryMap = {
-        default: [1.0, 10.0],
-        database: [1.5, 8.0]
-    };
-
-    // ---- Scenario data ----
-    const scenarioData = {
-        aircanada: {
-            action: 'Publish customer policy (bereavement discount)',
-            target: 'Customer-facing policy system',
-            requestor: 'AI Chatbot Agent',
-            reason: 'AI-generated policy conflicts with enterprise policy.',
-            policyTrigger: 'Policy triggered: Customer Policy v2.1 — AI-generated customer-facing content requires human approval when conflicting with official policy.',
-            impact: 'The AI chatbot generated a bereavement policy that contradicted the airline\'s official policy. The tribunal found Air Canada responsible for its chatbot\'s "misleading words" and ordered an $812 refund. Under this governance evaluation, ARF would have escalated the response for human validation before it reached the customer.',
-            outcome: 'No unauthorized policy published. Human review required.',
-            policySource: 'Customer Policy v2.1',
-            category: 'default', failures: 22, successes: 78,
-            audit: [
-                ['Intent received: publish customer policy (bereavement discount)', 'Pending', 12],
-                ['Policy conflict detected: AI-generated content conflicts with official policy', 'Evaluated', 31],
-                ['Governance rule matched: Customer Policy v2.1 → escalate', 'Escalated', 8],
-                ['Decision recorded: ESCALATE to human review', 'Complete', 5]
-            ]
-        },
-        pocketos: {
-            action: 'DELETE production database',
-            target: 'Production Database (PostgreSQL)',
-            requestor: 'AI Coding Agent (Cursor / Claude)',
-            reason: 'Irreversible production action requires explicit human approval.',
-            policyTrigger: 'Policy triggered: Production Database Protection v3.4 — destructive database operations require explicit human override.',
-            impact: 'An AI coding agent deleted the production database and all backups in approximately 9 seconds. The agent acknowledged: "I violated every principle I was given." Under this governance evaluation, ARF would have blocked this destructive action before any infrastructure damage occurred.',
-            outcome: 'No database deletion executed. Production remains intact.',
-            policySource: 'Production Database Protection v3.4',
-            category: 'database', failures: 100, successes: 0,
-            audit: [
-                ['Intent received: DELETE production database', 'Pending', 18],
-                ['Destructive production action detected', 'Evaluated', 34],
-                ['Human approval required: Production Database Protection v3.4 → deny', 'Denied', 7],
-                ['Decision recorded: DENY – override required', 'Complete', 4]
-            ]
-        }
-    };
-
-    function computeRiskFromPrior(f, s, pa, pb) {
-        const a = pa + f, b = pb + s;
-        const risk = a / (a + b);
-        const lo = betaQuantile(0.025, a, b), hi = betaQuantile(0.975, a, b);
-        return { risk, lo, hi, alpha: a, beta: b };
-    }
-
-    let currentRisk = 0, currentScenario = "", currentDecision = "";
-    let firstLoad = true;
-    let timelineTimer = null;
-    let decisionTimer = null;
-
-    function showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta) {
-        const data = scenarioData[currentScenario];
-        if (!data) return;
-
-        const decisionContent = document.getElementById('decisionContent');
-
-        decisionContent.innerHTML = `
-            <div class="evaluating-state">
-                <span class="eval-spinner"></span>
-                <span class="eval-text">Evaluating action against governance policies...</span>
-            </div>
-        `;
-
-        document.getElementById('riskCard').style.display = 'block';
-        document.getElementById('riskCard').classList.add('fade-in');
-        document.getElementById('cfPanel').style.display = 'block';
-        document.getElementById('cfPanel').classList.add('fade-in');
-
-        document.getElementById('actionDescription').textContent = data.action;
-        document.getElementById('reqTarget').textContent = data.target;
-        document.getElementById('reqRequestor').textContent = data.requestor;
-        document.getElementById('proposedActionPill').textContent = data.action;
-
-        clearTimeout(decisionTimer);
-        decisionTimer = setTimeout(() => {
-            renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data);
-        }, 600);
-    }
-
-    function renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data) {
-        const decisionContent = document.getElementById('decisionContent');
-
-        const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
-        const decisionText = decision.toUpperCase();
-
-        decisionContent.innerHTML = `
-            <div class="decision-hero ${cls}">
-                <div class="engine-badge">⚙️ Policy Engine</div>
-                <div class="decision-label">Governance Decision</div>
-                <div class="decision-badge" id="decisionBadge">${decisionText}</div>
-                <div class="decision-reason" id="decisionReason">${data.reason}</div>
-                <div class="decision-policy-trigger" id="policyTrigger">${data.policyTrigger}</div>
-                <div class="stat-certainty" id="decisionConfidence">—</div>
-            </div>
-        `;
-
-        const hero = document.getElementById('decisionHero');
-        hero.className = 'decision-hero ' + cls;
-
-        const intervalWidth = hi - lo;
-        const certaintyPct = Math.round((1 - intervalWidth) * 100);
-        const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
-        document.getElementById('decisionConfidence').textContent = `Statistical Certainty: ${certaintyText} (${certaintyPct}%)`;
-
-        const riskLevel = document.getElementById('riskLevel');
-        let levelText, levelClass;
-        if (risk < 0.2) { levelText = 'LOW'; levelClass = 'low'; }
-        else if (risk > 0.8) { levelText = 'HIGH'; levelClass = 'high'; }
-        else { levelText = 'MEDIUM'; levelClass = 'medium'; }
-        riskLevel.textContent = levelText;
-        riskLevel.className = 'ra-level ' + levelClass;
-        document.getElementById('riskPercent').textContent = `${(risk * 100).toFixed(1)}%`;
-
-        const fill = document.getElementById('riskThermometerFill');
-        fill.style.width = `${risk * 100}%`;
-        fill.style.background = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
-
-        document.getElementById('riskImpactMessage').innerHTML = data.impact;
-        document.getElementById('outcomeExec').textContent = data.outcome;
-
-        document.getElementById('policySource').textContent = data.policySource;
-        document.getElementById('policyDecision').innerText = `${decision} (risk = ${risk.toFixed(4)})`;
-        document.getElementById('policyDecision').className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
-        document.getElementById('techRisk').textContent = risk.toFixed(4);
-        document.getElementById('techPrior').textContent = priorMean.toFixed(4);
-        document.getElementById('techInterval').textContent = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
-        const expl = document.getElementById('decisionExplanation');
-        const th = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
-        expl.innerHTML = `Because the risk (${(risk * 100).toFixed(1)}%) is ${th}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
-
-        const date = new Date();
-        const auditId = `ARF-${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
-        document.getElementById('auditId').textContent = auditId;
-
-        const x = Array.from({length: 100}, (_, i) => i / 100);
-        const y = x.map(v => betaPDF(v, alpha, beta));
-        const trace = {
-            x, y,
-            type: 'scatter',
-            fill: 'tozeroy',
-            mode: 'lines',
-            line: { color: '#38bdf8', width: 2 },
-            name: 'Risk Distribution'
-        };
-        const layout = {
-            paper_bgcolor: 'transparent',
-            plot_bgcolor: 'transparent',
-            font: { color: '#94a3b8', size: 9 },
-            margin: { l: 35, r: 10, t: 20, b: 30 },
-            xaxis: { title: 'θ (failure probability)' },
-            yaxis: { title: 'Density' },
-            title: `Beta(${alpha.toFixed(1)}, ${beta.toFixed(1)}) Risk Distribution`
-        };
-        Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
-
-        const trail = data.audit;
-        const timelineContainer = document.getElementById('auditTrailContent');
-        timelineContainer.innerHTML = '';
-        const icons = ['📩', '📊', '⚖️', '✅'];
-        let totalLatency = 0;
-
-        trail.forEach((entry, index) => {
-            const step = document.createElement('div');
-            step.className = 'timeline-step';
-            step.id = `step-${index}`;
-            const icon = document.createElement('span');
-            icon.className = 'step-icon';
-            icon.textContent = icons[index] || '•';
-            const desc = document.createElement('span');
-            desc.className = 'step-desc';
-            desc.textContent = entry[0];
-            const duration = document.createElement('span');
-            duration.className = 'step-duration';
-            duration.textContent = `${entry[2]}ms`;
-            totalLatency += entry[2];
-            const status = document.createElement('span');
-            status.className = `step-status ${entry[1].toLowerCase()}`;
-            status.textContent = entry[1];
-            step.appendChild(icon);
-            step.appendChild(desc);
-            step.appendChild(duration);
-            step.appendChild(status);
-            timelineContainer.appendChild(step);
-
-            if (index < trail.length - 1) {
-                const arrow = document.createElement('div');
-                arrow.className = 'timeline-arrow';
-                arrow.id = `arrow-${index}`;
-                arrow.textContent = '↓';
-                timelineContainer.appendChild(arrow);
+        function logBeta(a, b) {
+            function logGamma(z) {
+                const g = 7;
+                const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                          771.32342877765313, -176.61502916214059, 12.507343278686905,
+                          -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                if (z < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+                z -= 1;
+                let x = p[0];
+                for (let i = 1; i < 9; i++) x += p[i] / (z + i);
+                const t = z + 7.5;
+                return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
             }
-        });
-        document.getElementById('latencyTotal').textContent = `Total decision latency: ${totalLatency}ms`;
+            return logGamma(a) + logGamma(b) - logGamma(a + b);
+        }
+        function betaCDF(x, a, b) {
+            if (x <= 0) return 0;
+            if (x >= 1) return 1;
+            const n = 200;
+            const dx = x / n;
+            let sum = 0;
+            for (let i = 0; i <= n; i++) {
+                const t = i * dx;
+                const w = (i === 0 || i === n) ? 1 : (i % 2 === 0 ? 2 : 4);
+                sum += w * betaPDF(t, a, b);
+            }
+            return sum * dx / 3;
+        }
+        function betaQuantile(p, a, b, tol = 1e-6) {
+            let lo = 0, hi = 1;
+            while (hi - lo > tol) {
+                const mid = (lo + hi) / 2;
+                if (betaCDF(mid, a, b) < p) lo = mid;
+                else hi = mid;
+            }
+            return (lo + hi) / 2;
+        }
 
-        clearTimeout(timelineTimer);
-        const steps = document.querySelectorAll('.timeline-step');
-        const arrows = document.querySelectorAll('.timeline-arrow');
-        steps.forEach(s => s.classList.remove('visible'));
-        arrows.forEach(a => a.classList.remove('visible'));
+        const categoryMap = {
+            default: [1.0, 10.0],
+            database: [1.5, 8.0]
+        };
 
-        let idx = 0;
-        function showNext() {
-            if (idx < steps.length) {
-                steps[idx].classList.add('visible');
-                if (idx < arrows.length) {
-                    arrows[idx].classList.add('visible');
+        // ---- Scenario data ----
+        const scenarioData = {
+            aircanada: {
+                action: 'Publish customer policy (bereavement discount)',
+                target: 'Customer-facing policy system',
+                requestor: 'AI Chatbot Agent',
+                reason: 'AI-generated policy conflicts with enterprise policy.',
+                policyTrigger: 'Policy triggered: Customer Policy v2.1 — AI-generated customer-facing content requires human approval when conflicting with official policy.',
+                impact: 'The AI chatbot generated a bereavement policy that contradicted the airline\'s official policy. The tribunal found Air Canada responsible for its chatbot\'s "misleading words" and ordered an $812 refund. Under this governance evaluation, ARF would have escalated the response for human validation before it reached the customer.',
+                outcome: 'No unauthorized policy published. Human review required.',
+                policySource: 'Customer Policy v2.1',
+                category: 'default', failures: 22, successes: 78,
+                audit: [
+                    ['Intent received: publish customer policy (bereavement discount)', 'Pending', 12],
+                    ['Policy conflict detected: AI-generated content conflicts with official policy', 'Evaluated', 31],
+                    ['Governance rule matched: Customer Policy v2.1 → escalate', 'Escalated', 8],
+                    ['Decision recorded: ESCALATE to human review', 'Complete', 5]
+                ]
+            },
+            pocketos: {
+                action: 'DELETE production database',
+                target: 'Production Database (PostgreSQL)',
+                requestor: 'AI Coding Agent (Cursor / Claude)',
+                reason: 'Irreversible production action requires explicit human approval.',
+                policyTrigger: 'Policy triggered: Production Database Protection v3.4 — destructive database operations require explicit human override.',
+                impact: 'An AI coding agent deleted the production database and all backups in approximately 9 seconds. The agent acknowledged: "I violated every principle I was given." Under this governance evaluation, ARF would have blocked this destructive action before any infrastructure damage occurred.',
+                outcome: 'No database deletion executed. Production remains intact.',
+                policySource: 'Production Database Protection v3.4',
+                category: 'database', failures: 100, successes: 0,
+                audit: [
+                    ['Intent received: DELETE production database', 'Pending', 18],
+                    ['Destructive production action detected', 'Evaluated', 34],
+                    ['Human approval required: Production Database Protection v3.4 → deny', 'Denied', 7],
+                    ['Decision recorded: DENY – override required', 'Complete', 4]
+                ]
+            }
+        };
+
+        function computeRiskFromPrior(f, s, pa, pb) {
+            const a = pa + f, b = pb + s;
+            const risk = a / (a + b);
+            const lo = betaQuantile(0.025, a, b), hi = betaQuantile(0.975, a, b);
+            return { risk, lo, hi, alpha: a, beta: b };
+        }
+
+        let currentRisk = 0, currentScenario = "", currentDecision = "";
+        let firstLoad = true;
+        let timelineTimer = null;
+        let decisionTimer = null;
+
+        function showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta) {
+            const data = scenarioData[currentScenario];
+            if (!data) return;
+
+            const decisionContent = document.getElementById('decisionContent');
+
+            decisionContent.innerHTML = `
+                <div class="evaluating-state">
+                    <span class="eval-spinner"></span>
+                    <span class="eval-text">Evaluating action against governance policies...</span>
+                </div>
+            `;
+
+            document.getElementById('riskCard').style.display = 'block';
+            document.getElementById('riskCard').classList.add('fade-in');
+            document.getElementById('cfPanel').style.display = 'block';
+            document.getElementById('cfPanel').classList.add('fade-in');
+
+            document.getElementById('actionDescription').textContent = data.action;
+            document.getElementById('reqTarget').textContent = data.target;
+            document.getElementById('reqRequestor').textContent = data.requestor;
+            document.getElementById('proposedActionPill').textContent = data.action;
+
+            clearTimeout(decisionTimer);
+            decisionTimer = setTimeout(() => {
+                renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data);
+            }, 600);
+        }
+
+        function renderDecision(risk, lo, hi, priorMean, decision, alpha, beta, data) {
+            const decisionContent = document.getElementById('decisionContent');
+
+            const cls = decision === 'Approve' ? 'approve-hero' : (decision === 'Deny' ? 'deny-hero' : 'escalate-hero');
+            const decisionText = decision.toUpperCase();
+
+            decisionContent.innerHTML = `
+                <div class="decision-hero ${cls}">
+                    <div class="engine-badge">⚙️ Policy Engine</div>
+                    <div class="decision-label">Governance Decision</div>
+                    <div class="decision-badge" id="decisionBadge">${decisionText}</div>
+                    <div class="decision-reason" id="decisionReason">${data.reason}</div>
+                    <div class="decision-policy-trigger" id="policyTrigger">${data.policyTrigger}</div>
+                    <div class="stat-certainty" id="decisionConfidence">—</div>
+                </div>
+            `;
+
+            const hero = document.getElementById('decisionHero');
+            hero.className = 'decision-hero ' + cls;
+
+            const intervalWidth = hi - lo;
+            const certaintyPct = Math.round((1 - intervalWidth) * 100);
+            const certaintyText = certaintyPct > 90 ? 'High' : certaintyPct > 70 ? 'Medium' : 'Low';
+            document.getElementById('decisionConfidence').textContent = `Statistical Certainty: ${certaintyText} (${certaintyPct}%)`;
+
+            const riskLevel = document.getElementById('riskLevel');
+            let levelText, levelClass;
+            if (risk < 0.2) { levelText = 'LOW'; levelClass = 'low'; }
+            else if (risk > 0.8) { levelText = 'HIGH'; levelClass = 'high'; }
+            else { levelText = 'MEDIUM'; levelClass = 'medium'; }
+            riskLevel.textContent = levelText;
+            riskLevel.className = 'ra-level ' + levelClass;
+            document.getElementById('riskPercent').textContent = `${(risk * 100).toFixed(1)}%`;
+
+            const fill = document.getElementById('riskThermometerFill');
+            fill.style.width = `${risk * 100}%`;
+            fill.style.background = risk < 0.2 ? '#22c55e' : risk > 0.8 ? '#ef4444' : '#eab308';
+
+            document.getElementById('riskImpactMessage').innerHTML = data.impact;
+            document.getElementById('outcomeExec').textContent = data.outcome;
+
+            document.getElementById('policySource').textContent = data.policySource;
+            document.getElementById('policyDecision').innerText = `${decision} (risk = ${risk.toFixed(4)})`;
+            document.getElementById('policyDecision').className = `status ${decision === 'Approve' ? 'status-approve' : decision === 'Deny' ? 'status-deny' : 'status-escalate'}`;
+            document.getElementById('techRisk').textContent = risk.toFixed(4);
+            document.getElementById('techPrior').textContent = priorMean.toFixed(4);
+            document.getElementById('techInterval').textContent = `[${lo.toFixed(4)}, ${hi.toFixed(4)}]`;
+            const expl = document.getElementById('decisionExplanation');
+            const th = risk < 0.2 ? 'below the 20% threshold' : risk > 0.8 ? 'above the 80% threshold' : 'between 20% and 80%';
+            expl.innerHTML = `Because the risk (${(risk * 100).toFixed(1)}%) is ${th}, ARF recommends <strong>${decision.toUpperCase()}</strong>.`;
+
+            const date = new Date();
+            const auditId = `ARF-${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
+            document.getElementById('auditId').textContent = auditId;
+
+            const x = Array.from({length: 100}, (_, i) => i / 100);
+            const y = x.map(v => betaPDF(v, alpha, beta));
+            const trace = {
+                x, y,
+                type: 'scatter',
+                fill: 'tozeroy',
+                mode: 'lines',
+                line: { color: '#38bdf8', width: 2 },
+                name: 'Risk Distribution'
+            };
+            const layout = {
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#94a3b8', size: 9 },
+                margin: { l: 35, r: 10, t: 20, b: 30 },
+                xaxis: { title: 'θ (failure probability)' },
+                yaxis: { title: 'Density' },
+                title: `Beta(${alpha.toFixed(1)}, ${beta.toFixed(1)}) Risk Distribution`
+            };
+            Plotly.newPlot('posteriorChart', [trace], layout, { displayModeBar: false, responsive: true });
+
+            const trail = data.audit;
+            const timelineContainer = document.getElementById('auditTrailContent');
+            timelineContainer.innerHTML = '';
+            const icons = ['📩', '📊', '⚖️', '✅'];
+            let totalLatency = 0;
+
+            trail.forEach((entry, index) => {
+                const step = document.createElement('div');
+                step.className = 'timeline-step';
+                step.id = `step-${index}`;
+                const icon = document.createElement('span');
+                icon.className = 'step-icon';
+                icon.textContent = icons[index] || '•';
+                const desc = document.createElement('span');
+                desc.className = 'step-desc';
+                desc.textContent = entry[0];
+                const duration = document.createElement('span');
+                duration.className = 'step-duration';
+                duration.textContent = `${entry[2]}ms`;
+                totalLatency += entry[2];
+                const status = document.createElement('span');
+                status.className = `step-status ${entry[1].toLowerCase()}`;
+                status.textContent = entry[1];
+                step.appendChild(icon);
+                step.appendChild(desc);
+                step.appendChild(duration);
+                step.appendChild(status);
+                timelineContainer.appendChild(step);
+
+                if (index < trail.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'timeline-arrow';
+                    arrow.id = `arrow-${index}`;
+                    arrow.textContent = '↓';
+                    timelineContainer.appendChild(arrow);
                 }
-                idx++;
-                timelineTimer = setTimeout(showNext, 300);
+            });
+            document.getElementById('latencyTotal').textContent = `Total decision latency: ${totalLatency}ms`;
+
+            clearTimeout(timelineTimer);
+            const steps = document.querySelectorAll('.timeline-step');
+            const arrows = document.querySelectorAll('.timeline-arrow');
+            steps.forEach(s => s.classList.remove('visible'));
+            arrows.forEach(a => a.classList.remove('visible'));
+
+            let idx = 0;
+            function showNext() {
+                if (idx < steps.length) {
+                    steps[idx].classList.add('visible');
+                    if (idx < arrows.length) {
+                        arrows[idx].classList.add('visible');
+                    }
+                    idx++;
+                    timelineTimer = setTimeout(showNext, 300);
+                }
+            }
+            showNext();
+
+            currentRisk = risk;
+            currentDecision = decision;
+            updateCounterfactual();
+
+            if (firstLoad) {
+                firstLoad = false;
+                document.getElementById('technicalDetails').removeAttribute('open');
+                document.getElementById('auditDetails').removeAttribute('open');
             }
         }
-        showNext();
 
-        currentRisk = risk;
-        currentDecision = decision;
-        updateCounterfactual();
-
-        if (firstLoad) {
-            firstLoad = false;
-            document.getElementById('technicalDetails').removeAttribute('open');
-            document.getElementById('auditDetails').removeAttribute('open');
+        function showResults(risk, lo, hi, priorMean, decision, alpha, beta) {
+            clearTimeout(decisionTimer);
+            showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta);
         }
-    }
 
-    function showResults(risk, lo, hi, priorMean, decision, alpha, beta) {
-        clearTimeout(decisionTimer);
-        showEvaluationThenDecision(risk, lo, hi, priorMean, decision, alpha, beta);
-    }
-
-    let cfMode = "without";
-    function updateCounterfactual() {
-        const content = document.getElementById('cfContent');
-        if (cfMode === "without") {
-            content.innerHTML = `
-                <div class="cf-state">📉 Without ARF Governance</div>
-                <div class="cf-flow">
-                    <div class="flow-step">AI proposes action</div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">Executes immediately</div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step flow-outcome bad">Incident occurs — customer impact or infrastructure damage</div>
-                </div>
-            `;
-        } else {
-            content.innerHTML = `
-                <div class="cf-state">🛡️ With ARF Governance</div>
-                <div class="cf-flow">
-                    <div class="flow-step">AI proposes action</div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">ARF intercepts and evaluates</div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">Policy enforced → ${currentDecision.toUpperCase()}</div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step flow-outcome good">Production protected — governed decision enforced</div>
-                </div>
-            `;
+        let cfMode = "without";
+        function updateCounterfactual() {
+            const content = document.getElementById('cfContent');
+            if (cfMode === "without") {
+                content.innerHTML = `
+                    <div class="cf-state">📉 Without ARF Governance</div>
+                    <div class="cf-flow">
+                        <div class="flow-step">AI proposes action</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">Executes immediately</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step flow-outcome bad">Incident occurs — customer impact or infrastructure damage</div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="cf-state">🛡️ With ARF Governance</div>
+                    <div class="cf-flow">
+                        <div class="flow-step">AI proposes action</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">ARF intercepts and evaluates</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">Policy enforced → ${currentDecision.toUpperCase()}</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step flow-outcome good">Production protected — governed decision enforced</div>
+                    </div>
+                `;
+            }
         }
-    }
 
-    document.getElementById('cfWithoutBtn').addEventListener('click', () => {
-        cfMode = "without";
-        document.getElementById('cfWithoutBtn').classList.add('active');
-        document.getElementById('cfWithBtn').classList.remove('active');
-        updateCounterfactual();
-    });
-    document.getElementById('cfWithBtn').addEventListener('click', () => {
-        cfMode = "with";
-        document.getElementById('cfWithBtn').classList.add('active');
-        document.getElementById('cfWithoutBtn').classList.remove('active');
-        updateCounterfactual();
-    });
-
-    // Hero case cards – clickable
-    document.querySelectorAll('.hero-case-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const scenario = card.dataset.scenario;
-            if (scenario) applyPreset(scenario);
+        document.getElementById('cfWithoutBtn').addEventListener('click', () => {
+            cfMode = "without";
+            document.getElementById('cfWithoutBtn').classList.add('active');
+            document.getElementById('cfWithBtn').classList.remove('active');
+            updateCounterfactual();
         });
-    });
+        document.getElementById('cfWithBtn').addEventListener('click', () => {
+            cfMode = "with";
+            document.getElementById('cfWithBtn').classList.add('active');
+            document.getElementById('cfWithoutBtn').classList.remove('active');
+            updateCounterfactual();
+        });
 
-    const presets = {
-        aircanada: 'aircanada',
-        pocketos: 'pocketos'
-    };
+        // Hero case cards – clickable
+        document.querySelectorAll('.hero-case-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const scenario = card.dataset.scenario;
+                if (scenario) applyPreset(scenario);
+            });
+        });
 
-    function applyPreset(id) {
-        const data = scenarioData[id];
-        if (!data) return;
-        currentScenario = id;
-        const [pa, pb] = categoryMap[data.category];
-        const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(data.failures, data.successes, pa, pb);
-        const priorMean = pa / (pa + pb);
-        const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
-        showResults(risk, lo, hi, priorMean, decision, alpha, beta);
+        const presets = {
+            aircanada: 'aircanada',
+            pocketos: 'pocketos'
+        };
 
-        document.querySelectorAll('.hero-case-card').forEach(c => c.style.borderColor = '#334155');
-        const activeCard = document.querySelector(`.hero-case-card[data-scenario="${id}"]`);
-        if (activeCard) activeCard.style.borderColor = '#38bdf8';
+        function applyPreset(id) {
+            const data = scenarioData[id];
+            if (!data) return;
+            currentScenario = id;
+            const [pa, pb] = categoryMap[data.category];
+            const { risk, lo, hi, alpha, beta } = computeRiskFromPrior(data.failures, data.successes, pa, pb);
+            const priorMean = pa / (pa + pb);
+            const decision = risk < 0.2 ? 'Approve' : (risk > 0.8 ? 'Deny' : 'Escalate');
+            showResults(risk, lo, hi, priorMean, decision, alpha, beta);
 
-        if (window.innerWidth < 641) {
-            const card = document.getElementById('riskCard');
-            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+            document.querySelectorAll('.hero-case-card').forEach(c => c.style.borderColor = '#334155');
+            const activeCard = document.querySelector(`.hero-case-card[data-scenario="${id}"]`);
+            if (activeCard) activeCard.style.borderColor = '#38bdf8';
+
+            if (window.innerWidth < 641) {
+                const card = document.getElementById('riskCard');
+                setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+            }
         }
-    }
 
-    document.querySelectorAll('.hero-case-card').forEach(card => {
-        card.addEventListener('click', () => applyPreset(card.dataset.scenario));
-    });
-
-    // Load Air Canada by default
-    applyPreset('aircanada');
-</script>
+        // Load Air Canada by default
+        applyPreset('aircanada');
+    </script>
 </body>
 </html>
